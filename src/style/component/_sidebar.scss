@@ -1,0 +1,16 @@
+.sidebar{
+  position: relative;
+  overflow-y: auto;
+  background: #f3f3f3;
+  flex: none;
+  width: 18rem;
+  height: 100vh;
+  @media (max-width:900px){
+    display: none;
+  }
+  &-footer{
+    width: inherit;
+    bottom: 0;
+    position: absolute;
+  }
+}
