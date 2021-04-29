@@ -21,7 +21,7 @@ export default createStore({
       const page = {
         id: new Date().getTime().toString(),
         name: 'untitle',
-        ParentID: '',
+        contain: [],
       };
       state.pages.push(page);
     },
@@ -33,12 +33,13 @@ export default createStore({
     },
     addBlock(state, typeName) {
       if (state.currentPageId === '') return;
+      const id = new Date().getTime().toString();
       const block = {
-        id: new Date().getTime().toString(),
+        id,
         content: '',
         type: typeName,
-        parentID: state.currentPageId,
       };
+      stateFind(state.pages, state.currentPageId).contain.push(id);
       state.blocks.push(block);
     },
     addP(state) {
@@ -47,9 +48,9 @@ export default createStore({
         id,
         content: '',
         type: 'p',
-        parentID: state.currentPageId,
       };
       state.blocks.push(block);
+      stateFind(state.pages, state.currentPageId).contain.push(id);
       state.currentFocusBlockId = '';
     },
     editBlockData(state, { id, value }) {
@@ -59,10 +60,12 @@ export default createStore({
     changeFocusBlock(state, id) {
       state.currentFocusBlockId = id;
     },
-    deleteBlock(state, block) { // 感覺就出錯了
+    deleteBlock(state, block) {
       if (block.id === state.currentFocusBlockId) {
         console.log(block.id);
         state.blocks = state.blocks.filter((item) => item.id !== block.id);
+        const currentPage = stateFind(state.pages, state.currentPageId);
+        currentPage.contain = currentPage.contain.filter((itemId) => itemId !== block.id);
       }
     },
 
@@ -82,15 +85,16 @@ export default createStore({
     currentPage(state) {
       return stateFind(state.pages, state.currentPageId);
     },
-    currentBlocks(state) {
-      return state.blocks.filter((block) => block.parentID === state.currentPageId);
-    },
-    currentBlocksNum(state, getters) {
-      return getters.currentBlocks.length;
+    currentBlocks(state, getters) {
+      return getters.currentPage.contain.map((itemId) => stateFind(state.blocks, itemId));
+      // return state.blocks.filter((block) => block.parentID === state.currentPageId);
     },
     currentFocusBlock(state, getters) {
       return stateFind(getters.currentBlocks, state.currentFocusBlockId);
     },
+    // currentBlocksNum(state, getters) {
+    //   return getters.currentBlocks.length;
+    // },
   },
   actions: {
     getAllData(store, collection) {
