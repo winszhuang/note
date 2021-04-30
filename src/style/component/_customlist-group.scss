@@ -50,7 +50,7 @@
     z-index: 1; // Place hover/focus items above their siblings for proper border styling
     color: $list-group-action-hover-color;
     text-decoration: none;
-    background-color: $list-group-hover-bg;
+    background-color: #e0e0e0;
   }
 
   &:active {
@@ -61,5 +61,6 @@
 
 // 單個list裡面的文字
 .customlist-item {
-  padding: 0 .4rem;
+  padding: 0 .25rem;
+  color: #6b6b6b;
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="sidebar">
       <UserInfo/>
-      <div class="customlist-group bb">
+      <div class="customlist-group bb" ref="list">
         <div class="customlist-group-item customlist-group-item-action"
               type="button"
               v-for="item in pages"
@@ -9,13 +9,25 @@
               @click="goCurrentPage(item.id)"
         >
           <div class="customlist-item">
-            <font-awesome-icon icon="angle-double-right" />
+            <font-awesome-icon icon="caret-right" class="caret-right"/>
+          </div>
+          <div class="customlist-item">
+            <font-awesome-icon :icon="['far', 'file']"/>
           </div>
           <div class="customlist-item">{{ item.name }}</div>
+          <div class="customlist-item ms-auto">
+            <font-awesome-icon :icon="['fas', 'ellipsis-h']" style="color: #999999" size="sm"/>
+          </div>
+          <div class="customlist-item">
+            <font-awesome-icon :icon="['far', 'plus-square']" style="color: #999999"/>
+          </div>
         </div>
         <div class="customlist-group-item customlist-group-item-action"
+          type="button"
           @click="addPage"
-        >+ 增加頁面</div>
+        >
+        + <div class="ms-2">增加頁面</div>
+        </div>
       </div>
       <div class="customlist-group bb">
         <div class="customlist-group-item customlist-group-item-action"
@@ -31,7 +43,7 @@
         </div>
       </div>
       <div class="sidebar-footer">
-        <div class="addpage" type="button">
+        <div class="addpage" type="button" @click="addPage">
           <div class="addpage-text">+ 新頁面</div>
         </div>
       </div>
@@ -40,7 +52,7 @@
 
 <script>
 import { useStore } from 'vuex';
-import { toRefs } from 'vue';
+import { toRefs, ref } from 'vue';
 import UserInfo from './UserInfo.vue';
 
 export default {
@@ -48,6 +60,7 @@ export default {
   components: { UserInfo },
   setup() {
     const store = useStore();
+    const list = ref(null);
     // onBeforeMount(() => { // 開發階段先不打開
     //   store.dispatch('getAllData', 'pages');
     //   store.dispatch('getAllData', 'blocks');
@@ -74,6 +87,7 @@ export default {
       addPage,
       goCurrentPage,
       addBlock,
+      list,
     };
   },
 };
@@ -107,5 +121,8 @@ export default {
 }
 .bb{
   border-bottom: .02rem solid #e4e4e4;
+}
+.caret-right{
+  margin-right: .3rem;
 }
 </style>

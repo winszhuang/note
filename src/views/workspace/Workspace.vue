@@ -77,7 +77,9 @@ export default {
     const currentIndexofContain = computed(() => store.getters.currentIndexofContain);
     const { editPageData } = commonUpdateEffect();
     const { getFirstToUpper } = commonEffect();
-    const { pages, blocks, currentFocusBlockId } = toRefs(store.state);
+    const {
+      currentFocusBlockId, // pages, blocks,
+    } = toRefs(store.state);
 
     const content = ref(null);
 
@@ -91,36 +93,36 @@ export default {
       },
     );
 
-    watch( // 監聽state中的pages資料被更新就馬上更新到FS
-      () => pages.value,
-      (currData) => {
-        store.dispatch('updateToFs', {
-          collectionName: 'pages',
-          data: currData,
-        });
-      },
-      { deep: true },
-    );
+    // watch( // 監聽state中的pages資料被更新就馬上更新到FS
+    //   () => pages.value,
+    //   (currData) => {
+    //     store.dispatch('updateToFs', {
+    //       collectionName: 'pages',
+    //       data: currData,
+    //     });
+    //   },
+    //   { deep: true },
+    // );
 
-    watch( // 監聽state中的blocks資料被更新就馬上更新到FS
-      () => blocks.value,
-      (currData, prevData) => {
-        // console.log(currData);
-        // 如果數據量比原本的多或者不變，就是新增或者編輯
-        if (currData.length >= prevData.length) {
-          store.dispatch('updateToFs', {
-            collectionName: 'blocks',
-            data: currData,
-          });
-        // 如果數據量比原本的少，就是刪除
-        } else {
-          store.dispatch('deleteToFs', {
-            collectionName: 'blocks',
-          });
-        }
-      },
-      { deep: true },
-    );
+    // watch( // 監聽state中的blocks資料被更新就馬上更新到FS
+    //   () => blocks.value,
+    //   (currData, prevData) => {
+    //     // console.log(currData);
+    //     // 如果數據量比原本的多或者不變，就是新增或者編輯
+    //     if (currData.length >= prevData.length) {
+    //       store.dispatch('updateToFs', {
+    //         collectionName: 'blocks',
+    //         data: currData,
+    //       });
+    //     // 如果數據量比原本的少，就是刪除
+    //     } else {
+    //       store.dispatch('deleteToFs', {
+    //         collectionName: 'blocks',
+    //       });
+    //     }
+    //   },
+    //   { deep: true },
+    // );
 
     return {
       content,

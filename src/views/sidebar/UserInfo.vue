@@ -18,11 +18,11 @@ export default {
 .user{
   width: 100%;
   display: flex;
-  padding: 1.2rem 1rem .7rem 1rem;
+  padding: 1.2rem 1rem 1rem 1rem;
   border-bottom: .02rem solid #e4e4e4;
   margin-bottom: 1rem;
   &:hover{
-    background: #ebebeb;
+    background: #e0e0e0;
     // color: #787878;
   }
   &__icon{
@@ -48,7 +48,9 @@ export default {
       margin-left: .1rem;
       font-size: .2rem;
       transform: scale(50%);
-      color: #70bae4;
+      color: #7a7a7a;
+      text-decoration: underline;
+      text-decoration-color: #b8b8b8;
     }
   }
 }
