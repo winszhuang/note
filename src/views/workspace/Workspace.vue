@@ -11,7 +11,7 @@
       >
     </div>
     <hr>
-    <div class="content">
+    <div class="content" ref="content">
       <component
           :is="getFirstToUpper(block.type)"
           v-for="(block) in currentBlocks"
@@ -29,7 +29,8 @@
       <li>id ------ {{ currentPage.id }}</li>
     </ul>
     <hr> -->
-    <!-- <div v-if="currentFocusBlock">
+    <hr>
+    <div v-if="currentFocusBlock">
       <div>currentFocusBlockId: {{ currentFocusBlockId }}</div>
       <div>currentFocusBlock: </div>
       <ul>
@@ -38,7 +39,7 @@
         <li>id ------ {{ currentFocusBlock.id }}</li>
         <hr>
       </ul>
-    </div> -->
+    </div>
     <!-- <div>currentBlocks: </div>
     <div v-if="currentBlocks.length">
       <div
@@ -56,7 +57,9 @@
 </template>
 
 <script>
-import { computed, toRefs, watch } from 'vue';
+import {
+  computed, toRefs, watch, ref, nextTick,
+} from 'vue';
 import { useStore } from 'vuex';
 import commonEffect from '../commonEffect';
 import commonUpdateEffect from '../commonUpdataEffect';
@@ -71,11 +74,24 @@ export default {
     const currentBlocks = computed(() => store.getters.currentBlocks);
     const currentFocusBlock = computed(() => store.getters.currentFocusBlock);
     const currentBlocksNum = computed(() => store.getters.currentBlocksNum);
-    const { pages, blocks, currentFocusBlockId } = toRefs(store.state);
+    const currentIndexofContain = computed(() => store.getters.currentIndexofContain);
     const { editPageData } = commonUpdateEffect();
     const { getFirstToUpper } = commonEffect();
+    const { pages, blocks, currentFocusBlockId } = toRefs(store.state);
 
-    watch( // 監聽state中的資料被更新就馬上更新到FS
+    const content = ref(null);
+
+    watch( // 監聽是否切換到其他元素
+      currentFocusBlockId,
+      () => {
+        const index = currentIndexofContain.value;
+        nextTick(() => {
+          content.value.children.item(index).focus();
+        });
+      },
+    );
+
+    watch( // 監聽state中的pages資料被更新就馬上更新到FS
       () => pages.value,
       (currData) => {
         store.dispatch('updateToFs', {
@@ -85,7 +101,8 @@ export default {
       },
       { deep: true },
     );
-    watch( // 監聽state中的資料被更新就馬上更新到FS
+
+    watch( // 監聽state中的blocks資料被更新就馬上更新到FS
       () => blocks.value,
       (currData, prevData) => {
         // console.log(currData);
@@ -106,6 +123,7 @@ export default {
     );
 
     return {
+      content,
       currentPage,
       editPageData,
       currentBlocks,

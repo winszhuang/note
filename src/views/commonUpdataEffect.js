@@ -14,16 +14,15 @@ const commonUpdateEffect = () => {
       value,
     });
   };
-  const deleteBlock = () => {
-    store.commit('deleteBlock');
-  };
   const keydownHandle = (block, e) => {
     if (block.content === '' && e.keyCode === 8) {
-      store.commit('deleteBlock', block);
+      store.commit('deleteBlock');
     }
     if (e.keyCode === 13) {
-      store.commit('addP');
+      store.commit('addBlock', 'p');
     }
+    // if (block.id === store.state.currentFocusBlockId) {
+    // }
   };
   const getFocusBlock = (id) => {
     store.commit('changeFocusBlock', id);
@@ -31,7 +30,6 @@ const commonUpdateEffect = () => {
   return {
     editBlockData,
     editPageData,
-    deleteBlock,
     keydownHandle,
     getFocusBlock,
   };

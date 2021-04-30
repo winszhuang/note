@@ -40,7 +40,7 @@
 
 <script>
 import { useStore } from 'vuex';
-import { onBeforeMount, toRefs } from 'vue';
+import { toRefs } from 'vue';
 import UserInfo from './UserInfo.vue';
 
 export default {
@@ -48,11 +48,11 @@ export default {
   components: { UserInfo },
   setup() {
     const store = useStore();
-    onBeforeMount(() => {
-      store.dispatch('getAllData', 'pages');
-      store.dispatch('getAllData', 'blocks');
-      store.dispatch('getAllData', 'blocktype');
-    });
+    // onBeforeMount(() => { // 開發階段先不打開
+    //   store.dispatch('getAllData', 'pages');
+    //   store.dispatch('getAllData', 'blocks');
+    //   store.dispatch('getAllData', 'blocktype');
+    // });
 
     const { pages, blocks, blocktype } = toRefs(store.state);
 

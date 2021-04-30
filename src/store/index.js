@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+// import { nextTick } from 'vue';
 import { createStore } from 'vuex';
 import { db } from './db';
 
@@ -9,7 +10,28 @@ export default createStore({
   state: {
     pages: [],
     blocks: [],
-    blocktype: [],
+    blocktype: [
+      {
+        type: 'h1',
+        name: '大標題',
+      },
+      {
+        type: 'h2',
+        name: '中標題',
+      },
+      {
+        type: 'h3',
+        name: '小標題',
+      },
+      {
+        type: 'img',
+        name: '圖片',
+      },
+      {
+        type: 'p',
+        name: '文字片段',
+      },
+    ],
     currentPageId: '', // 存當前頁面id 不用放數據庫
     currentFocusBlockId: '',
   },
@@ -33,25 +55,22 @@ export default createStore({
     },
     addBlock(state, typeName) {
       if (state.currentPageId === '') return;
+      const isSelect = state.currentFocusBlockId !== '';
+      const currentPage = stateFind(state.pages, state.currentPageId);
       const id = new Date().getTime().toString();
       const block = {
         id,
         content: '',
         type: typeName,
       };
-      stateFind(state.pages, state.currentPageId).contain.push(id);
+      if (isSelect) {
+        const index = currentPage.contain.indexOf(state.currentFocusBlockId);
+        currentPage.contain.splice(index + 1, 0, id);
+      } else {
+        currentPage.contain.push(id);
+      }
       state.blocks.push(block);
-    },
-    addP(state) {
-      const id = new Date().getTime().toString();
-      const block = {
-        id,
-        content: '',
-        type: 'p',
-      };
-      state.blocks.push(block);
-      stateFind(state.pages, state.currentPageId).contain.push(id);
-      state.currentFocusBlockId = '';
+      state.currentFocusBlockId = id;
     },
     editBlockData(state, { id, value }) {
       if (state.currentPageId === '') return;
@@ -60,26 +79,13 @@ export default createStore({
     changeFocusBlock(state, id) {
       state.currentFocusBlockId = id;
     },
-    deleteBlock(state, block) {
-      if (block.id === state.currentFocusBlockId) {
-        console.log(block.id);
-        state.blocks = state.blocks.filter((item) => item.id !== block.id);
-        const currentPage = stateFind(state.pages, state.currentPageId);
-        currentPage.contain = currentPage.contain.filter((itemId) => itemId !== block.id);
-      }
+    deleteBlock(state) {
+      const currentPage = stateFind(state.pages, state.currentPageId);
+      const index = currentPage.contain.indexOf(state.currentFocusBlockId);
+      state.blocks = state.blocks.filter((item) => item.id !== state.currentFocusBlockId);
+      currentPage.contain.splice(index, 1);
+      state.currentFocusBlockId = currentPage.contain[index - 1];
     },
-
-    // updateCurrentPage(state, item) {
-    //   state.notes.forEach((page) => {
-    //     if (page.item === state.currentPageId) {
-    //       const notes = [...state.notes];
-    //       notes.page = item;
-    //       state.notes = notes;
-    //       console.log(state.notes.page);
-    //       console.log(state.notes);
-    //     }
-    //   });
-    // },
   },
   getters: {
     currentPage(state) {
@@ -92,9 +98,9 @@ export default createStore({
     currentFocusBlock(state, getters) {
       return stateFind(getters.currentBlocks, state.currentFocusBlockId);
     },
-    // currentBlocksNum(state, getters) {
-    //   return getters.currentBlocks.length;
-    // },
+    currentIndexofContain(state, getters) {
+      return getters.currentPage.contain.indexOf(state.currentFocusBlockId);
+    },
   },
   actions: {
     getAllData(store, collection) {

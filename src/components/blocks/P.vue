@@ -18,7 +18,9 @@ export default {
   setup() {
     const { editBlockData, getFocusBlock, keydownHandle } = commonUpdateEffect();
 
-    return { editBlockData, getFocusBlock, keydownHandle };
+    return {
+      editBlockData, getFocusBlock, keydownHandle,
+    };
   },
 };
 </script>
