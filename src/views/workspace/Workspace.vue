@@ -43,6 +43,12 @@
         </ul>
       </div>
     </div>
+    <hr>
+    <div v-for="item in pages" :key="item.id">
+      <div>id: {{ item.id }}</div>
+      <div>blocks: {{ item.blocks }}</div>
+      <h1></h1>
+    </div>
     <!-- <div>currentBlocks: </div>
     <div v-if="currentBlocks.length">
       <div
@@ -81,7 +87,7 @@ export default {
     const { editPageData } = commonUpdateEffect();
     const { getFirstToUpper } = commonEffect();
     const {
-      currentFocusBlockId, // pages, blocks,
+      currentFocusBlockId, pages, // pages, blocks,
     } = toRefs(store.state);
 
     const content = ref(null);
@@ -133,6 +139,7 @@ export default {
     // );
 
     return {
+      pages,
       content,
       currentPage,
       editPageData,

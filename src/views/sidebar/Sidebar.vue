@@ -3,6 +3,7 @@
 <template>
   <div class="sidebar">
       <UserInfo/>
+      <!-- {{ currentPage }} -->
       <div class="customlist-group bb">
         <CustomList
           v-for="item in rootPages"
@@ -82,6 +83,7 @@ export default {
       blocks,
       blocktype,
       addPage,
+      currentPage,
       currentPageId,
       currentPageIdOnMouse,
       addBlock,

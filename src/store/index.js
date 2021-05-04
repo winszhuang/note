@@ -74,7 +74,8 @@ export default createStore({
     },
     // 添加block到某page，須帶入參數含
     addBlock(state, { typeName, page, value }) { // 若typeName是page，value存新id
-      const newBlockId = new Date().getTime().toString();
+      const newBlockId = (new Date().getTime() + 3).toString();
+      // console.log(newBlockId);
       const newBlock = {
         id: newBlockId,
         content: value || '',
@@ -92,28 +93,6 @@ export default createStore({
       state.blocks.push(newBlock);
       state.currentFocusBlockId = newBlockId;
     },
-    // addIdtoBlocksOfPage(state, )
-    // addBlock(state, { typeName, value }) { // 若typeName是page，value存新id
-    //   const isSelect = state.currentFocusBlockId !== '';
-    //   const parentPageId = value || state.currentPageId;
-    //   console.log(parentPageId);
-    //   const currentPage = stateFind(state.pages, parentPageId);
-    //   const id = new Date().getTime().toString();
-    //   const block = {
-    //     id,
-    //     content: '',
-    //     type: typeName,
-    //   };
-    //   if (isSelect) {
-    //     const index = currentPage.blocks.indexOf(state.currentFocusBlockId);
-    //     currentPage.blocks.splice(index + 1, 0, id);
-    //   } else {
-    //     console.log(currentPage);
-    //     currentPage.blocks.push(id);
-    //   }
-    //   state.blocks.push(block);
-    //   state.currentFocusBlockId = id;
-    // },
     editBlockData(state, { id, value }) {
       if (state.currentPageId === '') return;
       stateFind(state.blocks, id).content = value;
@@ -122,11 +101,12 @@ export default createStore({
       state.currentFocusBlockId = id;
     },
     deleteBlock(state, { containPage, blockId }) {
+      console.log('containPage: ', containPage, 'blockId: ', blockId);
       const page = containPage || stateFind(state.pages, state.currentPageId);
       const thisBlockId = blockId || state.currentFocusBlockId;
       const index = page.blocks.indexOf(thisBlockId);
-      state.blocks = state.blocks.filter((item) => item.id !== thisBlockId);
       page.blocks.splice(index, 1);
+      state.blocks = state.blocks.filter((item) => item.id !== thisBlockId);
       if (state.currentFocusBlockId !== '') {
         state.currentFocusBlockId = page.blocks[index - 1];
       }
@@ -198,6 +178,8 @@ export default createStore({
     // 先創一個type是page的block，再把新創的page連結丟入此block的content
     addPageInside(store, parentPage) {
       const id = new Date().getTime().toString(); // 新的id
+      console.log('newPageId: ', id);
+      // console.log('newPageId: ',);
       store.commit('addPage', {
         id,
         parentPageId: parentPage.id,
@@ -208,15 +190,20 @@ export default createStore({
         value: id,
       });
     },
-    // 刪除某頁面
+    // 刪除某頁面 item是點擊刪除按鈕同行的page
     deletePageWithIcon(store, item) {
       if (item.parentId !== '') {
         store.commit('deleteBlock', {
-          containPage: item,
-          blockId: store.state.blocks.find((block) => block.content === item.id),
+          containPage: stateFind(store.state.pages, item.parentId),
+          blockId: store.state.blocks.find((block) => block.content === item.id).id,
         });
       }
       store.commit('deletePage', item);
+
+      const childrenPages = store.state.pages.filter((page) => page.parentId === item.id);
+      if (childrenPages && childrenPages.length !== 0) {
+        childrenPages.forEach((page) => store.dispatch('deletePageWithIcon', page));
+      }
     },
   },
   modules: {
