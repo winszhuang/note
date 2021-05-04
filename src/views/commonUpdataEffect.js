@@ -1,4 +1,5 @@
 import { useStore } from 'vuex';
+import { computed } from 'vue';
 
 const commonUpdateEffect = () => {
   const store = useStore();
@@ -19,19 +20,25 @@ const commonUpdateEffect = () => {
       store.commit('deleteBlock');
     }
     if (e.keyCode === 13) {
-      store.commit('addBlock', 'p');
+      const currentPage = computed(() => store.getters.currentPage);
+      store.commit('addBlock', {
+        typeName: 'p',
+        page: currentPage.value,
+      });
     }
-    // if (block.id === store.state.currentFocusBlockId) {
-    // }
   };
   const getFocusBlock = (id) => {
     store.commit('changeFocusBlock', id);
+  };
+  const goCurrentPage = (id) => {
+    store.commit('changeCurrentPage', id);
   };
   return {
     editBlockData,
     editPageData,
     keydownHandle,
     getFocusBlock,
+    goCurrentPage,
   };
 };
 

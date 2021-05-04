@@ -1,32 +1,19 @@
+/* eslint-disable prefer-const */
+/* eslint-disable no-restricted-syntax */
 <template>
   <div class="sidebar">
       <UserInfo/>
-      <div class="customlist-group bb" ref="list">
+      <div class="customlist-group bb">
+        <CustomList
+          v-for="item in rootPages"
+          :key="item.id"
+          :page="item"
+        />
         <div class="customlist-group-item customlist-group-item-action"
-              type="button"
-              v-for="item in pages"
-              :key="item.id"
-              @click="goCurrentPage(item.id)"
+            type="button"
+            @click="addPage"
         >
-          <div class="customlist-item">
-            <font-awesome-icon icon="caret-right" class="caret-right"/>
-          </div>
-          <div class="customlist-item">
-            <font-awesome-icon :icon="['far', 'file']"/>
-          </div>
-          <div class="customlist-item">{{ item.name }}</div>
-          <div class="customlist-item ms-auto">
-            <font-awesome-icon :icon="['fas', 'ellipsis-h']" style="color: #999999" size="sm"/>
-          </div>
-          <div class="customlist-item">
-            <font-awesome-icon :icon="['far', 'plus-square']" style="color: #999999"/>
-          </div>
-        </div>
-        <div class="customlist-group-item customlist-group-item-action"
-          type="button"
-          @click="addPage"
-        >
-        + <div class="ms-2">增加頁面</div>
+          + <div class="ms-2">增加頁面</div>
         </div>
       </div>
       <div class="customlist-group bb">
@@ -52,40 +39,51 @@
 
 <script>
 import { useStore } from 'vuex';
-import { toRefs, ref } from 'vue';
+import {
+  toRefs, ref, computed, // reactive
+} from 'vue';
 import UserInfo from './UserInfo.vue';
+import CustomList from '../../components/CustomList.vue';
 
 export default {
   name: 'Sidebar',
-  components: { UserInfo },
+  components: { UserInfo, CustomList },
   setup() {
     const store = useStore();
     const list = ref(null);
-    // onBeforeMount(() => { // 開發階段先不打開
-    //   store.dispatch('getAllData', 'pages');
-    //   store.dispatch('getAllData', 'blocks');
-    //   store.dispatch('getAllData', 'blocktype');
-    // });
-
-    const { pages, blocks, blocktype } = toRefs(store.state);
+    const currentPage = computed(() => store.getters.currentPage);
+    const rootPages = computed(() => store.getters.childrenPages(''));
+    const {
+      pages, blocks, blocktype, currentPageId, currentPageIdOnMouse,
+    } = toRefs(store.state);
 
     const addPage = () => {
-      store.commit('addPage');
-    };
-    const goCurrentPage = (id) => {
-      store.commit('changeCurrentPage', id);
+      store.commit('addPage', {});
     };
 
     const addBlock = (typeName) => {
-      store.commit('addBlock', typeName);
+      if (currentPageId.value === '') {
+        console.log('請先選擇頁面');
+        return;
+      }
+      if (typeName === 'page') {
+        store.dispatch('addPageInside', currentPage.value);
+      } else {
+        store.commit('addBlock', {
+          typeName,
+          page: currentPage.value,
+        });
+      }
     };
 
     return {
       pages,
+      rootPages,
       blocks,
       blocktype,
       addPage,
-      goCurrentPage,
+      currentPageId,
+      currentPageIdOnMouse,
       addBlock,
       list,
     };
@@ -101,11 +99,6 @@ export default {
   top: 0;
   width: 1rem;
 }
-.customlist-group{
-  padding-bottom: 1rem;
-  margin-bottom: 1rem;
-  overflow: auto;
-}
 .addpage{
   width: 100%;
   line-height: 2.5rem;
@@ -119,10 +112,8 @@ export default {
     color: #787878;
   }
 }
-.bb{
-  border-bottom: .02rem solid #e4e4e4;
-}
 .caret-right{
   margin-right: .3rem;
 }
+
 </style>

@@ -1,11 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
+import Workspace from '../views/workspace/Workspace.vue';
 
 const routes = [
   {
     path: '/',
     name: 'Home',
     component: Home,
+  },
+  {
+    path: '/:id',
+    name: 'Workspace',
+    component: Workspace,
   },
   // {
   //   path: '/about',

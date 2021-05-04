@@ -7,6 +7,7 @@ import H1 from './components/blocks/H1.vue';
 import H2 from './components/blocks/H2.vue';
 import H3 from './components/blocks/H3.vue';
 import Img from './components/blocks/Img.vue';
+import Page from './components/blocks/Page.vue';
 import P from './components/blocks/P.vue';
 import App from './App.vue';
 import router from './router';
@@ -25,6 +26,7 @@ createApp(App).component('font-awesome-icon', FontAwesomeIcon)
   .component('H3', H3)
   .component('P', P)
   .component('Img', Img)
+  .component('Page', Page)
   .use(store)
   .use(router)
   .mount('#app');

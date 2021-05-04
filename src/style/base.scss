@@ -4,3 +4,20 @@ input {
 html {
   font-size: 14px;
 }
+
+.pageblock{
+  &:hover{
+    text-decoration: underline;
+  }
+}
+
+.icon-button{
+  &:hover{
+    // border: .1rem solid #ebebeb;
+    background:#c7c7c7;
+  }
+}
+
+.bb{
+  border-bottom: .02rem solid #e4e4e4;
+}

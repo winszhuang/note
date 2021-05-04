@@ -3,6 +3,7 @@
     type="text"
     class="h2"
     placeholder="請輸入"
+    :id=block.id
     :value="block.content"
     @input="editBlockData(block.id, $event.target.value)"
     @keydown="keydownHandle(block, $event)"

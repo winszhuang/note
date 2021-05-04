@@ -1,44 +1,47 @@
 <template>
-  <div class="workspace" v-if="currentPage">
-    <Breadcrumb/>
-    <div class="title line-break">
-      <input class="h1"
-          style="font-weight: bold;"
-          type="text"
-          placeholder="請輸入標題"
-          :value="currentPage.name"
-          @input="editPageData('name', $event.target.value)"
-      >
-    </div>
+  <div class="workspace">
+    <template v-if="currentPage">
+      <Breadcrumb/>
+      <div class="title line-break">
+        <input class="h1"
+            style="font-weight: bold;"
+            type="text"
+            placeholder="請輸入標題"
+            :value="currentPage.name"
+            @input="editPageData('name', $event.target.value)"
+        >
+      </div>
+      <hr>
+      <div class="content" ref="content" v-if="currentBlocks">
+        <component
+            :is="getFirstToUpper(block.type)"
+            v-for="(block) in currentBlocks"
+            :key="block.id"
+            :block="block"
+            >
+        </component>
+      </div>
+    </template>
     <hr>
-    <div class="content" ref="content">
-      <component
-          :is="getFirstToUpper(block.type)"
-          v-for="(block) in currentBlocks"
-          :key="block.id"
-          :block="block"
-          >
-      </component>
-    </div>
-    {{ currentBlocksNum }}
-    <!-- <hr> -->
-    <!-- <div>currentPage: </div>
-    <ul>
-      <li>name ------ {{ currentPage.name }}</li>
-      <li>parentID ------ {{ currentPage.parentID }}</li>
-      <li>id ------ {{ currentPage.id }}</li>
-    </ul>
-    <hr> -->
-    <hr>
-    <div v-if="currentFocusBlock">
-      <div>currentFocusBlockId: {{ currentFocusBlockId }}</div>
-      <div>currentFocusBlock: </div>
+    <div v-if="currentPage">
+      <div>currentPage: </div>
       <ul>
-        <li>content ------ {{ currentFocusBlock.content }}</li>
-        <li>type ------ {{ currentFocusBlock.type }}</li>
-        <li>id ------ {{ currentFocusBlock.id }}</li>
-        <hr>
+        <li>name ------ {{ currentPage.name }}</li>
+        <li>blocks ------ {{ currentPage.blocks }}</li>
+        <li>parentID ------ {{ currentPage.parentId }}</li>
+        <li>id ------ {{ currentPage.id }}</li>
       </ul>
+      <hr>
+      <div v-if="currentFocusBlock">
+        <div>currentFocusBlockId: {{ currentFocusBlockId }}</div>
+        <div>currentFocusBlock: </div>
+        <ul>
+          <li>content ------ {{ currentFocusBlock.content }}</li>
+          <li>type ------ {{ currentFocusBlock.type }}</li>
+          <li>id ------ {{ currentFocusBlock.id }}</li>
+          <hr>
+        </ul>
+      </div>
     </div>
     <!-- <div>currentBlocks: </div>
     <div v-if="currentBlocks.length">
@@ -58,7 +61,7 @@
 
 <script>
 import {
-  computed, toRefs, watch, ref, nextTick,
+  computed, toRefs, ref, watch, nextTick,
 } from 'vue';
 import { useStore } from 'vuex';
 import commonEffect from '../commonEffect';
@@ -74,7 +77,7 @@ export default {
     const currentBlocks = computed(() => store.getters.currentBlocks);
     const currentFocusBlock = computed(() => store.getters.currentFocusBlock);
     const currentBlocksNum = computed(() => store.getters.currentBlocksNum);
-    const currentIndexofContain = computed(() => store.getters.currentIndexofContain);
+    // const indexOfCurrentBlock = computed(() => store.getters.indexOfCurrentBlock);
     const { editPageData } = commonUpdateEffect();
     const { getFirstToUpper } = commonEffect();
     const {
@@ -82,17 +85,22 @@ export default {
     } = toRefs(store.state);
 
     const content = ref(null);
-
-    watch( // 監聽是否切換到其他元素
-      currentFocusBlockId,
-      () => {
-        const index = currentIndexofContain.value;
-        nextTick(() => {
-          content.value.children.item(index).focus();
-        });
-      },
-    );
-
+    if (currentFocusBlockId) {
+      watch( // 監聽是否切換到其他元素
+        currentFocusBlockId,
+        () => {
+          // console.log(currentFocusBlockId.value);
+          // const index = indexOfCurrentBlock.value;
+          nextTick(() => {
+            if (!content.value) return;
+            const children = [...content.value.children];
+            if (!currentFocusBlockId.value) return;
+            children.find((e) => e.id === currentFocusBlockId.value).focus();
+            // content.value.children.item(index).focus();
+          });
+        },
+      );
+    }
     // watch( // 監聽state中的pages資料被更新就馬上更新到FS
     //   () => pages.value,
     //   (currData) => {
