@@ -1,10 +1,12 @@
 <template>
-  <div class="workspace">
-    <template v-if="currentPage">
-      <Breadcrumb/>
+  <div class="container" v-if="currentPage">
+    <div class="card-body">
+      <Breadcrumb :page="currentPage"/>
+    </div>
+    <div class="workspace">
       <div class="title line-break">
         <input class="h1"
-            style="font-weight: bold;"
+            style="font-weight: 900;"
             type="text"
             placeholder="請輸入標題"
             :value="currentPage.name"
@@ -13,55 +15,59 @@
       </div>
       <hr>
       <div class="content" ref="content" v-if="currentBlocks">
-        <component
-            :is="getFirstToUpper(block.type)"
-            v-for="(block) in currentBlocks"
-            :key="block.id"
-            :block="block"
-            >
-        </component>
+        <div class="d-flex"
+              v-for="(block) in currentBlocks"
+              :key="block.id"
+        >
+          <DragItem/>
+          <component
+              :is="getFirstToUpper(block.type)"
+              :block="block"
+              >
+          </component>
+        </div>
       </div>
-    </template>
-    <hr>
-    <div v-if="currentPage">
-      <div>currentPage: </div>
-      <ul>
-        <li>name ------ {{ currentPage.name }}</li>
-        <li>blocks ------ {{ currentPage.blocks }}</li>
-        <li>parentID ------ {{ currentPage.parentId }}</li>
-        <li>id ------ {{ currentPage.id }}</li>
-      </ul>
       <hr>
-      <div v-if="currentFocusBlock">
-        <div>currentFocusBlockId: {{ currentFocusBlockId }}</div>
-        <div>currentFocusBlock: </div>
+      <div v-if="currentPage">
+        <div>currentPage: </div>
         <ul>
-          <li>content ------ {{ currentFocusBlock.content }}</li>
-          <li>type ------ {{ currentFocusBlock.type }}</li>
-          <li>id ------ {{ currentFocusBlock.id }}</li>
-          <hr>
+          <li>name ------ {{ currentPage.name }}</li>
+          <li>blocks ------ {{ currentPage.blocks }}</li>
+          <li>parentID ------ {{ currentPage.parentId }}</li>
+          <li>id ------ {{ currentPage.id }}</li>
         </ul>
+        <hr>
+        <div v-if="currentFocusBlock">
+          <div>currentFocusBlockId: {{ currentFocusBlockId }}</div>
+          <div>currentFocusBlock: </div>
+          <ul>
+            <li>content ------ {{ currentFocusBlock.content }}</li>
+            <li>type ------ {{ currentFocusBlock.type }}</li>
+            <li>id ------ {{ currentFocusBlock.id }}</li>
+            <hr>
+          </ul>
+        </div>
       </div>
-    </div>
-    <hr>
-    <div v-for="item in pages" :key="item.id">
-      <div>id: {{ item.id }}</div>
-      <div>blocks: {{ item.blocks }}</div>
-      <h1></h1>
-    </div>
-    <!-- <div>currentBlocks: </div>
-    <div v-if="currentBlocks.length">
-      <div
-        v-for="block in currentBlocks"
-        :key="block.id">
-        <ul>
-          <li>content ------ {{ block.content }}</li>
-          <li>type ------ {{ block.type }}</li>
-          <li>id ------ {{ block.id }}</li>
-          <hr>
-        </ul>
+      <hr>
+      <div v-for="item in pages" :key="item.id">
+        <div>id: {{ item.id }}</div>
+        <div>blocks: {{ item.blocks }}</div>
+        <h1></h1>
       </div>
-    </div> -->
+      <!-- <div>currentBlocks: </div>
+      <div v-if="currentBlocks.length">
+        <div
+          v-for="block in currentBlocks"
+          :key="block.id">
+          <ul>
+            <li>content ------ {{ block.content }}</li>
+            <li>type ------ {{ block.type }}</li>
+            <li>id ------ {{ block.id }}</li>
+            <hr>
+          </ul>
+        </div>
+      </div> -->
+    </div>
   </div>
 </template>
 
@@ -73,22 +79,23 @@ import { useStore } from 'vuex';
 import commonEffect from '../commonEffect';
 import commonUpdateEffect from '../commonUpdataEffect';
 import Breadcrumb from './Breadcrumb.vue';
+import DragItem from '../../components/DragItem.vue';
 
 export default {
   name: 'Workspace',
-  components: { Breadcrumb },
+  components: { Breadcrumb, DragItem },
   setup() {
     const store = useStore();
     const currentPage = computed(() => store.getters.currentPage);
     const currentBlocks = computed(() => store.getters.currentBlocks);
     const currentFocusBlock = computed(() => store.getters.currentFocusBlock);
     const currentBlocksNum = computed(() => store.getters.currentBlocksNum);
-    // const indexOfCurrentBlock = computed(() => store.getters.indexOfCurrentBlock);
     const { editPageData } = commonUpdateEffect();
     const { getFirstToUpper } = commonEffect();
     const {
       currentFocusBlockId, pages, // pages, blocks,
     } = toRefs(store.state);
+      // const indexOfCurrentBlock = computed(() => store.getters.indexOfCurrentBlock);
 
     const content = ref(null);
     if (currentFocusBlockId) {
@@ -167,12 +174,13 @@ export default {
 }
 .workspace{
   flex-grow:1;
-  padding: 1rem 4rem 0 4rem;
+  padding: 1rem 15% 0 15%;
   overflow-y: auto;
-  position: absolute;
-  bottom: 0;
-  top: 0;
-  left: 18rem;
+  // position: absolute;
+  // bottom: 0;
+  // top: 2rem;
+  // left: 18rem;
+  // right: 0;
   @media (max-width:900px){
     left: 0;
   }
@@ -182,6 +190,7 @@ export default {
 }
 
 input, textarea{
+  background: transparent;
   border: none;
   outline: none;
   &:hover{

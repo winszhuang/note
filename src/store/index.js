@@ -28,6 +28,10 @@ export default createStore({
         name: '圖片',
       },
       {
+        type: 'video',
+        name: '影片',
+      },
+      {
         type: 'p',
         name: '文字片段',
       },
@@ -101,7 +105,6 @@ export default createStore({
       state.currentFocusBlockId = id;
     },
     deleteBlock(state, { containPage, blockId }) {
-      console.log('containPage: ', containPage, 'blockId: ', blockId);
       const page = containPage || stateFind(state.pages, state.currentPageId);
       const thisBlockId = blockId || state.currentFocusBlockId;
       const index = page.blocks.indexOf(thisBlockId);
@@ -116,6 +119,10 @@ export default createStore({
     // 回傳帶入的page的id所取得的所有子集pages ; 帶入''回傳根pages
     childrenPages(state) {
       return (id) => state.pages.filter((page) => page.parentId === id);
+    },
+    // 回傳帶入的page所取得的父page
+    parentPage(state) {
+      return (page) => stateFind(state.pages, page.parentId);
     },
     // 回傳帶入的某id所取得的page
     choosePage(state) {
@@ -178,7 +185,7 @@ export default createStore({
     // 先創一個type是page的block，再把新創的page連結丟入此block的content
     addPageInside(store, parentPage) {
       const id = new Date().getTime().toString(); // 新的id
-      console.log('newPageId: ', id);
+      // console.log('newPageId: ', id);
       // console.log('newPageId: ',);
       store.commit('addPage', {
         id,

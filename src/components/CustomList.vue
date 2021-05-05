@@ -6,9 +6,11 @@
       @mouseover="hoverHandle(page.id)"
       @mouseout="hoverHandle('')"
   >
-    <div :style="{ 'padding-left': `${count*12}px` }"></div> <!--調間距用-->
-    <div class="customlist-item">
-      <font-awesome-icon icon="caret-right" class="caret-right"/>
+    <div :style="{ 'padding-left': `${count*14}px` }"></div> <!--調間距用-->
+    <div class="customlist-item icon-button"
+        @click="toggleCollapse(page.id)"
+    >
+      <font-awesome-icon :icon="caretIcon"/>
     </div>
     <div class="customlist-item">
       <font-awesome-icon :icon="['far', 'file']"/>
@@ -28,7 +30,7 @@
     </div>
   </div>
 
-  <div v-if="childrenPages.length !== 0">
+  <div v-if="childrenPages.length !== 0" v-show="collapes">
     <CustomList
       v-for="item in childrenPages"
       :key="item.id"
@@ -43,13 +45,20 @@
 
 <script>
 import {
-  toRefs, computed, // onMounted
+  toRefs, computed, ref, // onMounted
 } from 'vue';
 import { useStore } from 'vuex';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  faCaretRight, faCaretDown,
+} from '@fortawesome/free-solid-svg-icons';
 import commonUpdateEffect from '../views/commonUpdataEffect';
 
 export default {
   name: 'CustomList',
+  components: {
+    FontAwesomeIcon,
+  },
   props: {
     page: {
       type: Object,
@@ -59,12 +68,13 @@ export default {
       default: 0,
     },
   },
-  // props: ['page', 'number'],
   setup(props) {
     const store = useStore();
     const childrenPages = computed(() => store.getters.childrenPages(props.page.id));
     const { currentPageId, currentPageIdOnMouse } = toRefs(store.state);
     const { goCurrentPage } = commonUpdateEffect();
+    const collapes = ref(true);
+    const caretIcon = computed(() => (collapes.value ? faCaretRight : faCaretDown));
 
     // eslint-disable-next-line vue/no-setup-props-destructure
     const count = props.number; // 用來指定目前page是第幾層
@@ -81,6 +91,12 @@ export default {
       store.dispatch('deletePageWithIcon', item);
     };
 
+    const toggleCollapse = (id) => {
+      collapes.value = !collapes.value;
+      console.log(collapes.value);
+      console.log(id);
+    };
+
     return {
       goCurrentPage,
       childrenPages,
@@ -90,6 +106,9 @@ export default {
       addPageInside,
       hoverHandle,
       count,
+      collapes,
+      caretIcon,
+      toggleCollapse,
     };
   },
 };

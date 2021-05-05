@@ -17,7 +17,7 @@ const commonUpdateEffect = () => {
   };
   const keydownHandle = (block, e) => {
     if (block.content === '' && e.keyCode === 8) {
-      store.commit('deleteBlock');
+      store.commit('deleteBlock', {});
     }
     if (e.keyCode === 13) {
       const currentPage = computed(() => store.getters.currentPage);
