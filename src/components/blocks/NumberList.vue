@@ -8,6 +8,9 @@
 <script>
 export default {
   name: 'NumberList',
+  props: ['block'],
+  setup() {
+  },
 };
 </script>
 

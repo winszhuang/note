@@ -1,13 +1,14 @@
 <template>
   <div class="customlist-group-item pageblock"
       type="button"
+      :data-pageid="block.content"
       :id=block.id
       @click="goCurrentPage(targetPage.id)"
   >
-    <div class="customlist-item">
+    <div class="customlist-item" :data-pageid="block.content">
       <font-awesome-icon :icon="['far', 'file']"/>
     </div>
-    <div class="customlist-item">
+    <div class="customlist-item" :data-pageid="block.content">
       {{ targetPage.name }}
     </div>
   </div>

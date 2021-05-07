@@ -8,8 +8,30 @@ const stateFind = (collection, id) => collection.find((item) => item.id === id);
 export default createStore({
   strict: true, // 正式上線的時候關掉
   state: {
-    pages: [],
-    blocks: [],
+    pages: [
+      {
+        id: '1111',
+        name: 'Javascript筆記',
+        blocks: [
+          '777',
+        ],
+        parentId: '',
+        cover: '',
+      },
+      {
+        id: '2222',
+        name: '旅遊規劃',
+        blocks: [],
+        parentId: '1111',
+      },
+    ],
+    blocks: [
+      {
+        id: '777',
+        content: '2222',
+        type: 'page',
+      },
+    ],
     blocktype: [
       {
         type: 'h1',
@@ -39,9 +61,14 @@ export default createStore({
         type: 'page',
         name: '頁面',
       },
+      {
+        type: 'numberList',
+        name: '順序列表',
+      },
     ],
     currentPageId: '', // 存當前頁面id 不用放數據庫
     currentPageIdOnMouse: '',
+    currentBlockIdOnMouse: '',
     currentFocusBlockId: '',
   },
   mutations: {
@@ -58,6 +85,7 @@ export default createStore({
         name: 'untitle',
         blocks: [],
         parentId: parentPageId || '',
+        cover: '',
       };
       // console.log(page.parentId);
       state.pages.push(page);
@@ -67,14 +95,18 @@ export default createStore({
       state.pages.splice(index, 1);
     },
 
-    editPageData(state, { property, value }) {
-      stateFind(state.pages, state.currentPageId)[property] = value;
+    editPageData(state, { property, value, pageId }) {
+      const editPageId = pageId || state.currentPageId;
+      stateFind(state.pages, editPageId)[property] = value;
     },
     changeCurrentPage(state, id) {
       state.currentPageId = id;
     },
     changeCurrentPageIdOnMouse(state, id) {
       state.currentPageIdOnMouse = id;
+    },
+    changeCurrentBlockIdOnMouse(state, id) {
+      state.currentBlockIdOnMouse = id;
     },
     // 添加block到某page，須帶入參數含
     addBlock(state, { typeName, page, value }) { // 若typeName是page，value存新id

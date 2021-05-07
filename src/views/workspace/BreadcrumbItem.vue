@@ -32,7 +32,8 @@ export default {
 
 <style lang="scss" scoped>
 .breadcrumb-item{
-  color: #6d6d6d;
+  color: #a0a0a0;
+  font-weight: 700;
 }
 .effect{
   &:hover{

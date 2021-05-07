@@ -16,5 +16,9 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+ol{
+  height: 100%;
+  margin-bottom: 0;
+}
 </style>

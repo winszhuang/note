@@ -1,33 +1,38 @@
 <template>
   <div class="container" v-if="currentPage">
-    <div class="card-body">
+    <div class="ps-1 pe-3 pt-3 pb-3">
       <Breadcrumb :page="currentPage"/>
     </div>
+    <div class="cover"
+        style="background-image: url(https://images.unsplash.com/photo-1496681859237-6039cd585c4e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80);"
+        @mouseover="hoverHandle(true)"
+        @mouseout="hoverHandle(false)"
+    >
+      <div class="cover-edit" v-show="isShowEditCoverButton">
+        <button type="button"
+              class="btn btn-transparent"
+              @click="editCoverCardHandle(true)"
+        >編輯圖片</button>
+      </div>
+    </div>
     <div class="workspace">
-      <div class="title line-break">
-        <input class="h1"
-            style="font-weight: 900;"
+      <div class="title bb-light">
+        <input class="title-input"
             type="text"
             placeholder="請輸入標題"
             :value="currentPage.name"
             @input="editPageData('name', $event.target.value)"
         >
       </div>
-      <hr>
+      <!-- <div class="ms-1 pageinfo">
+        <span>請輸入內容以描述本頁</span>
+      </div> -->
       <div class="content" ref="content" v-if="currentBlocks">
-        <div class="d-flex"
-              v-for="(block) in currentBlocks"
-              :key="block.id"
-        >
-          <DragItem/>
-          <component
-              :is="getFirstToUpper(block.type)"
-              :block="block"
-              >
-          </component>
-        </div>
+        <template v-for="(block) in currentBlocks" :key="block.id">
+          <Block :block="block"/>
+        </template>
       </div>
-      <hr>
+      <!-- <hr>
       <div v-if="currentPage">
         <div>currentPage: </div>
         <ul>
@@ -53,7 +58,7 @@
         <div>id: {{ item.id }}</div>
         <div>blocks: {{ item.blocks }}</div>
         <h1></h1>
-      </div>
+      </div> -->
       <!-- <div>currentBlocks: </div>
       <div v-if="currentBlocks.length">
         <div
@@ -76,14 +81,13 @@ import {
   computed, toRefs, ref, watch, nextTick,
 } from 'vue';
 import { useStore } from 'vuex';
-import commonEffect from '../commonEffect';
 import commonUpdateEffect from '../commonUpdataEffect';
 import Breadcrumb from './Breadcrumb.vue';
-import DragItem from '../../components/DragItem.vue';
+import Block from '../../components/Block.vue';
 
 export default {
   name: 'Workspace',
-  components: { Breadcrumb, DragItem },
+  components: { Block, Breadcrumb },
   setup() {
     const store = useStore();
     const currentPage = computed(() => store.getters.currentPage);
@@ -91,11 +95,23 @@ export default {
     const currentFocusBlock = computed(() => store.getters.currentFocusBlock);
     const currentBlocksNum = computed(() => store.getters.currentBlocksNum);
     const { editPageData } = commonUpdateEffect();
-    const { getFirstToUpper } = commonEffect();
     const {
       currentFocusBlockId, pages, // pages, blocks,
     } = toRefs(store.state);
       // const indexOfCurrentBlock = computed(() => store.getters.indexOfCurrentBlock);
+
+    const isShowEditCoverButton = ref(false);
+    const hoverHandle = (choose) => {
+      isShowEditCoverButton.value = choose;
+    };
+
+    const isShowEditCoverCard = ref(false);
+    const editCoverCardHandle = (choose) => {
+      isShowEditCoverCard.value = choose;
+    };
+    // const hoverHandle = (choose) => {
+    //   isShowEditImageCard.value = choose;
+    // };
 
     const content = ref(null);
     if (currentFocusBlockId) {
@@ -106,10 +122,16 @@ export default {
           // const index = indexOfCurrentBlock.value;
           nextTick(() => {
             if (!content.value) return;
-            const children = [...content.value.children];
             if (!currentFocusBlockId.value) return;
-            children.find((e) => e.id === currentFocusBlockId.value).focus();
-            // content.value.children.item(index).focus();
+
+            const children = [...content.value.children];
+            children.forEach((e) => {
+              const input = e.getElementsByTagName('input')[0];
+              if (!input) return;
+              if (input.id === currentFocusBlockId.value) {
+                input.focus();
+              }
+            });
           });
         },
       );
@@ -151,10 +173,13 @@ export default {
       currentPage,
       editPageData,
       currentBlocks,
-      getFirstToUpper,
       currentFocusBlockId,
       currentFocusBlock,
       currentBlocksNum,
+      hoverHandle,
+      isShowEditCoverButton,
+      isShowEditCoverCard,
+      editCoverCardHandle,
     };
   },
 };
@@ -169,12 +194,9 @@ export default {
     min-height: 50px;
   }
 }
-.line-break{
-  margin-bottom: 1rem;
-}
 .workspace{
   flex-grow:1;
-  padding: 1rem 15% 0 15%;
+  padding: 0 15% 0 15%;
   overflow-y: auto;
   // position: absolute;
   // bottom: 0;
@@ -184,9 +206,40 @@ export default {
   @media (max-width:900px){
     left: 0;
   }
+  @media (min-width:1100px){
+    padding: 0 20% 0 20%;
+  }
 }
 .title{
-  margin-top: 4rem;
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+  input{
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 700;
+    color: #464646;
+    font-size: 3rem;
+  }
+}
+.pageinfo{
+  color: #7c7c7c;
+}
+.cover{
+  position: relative;
+  height: 16rem;
+  background-size: cover;
+  background-origin: content-box;
+  margin: 0 -10.5px 0 -10.5px;
+  &-edit{
+    position: absolute;
+    right: 1rem;
+    bottom: .5rem;
+    button{
+      color: #f3f3f3;
+      background: rgba($color: #000000, $alpha: 0.3);
+    }
+  }
+  // &-input{
+  // }
 }
 
 input, textarea{
