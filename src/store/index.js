@@ -109,22 +109,27 @@ export default createStore({
       state.currentBlockIdOnMouse = id;
     },
     // 添加block到某page，須帶入參數含
-    addBlock(state, { typeName, page, value }) { // 若typeName是page，value存新id
-      const newBlockId = (new Date().getTime() + 3).toString();
-      // console.log(newBlockId);
+    addBlock(state, {
+      typeName, page, value, id, // 若typeName是page，value存新id
+    }) {
+      const newBlockId = id || (new Date().getTime() + 3).toString();
       const newBlock = {
         id: newBlockId,
         content: value || '',
         type: typeName,
       };
+
       // 此段處理block的id被加入某page中的blocks陣列裡的某位置
+      const thisPage = page || stateFind(state.pages, state.currentPageId);
       const isSelect = state.currentFocusBlockId !== '';
+
       if (isSelect) {
-        const index = page.blocks.indexOf(state.currentFocusBlockId);
-        page.blocks.splice(index + 1, 0, newBlockId);
+        const index = thisPage.blocks.indexOf(state.currentFocusBlockId);
+        thisPage.blocks.splice(index + 1, 0, newBlockId);
       } else {
-        page.blocks.push(newBlockId);
+        thisPage.blocks.push(newBlockId);
       }
+
       // 把新的block加入blocks裡面
       state.blocks.push(newBlock);
       state.currentFocusBlockId = newBlockId;
@@ -215,10 +220,10 @@ export default createStore({
 
     // 增加子頁面
     // 先創一個type是page的block，再把新創的page連結丟入此block的content
-    addPageInside(store, parentPage) {
+    addPageInside(store, page) {
+      const parentPage = page || store.getters.currentPage;
+
       const id = new Date().getTime().toString(); // 新的id
-      // console.log('newPageId: ', id);
-      // console.log('newPageId: ',);
       store.commit('addPage', {
         id,
         parentPageId: parentPage.id,

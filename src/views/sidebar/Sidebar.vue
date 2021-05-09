@@ -68,11 +68,15 @@ export default {
         return;
       }
       if (typeName === 'page') {
-        store.dispatch('addPageInside', currentPage.value);
+        store.dispatch('addPageInside');
+      } else if (typeName === 'numberList') {
+        store.commit('addBlock', {
+          typeName,
+          value: [],
+        });
       } else {
         store.commit('addBlock', {
           typeName,
-          page: currentPage.value,
         });
       }
     };

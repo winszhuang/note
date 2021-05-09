@@ -16,7 +16,7 @@
       </div>
     </div>
     <div class="workspace">
-      <div class="title bb-light">
+      <div class="title ">
         <input class="title-input"
             type="text"
             placeholder="請輸入標題"
@@ -24,23 +24,20 @@
             @input="editPageData('name', $event.target.value)"
         >
       </div>
-      <!-- <div class="ms-1 pageinfo">
-        <span>請輸入內容以描述本頁</span>
-      </div> -->
       <div class="content" ref="content" v-if="currentBlocks">
         <template v-for="(block) in currentBlocks" :key="block.id">
           <Block :block="block"/>
         </template>
       </div>
-      <!-- <hr>
+      <hr>
       <div v-if="currentPage">
-        <div>currentPage: </div>
+        <!-- <div>currentPage: </div>
         <ul>
           <li>name ------ {{ currentPage.name }}</li>
           <li>blocks ------ {{ currentPage.blocks }}</li>
           <li>parentID ------ {{ currentPage.parentId }}</li>
           <li>id ------ {{ currentPage.id }}</li>
-        </ul>
+        </ul> -->
         <hr>
         <div v-if="currentFocusBlock">
           <div>currentFocusBlockId: {{ currentFocusBlockId }}</div>
@@ -54,12 +51,12 @@
         </div>
       </div>
       <hr>
-      <div v-for="item in pages" :key="item.id">
+      <!-- <div v-for="item in pages" :key="item.id">
         <div>id: {{ item.id }}</div>
         <div>blocks: {{ item.blocks }}</div>
         <h1></h1>
       </div> -->
-      <!-- <div>currentBlocks: </div>
+      <div>currentBlocks: </div>
       <div v-if="currentBlocks.length">
         <div
           v-for="block in currentBlocks"
@@ -71,7 +68,7 @@
             <hr>
           </ul>
         </div>
-      </div> -->
+      </div>
     </div>
   </div>
 </template>

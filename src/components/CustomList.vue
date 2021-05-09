@@ -83,8 +83,8 @@ export default {
       store.commit('changeCurrentPageIdOnMouse', id);
     };
 
-    const addPageInside = (parentPage) => {
-      store.dispatch('addPageInside', parentPage);
+    const addPageInside = (page) => {
+      store.dispatch('addPageInside', page);
     };
 
     const deletePage = (item) => {
