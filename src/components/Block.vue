@@ -1,14 +1,19 @@
 <template>
-  <div class="position-relative d-flex"
-        @mouseover="hoverHandle(block.id)"
+  <div class="block"
+        @mouseover="hoverHandle(block.id, $event)"
         @mouseout="hoverHandle('')"
   >
-    <DragItem :block="block" v-show="isDragShow"/>
-    <component
-        :is="getFirstToUpper(block.type)"
-        :block="block"
-        >
-    </component>
+    <div class="block-indent"></div>
+    <div class="block-drag">
+      <DragItem :block="block" v-show="isDragShow"/>
+    </div>
+    <div>
+      <component
+          :is="getFirstToUpper(block.type)"
+          :block="block"
+          >
+      </component>
+    </div>
   </div>
 </template>
 
@@ -31,6 +36,7 @@ export default {
     const isDragShow = ref(false);
 
     const hoverHandle = (id) => {
+      // if (e) console.log(e.currentTarget);
       store.commit('changeCurrentBlockIdOnMouse', id);
       if (id === currentBlockIdOnMouse.value) {
         isDragShow.value = true;
@@ -52,3 +58,14 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+.block{
+  position: relative;
+  display: flex;
+  margin-left: -1.5rem;
+  &-drag{
+    width: 1.5rem;
+  }
+}
+</style>

@@ -4,6 +4,22 @@ import { createStore } from 'vuex';
 import { db } from './db';
 
 const stateFind = (collection, id) => collection.find((item) => item.id === id);
+const arrayDeleteByValue = (arr, value) => {
+  console.log(value);
+  const newArr = [...arr];
+  newArr.forEach((e) => {
+    console.log(e);
+  });
+  const index = newArr.indexOf(value);
+  console.log(index);
+  newArr.splice(index, 1);
+  return newArr;
+  // return newArr.splice(index, 1);
+};
+// const arrayDeleteByIndex = (arr, index) => {
+//   const newArr = [...arr];
+//   return newArr.splice(index, 1);
+// };
 
 export default createStore({
   strict: true, // 正式上線的時候關掉
@@ -12,26 +28,12 @@ export default createStore({
       {
         id: '1111',
         name: 'Javascript筆記',
-        blocks: [
-          '777',
-        ],
+        blocks: [],
         parentId: '',
         cover: '',
       },
-      {
-        id: '2222',
-        name: '旅遊規劃',
-        blocks: [],
-        parentId: '1111',
-      },
     ],
-    blocks: [
-      {
-        id: '777',
-        content: '2222',
-        type: 'page',
-      },
-    ],
+    blocks: [],
     blocktype: [
       {
         type: 'h1',
@@ -91,8 +93,7 @@ export default createStore({
       state.pages.push(page);
     },
     deletePage(state, item) {
-      const index = state.pages.indexOf(item);
-      state.pages.splice(index, 1);
+      state.pages = arrayDeleteByValue(state.pages, item);
     },
 
     editPageData(state, { property, value, pageId }) {
@@ -102,55 +103,54 @@ export default createStore({
     changeCurrentPage(state, id) {
       state.currentPageId = id;
     },
+    addBlock(state, item) {
+      state.blocks.push(item);
+    },
+    deleteBlock(state, item) {
+      const index = state.blocks.indexOf(item);
+      state.blocks.splice(index, 1);
+    },
     changeCurrentPageIdOnMouse(state, id) {
       state.currentPageIdOnMouse = id;
     },
     changeCurrentBlockIdOnMouse(state, id) {
       state.currentBlockIdOnMouse = id;
     },
-    // 添加block到某page，須帶入參數含
-    addBlock(state, {
-      typeName, page, value, id, // 若typeName是page，value存新id
-    }) {
-      const newBlockId = id || (new Date().getTime() + 3).toString();
-      const newBlock = {
-        id: newBlockId,
-        content: value || '',
-        type: typeName,
-      };
 
-      // 此段處理block的id被加入某page中的blocks陣列裡的某位置
-      const thisPage = page || stateFind(state.pages, state.currentPageId);
-      const isSelect = state.currentFocusBlockId !== '';
-
-      if (isSelect) {
-        const index = thisPage.blocks.indexOf(state.currentFocusBlockId);
-        thisPage.blocks.splice(index + 1, 0, newBlockId);
+    addIdToBlocksOfPage(state, { page, blockId, index }) {
+      if (index) {
+        page.blocks.splice(index, 0, blockId);
       } else {
-        thisPage.blocks.push(newBlockId);
+        page.blocks.push(blockId);
       }
-
-      // 把新的block加入blocks裡面
-      state.blocks.push(newBlock);
-      state.currentFocusBlockId = newBlockId;
     },
-    editBlockData(state, { id, value }) {
+    addIdToBlocksOfBlock(state, { block, blockId, index }) {
+      if (index) {
+        block.blocks.splice(index, 0, blockId);
+      } else {
+        block.blocks.push(blockId);
+      }
+    },
+    deleteIdToBlocksOfPage(state, { page, blockId }) {
+      const index = page.blocks.indexOf(blockId);
+      page.blocks.splice(index, 1);
+    },
+    deleteIdToBlocksOfBlock(state, { block, blockId }) {
+      const index = block.blocks.indexOf(blockId);
+      block.blocks.splice(index, 1);
+    },
+    editBlockData(state, { id, key = 'content', value }) {
       if (state.currentPageId === '') return;
-      stateFind(state.blocks, id).content = value;
+      stateFind(state.blocks, id)[key] = value;
     },
     changeFocusBlock(state, id) {
-      state.currentFocusBlockId = id;
-    },
-    deleteBlock(state, { containPage, blockId }) {
-      const page = containPage || stateFind(state.pages, state.currentPageId);
-      const thisBlockId = blockId || state.currentFocusBlockId;
-      const index = page.blocks.indexOf(thisBlockId);
-      page.blocks.splice(index, 1);
-      state.blocks = state.blocks.filter((item) => item.id !== thisBlockId);
-      if (state.currentFocusBlockId !== '') {
-        state.currentFocusBlockId = page.blocks[index - 1];
+      if (id) {
+        state.currentFocusBlockId = id;
+      } else {
+        state.currentFocusBlockId = '';
       }
     },
+
   },
   getters: {
     // 回傳帶入的page的id所取得的所有子集pages ; 帶入''回傳根pages
@@ -170,9 +170,17 @@ export default createStore({
       return stateFind(state.pages, state.currentPageId);
     },
     // 回傳當前page裡面包含的所有blocks
-    currentBlocks(state, getters) {
+    currentBlocks(state, getters) { // 這邊的問題 應該讓所有block(包含子block)單純放page裡面
       return getters.currentPage.blocks.map((itemId) => stateFind(state.blocks, itemId));
-      // return state.blocks.filter((block) => block.parentID === state.currentPageId);
+    },
+
+    // 回傳帶入的某id所取得的block
+    chooseBlock(state) {
+      return (id) => stateFind(state.blocks, id);
+    },
+    // 回傳帶入的block的id所取得的所有子集blocks ; 帶入''回傳當前頁有的根blocks
+    childrenCurrentBlocks(state, getters) {
+      return (id) => getters.currentBlocks.filter((block) => block.parentId === id);
     },
     // 回傳當前page裡面被選中的block
     currentFocusBlock(state, getters) {
@@ -228,18 +236,92 @@ export default createStore({
         id,
         parentPageId: parentPage.id,
       });
-      store.commit('addBlock', {
+      store.dispatch('addBlock', {
         typeName: 'page',
         page: parentPage,
         value: id,
       });
     },
+    // 添加block到某page，須帶入參數含
+    addBlock(store, {
+      page, typeName, value, id, blocks, parentId, // 若typeName是page，value存新id
+    }) {
+      const newBlockId = id || (new Date().getTime() + 3).toString();
+      const newBlock = {
+        id: newBlockId,
+        type: typeName,
+        content: value || '',
+        blocks: blocks || [],
+        parentId: parentId || '',
+      };
+
+      // 此段處理block的id被加入某page中的blocks陣列裡的某位置
+      const thisPage = page || stateFind(store.state.pages, store.state.currentPageId);
+      const isSelect = store.state.currentFocusBlockId !== '';
+
+      const index = thisPage.blocks.indexOf(store.state.currentFocusBlockId);
+      store.commit('addIdToBlocksOfPage', {
+        page: thisPage,
+        blockId: newBlockId,
+        index: isSelect ? index + 1 : null,
+      });
+      store.commit('addBlock', newBlock);
+      store.commit('changeFocusBlock', newBlockId);
+    },
+
+    // 增加子block
+    addBlockInside(store, block) {
+      const parentBlock = block;
+
+      const id = new Date().getTime().toString(); // 創一個新的blockId
+
+      store.dispatch('addBlock', {
+        typeName: 'p',
+        id,
+        parentId: parentBlock.id,
+      });
+
+      const newBlocks = [...parentBlock.blocks, id];
+      store.commit('editBlockData', {
+        id: parentBlock.id, // 此處id為父集id
+        key: 'blocks',
+        value: newBlocks,
+      });
+    },
+
+    deleteBlock(store, { containPage, block }) {
+      const page = containPage || stateFind(store.state.pages, store.state.currentPageId);
+      const thisBlock = block || stateFind(store.state.blocks, store.state.currentFocusBlockId);
+
+      // 如果刪除的block是包在某父集block裡面的情況，就刪除父集block屬性blocks中的對應ID
+      if (thisBlock.parentId !== '') {
+        const parentBlock = stateFind(store.state.blocks, thisBlock.parentId);
+        const index = parentBlock.blocks.indexOf(thisBlock.id);
+        store.commit('changeFocusBlock', parentBlock.blocks[index - 1]);
+        store.commit('deleteIdToBlocksOfBlock', {
+          block: parentBlock,
+          blockId: thisBlock.id,
+        });
+      } else { // 單純的刪除page裡面某位置的blockId
+        const index = page.blocks.indexOf(thisBlock.id);
+        store.commit('changeFocusBlock', page.blocks[index - 1]);
+      }
+
+      // 刪除當前page的blocks裡面對應的id
+      store.commit('deleteIdToBlocksOfPage', {
+        page,
+        blockId: thisBlock.id,
+      });
+
+      store.commit('deleteBlock', thisBlock); // 徹底刪除此block
+    },
+
     // 刪除某頁面 item是點擊刪除按鈕同行的page
     deletePageWithIcon(store, item) {
       if (item.parentId !== '') {
-        store.commit('deleteBlock', {
+        store.dispatch('deleteBlock', {
           containPage: stateFind(store.state.pages, item.parentId),
-          blockId: store.state.blocks.find((block) => block.content === item.id).id,
+          block: store.state.blocks.find((block) => block.content === item.id),
         });
       }
       store.commit('deletePage', item);

@@ -3,7 +3,9 @@
 <template>
   <div class="sidebar">
       <UserInfo/>
-      <!-- {{ currentPage }} -->
+      <div v-if="currentPage">
+        {{ currentPage.blocks }}
+      </div>
       <div class="customlist-group bb">
         <CustomList
           v-for="item in rootPages"
@@ -69,13 +71,8 @@ export default {
       }
       if (typeName === 'page') {
         store.dispatch('addPageInside');
-      } else if (typeName === 'numberList') {
-        store.commit('addBlock', {
-          typeName,
-          value: [],
-        });
       } else {
-        store.commit('addBlock', {
+        store.dispatch('addBlock', {
           typeName,
         });
       }

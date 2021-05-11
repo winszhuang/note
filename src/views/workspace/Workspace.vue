@@ -15,6 +15,21 @@
         >編輯圖片</button>
       </div>
     </div>
+    <!-- <div>rootCurrentBlocks: </div>
+      <div v-if="rootCurrentBlocks.length > 0">
+        <div
+          v-for="block in rootCurrentBlocks"
+          :key="block.id">
+          <ul>
+            <li>content ------ {{ block.content }}</li>
+            <li>type ------ {{ block.type }}</li>
+            <li>id ------ {{ block.id }}</li>
+            <li>parentId ------ {{ block.parentId }}</li>
+            <li>blocks ------ {{ block.blocks }}</li>
+            <hr>
+          </ul>
+        </div>
+      </div> -->
     <div class="workspace">
       <div class="title ">
         <input class="title-input"
@@ -25,7 +40,8 @@
         >
       </div>
       <div class="content" ref="content" v-if="currentBlocks">
-        <template v-for="(block) in currentBlocks" :key="block.id">
+        <template v-for="(block) in rootCurrentBlocks"
+                  :key="block.id">
           <Block :block="block"/>
         </template>
       </div>
@@ -46,6 +62,8 @@
             <li>content ------ {{ currentFocusBlock.content }}</li>
             <li>type ------ {{ currentFocusBlock.type }}</li>
             <li>id ------ {{ currentFocusBlock.id }}</li>
+            <li>parentId ------ {{ currentFocusBlock.parentId }}</li>
+            <li>blocks ------ {{ currentFocusBlock.blocks }}</li>
             <hr>
           </ul>
         </div>
@@ -65,6 +83,8 @@
             <li>content ------ {{ block.content }}</li>
             <li>type ------ {{ block.type }}</li>
             <li>id ------ {{ block.id }}</li>
+            <li>parentId ------ {{ block.parentId }}</li>
+            <li>blocks ------ {{ block.blocks }}</li>
             <hr>
           </ul>
         </div>
@@ -89,6 +109,7 @@ export default {
     const store = useStore();
     const currentPage = computed(() => store.getters.currentPage);
     const currentBlocks = computed(() => store.getters.currentBlocks);
+    const rootCurrentBlocks = computed(() => store.getters.childrenCurrentBlocks(''));
     const currentFocusBlock = computed(() => store.getters.currentFocusBlock);
     const currentBlocksNum = computed(() => store.getters.currentBlocksNum);
     const { editPageData } = commonUpdateEffect();
@@ -115,24 +136,20 @@ export default {
       watch( // 監聽是否切換到其他元素
         currentFocusBlockId,
         () => {
-          // console.log(currentFocusBlockId.value);
-          // const index = indexOfCurrentBlock.value;
           nextTick(() => {
             if (!content.value) return;
             if (!currentFocusBlockId.value) return;
 
-            const children = [...content.value.children];
-            children.forEach((e) => {
-              const input = e.getElementsByTagName('input')[0];
-              if (!input) return;
-              if (input.id === currentFocusBlockId.value) {
-                input.focus();
-              }
-            });
+            document.getElementById(currentFocusBlockId.value).focus();
+            // console.log(rootCurrentBlocks.value);
           });
         },
       );
     }
+
+    // watch(
+
+    // )
     // watch( // 監聽state中的pages資料被更新就馬上更新到FS
     //   () => pages.value,
     //   (currData) => {
@@ -170,6 +187,7 @@ export default {
       currentPage,
       editPageData,
       currentBlocks,
+      rootCurrentBlocks,
       currentFocusBlockId,
       currentFocusBlock,
       currentBlocksNum,

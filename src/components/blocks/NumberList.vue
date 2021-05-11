@@ -1,15 +1,15 @@
-<template>
-  <div class="ms-2"
-        v-for="(childBlockId, index) in block.content"
+<template v-if="block.blocks.length > 0">
+  <div class="ms-2 d-flex"
+        v-for="(childBlockId, index) in block.blocks"
         :key="childBlockId">
-    <p>{{ index + 1 }}. </p>
+    <div class="number">{{ index + 1 }}. </div>
     <P :block="getBlockById(childBlockId)"/>
   </div>
 </template>
 
 <script>
 import {
-  computed, onMounted, // nextTick,
+  computed, onMounted, onUpdated, // nextTick,
 } from 'vue';
 import { useStore } from 'vuex';
 import P from './P.vue';
@@ -19,25 +19,30 @@ export default {
   component: { P },
   props: ['block'],
   setup(props) {
-    console.log(props.block);
     const store = useStore();
     onMounted(() => {
-      const id = new Date().getTime().toString(); // 創一個新的blockId
-      store.commit('addBlock', {
-        typeName: 'p',
-        id,
-      });
-      store.commit('editBlockData', {
-        id: props.block.id, // 此處id為父集id
-        value: [id],
-      });
+      store.dispatch('addBlockInside', props.block);
     });
-    const getBlockById = (id) => computed(() => store.getters.choosePage(id));
+    onUpdated(() => {
+      if (props.block.blocks.length === 0) {
+        console.log('準備刪除');
+        // console.log(object);
+        store.dispatch('deleteBlock', {
+          block: props.block,
+        });
+      }
+    });
+
+    const getBlockById = (id) => computed(() => store.getters.chooseBlock(id)).value;
 
     return { getBlockById };
   },
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.number{
+  margin-right: .5rem;
+  line-height: 2rem;
+}
 </style>

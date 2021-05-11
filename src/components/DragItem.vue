@@ -1,5 +1,5 @@
 <template>
-  <div class="me-2 dragicon"
+  <div class="dragicon"
       draggable="true"
       @dragend="handleDrop($event)"
   >
@@ -22,7 +22,7 @@ export default {
       const x = e.clientX;
       const y = e.clientY;
       const chooseItem = document.elementFromPoint(x, y);
-      const originalItem = e.target.nextElementSibling;
+      const originalItem = e.target.parentElement.nextElementSibling.children[0];
 
       if (chooseItem.hasAttribute('id') && chooseItem !== originalItem) {
         const blocks = [...currentPage.value.blocks];
@@ -69,9 +69,8 @@ export default {
 
 <style lang="scss">
 .dragicon{
-  // position: absolute;
-  // right: 10rem;
-  // top: 0;
+  width: 1rem;
+
   color: #c0c0c0;
   &:hover{
     color: #747474;
