@@ -67,6 +67,10 @@ export default createStore({
         type: 'numberList',
         name: '順序列表',
       },
+      {
+        type: 'bulletList',
+        name: '無序列表',
+      },
     ],
     currentPageId: '', // 存當前頁面id 不用放數據庫
     currentPageIdOnMouse: '',

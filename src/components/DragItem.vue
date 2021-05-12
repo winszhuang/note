@@ -22,15 +22,24 @@ export default {
       const x = e.clientX;
       const y = e.clientY;
       const chooseItem = document.elementFromPoint(x, y);
+      // const chooseItemBottom = rect.bottom;
+
       const originalItem = e.target.parentElement.nextElementSibling.children[0];
 
       if (chooseItem.hasAttribute('id') && chooseItem !== originalItem) {
+        const rect = chooseItem.getBoundingClientRect();
+        const chooseItemMidline = rect.top + rect.height / 2; // 找選到的元素的中線位置
+
         const blocks = [...currentPage.value.blocks];
         const originalIndex = blocks.indexOf(originalItem.id);
-        blocks.splice(originalIndex, 1);
+        blocks.splice(originalIndex, 1); // 先刪除原本的位置的lbockID
 
         const newIndex = blocks.indexOf(chooseItem.id);
-        blocks.splice(newIndex, 0, originalItem.id);
+        if (y < chooseItemMidline) {
+          blocks.splice(newIndex, 0, originalItem.id);
+        } else {
+          blocks.splice(newIndex + 1, 0, originalItem.id);
+        }
 
         store.commit('editPageData', {
           property: 'blocks',

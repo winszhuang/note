@@ -1,8 +1,8 @@
 <template v-if="block.blocks.length > 0">
   <div class="ms-2 d-flex"
-        v-for="(childBlockId, index) in block.blocks"
+        v-for="(childBlockId) in block.blocks"
         :key="childBlockId">
-    <div class="number">{{ index + 1 }}. </div>
+    <div class="bullet">⦁</div>
     <P :block="getBlockById(childBlockId)"/>
   </div>
 </template>
@@ -15,7 +15,7 @@ import { useStore } from 'vuex';
 import P from './P.vue';
 
 export default {
-  name: 'NumberList',
+  name: 'BulletList',
   component: { P },
   props: ['block'],
   setup(props) {
@@ -40,7 +40,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.number{
+.bullet{
   margin-right: .5rem;
   line-height: 2rem;
 }

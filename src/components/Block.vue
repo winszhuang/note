@@ -22,8 +22,6 @@ import { ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import commonEffect from '../views/commonEffect';
 import DragItem from './DragItem.vue';
-// import { useStore } from 'vuex';
-// import { toRefs } from 'vue';
 
 export default {
   name: 'Block',
