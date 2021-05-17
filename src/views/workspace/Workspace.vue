@@ -31,6 +31,7 @@
         </div>
       </div> -->
     <div class="workspace">
+      <AreaSelect/>
       <div class="title ">
         <input class="title-input"
             type="text"
@@ -44,6 +45,10 @@
                   :key="block.id">
           <Block :block="block"/>
         </template>
+      </div>
+      <hr>
+      <div v-if="currentBlocksByAreaSelect">
+        {{ currentBlocksByAreaSelect }}
       </div>
       <hr>
       <div v-if="currentPage">
@@ -101,10 +106,11 @@ import { useStore } from 'vuex';
 import commonUpdateEffect from '../commonUpdataEffect';
 import Breadcrumb from './Breadcrumb.vue';
 import Block from '../../components/Block.vue';
+import AreaSelect from '../../components/AreaSelect.vue';
 
 export default {
   name: 'Workspace',
-  components: { Block, Breadcrumb },
+  components: { Block, Breadcrumb, AreaSelect },
   setup() {
     const store = useStore();
     const currentPage = computed(() => store.getters.currentPage);
@@ -112,6 +118,7 @@ export default {
     const rootCurrentBlocks = computed(() => store.getters.childrenCurrentBlocks(''));
     const currentFocusBlock = computed(() => store.getters.currentFocusBlock);
     const currentBlocksNum = computed(() => store.getters.currentBlocksNum);
+    const currentBlocksByAreaSelect = computed(() => store.getters.currentBlocksByAreaSelect);
     const { editPageData } = commonUpdateEffect();
     const {
       currentFocusBlockId, pages, // pages, blocks,
@@ -195,12 +202,16 @@ export default {
       isShowEditCoverButton,
       isShowEditCoverCard,
       editCoverCardHandle,
+      currentBlocksByAreaSelect,
     };
   },
 };
 </script>
 
 <style lang="scss">
+.container{
+  background: #FCFFFC;
+}
 
 .content{
   width: 100%;

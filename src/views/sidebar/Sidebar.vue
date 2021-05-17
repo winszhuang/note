@@ -3,9 +3,9 @@
 <template>
   <div class="sidebar">
       <UserInfo/>
-      <div v-if="currentPage">
+      <!-- <div v-if="currentPage">
         {{ currentPage.blocks }}
-      </div>
+      </div> -->
       <div class="customlist-group bb">
         <CustomList
           v-for="item in rootPages"
@@ -26,10 +26,12 @@
               :key="item.type"
               @click="addBlock(item.type)"
         >
-          <div class="customlist-item">
-            {{ item.type }}
+          <div class="customlist-item block-icon">
+            <font-awesome-icon
+                :icon="[style[item.style], item.icon || 'heading']" :size="item.size || 'xs'"/>
+            <!-- {{ item.type }} -->
           </div>
-          <div class="customlist-item mr-1">{{ item.name }}</div>
+          <div class="customlist-item block-name">{{ item.name }}</div>
         </div>
       </div>
       <div class="sidebar-footer">
@@ -60,6 +62,11 @@ export default {
       pages, blocks, blocktype, currentPageId, currentPageIdOnMouse,
     } = toRefs(store.state);
 
+    const style = {
+      solid: 'fas',
+      regular: 'far',
+    };
+
     const addPage = () => {
       store.commit('addPage', {});
     };
@@ -89,6 +96,7 @@ export default {
       currentPageIdOnMouse,
       addBlock,
       list,
+      style,
     };
   },
 };
@@ -117,6 +125,12 @@ export default {
 }
 .caret-right{
   margin-right: .3rem;
+}
+.block-icon{
+  width: 1.3rem;
+}
+.block-name{
+  padding-top: .05rem;
 }
 
 </style>

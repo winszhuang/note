@@ -14,12 +14,7 @@ const arrayDeleteByValue = (arr, value) => {
   console.log(index);
   newArr.splice(index, 1);
   return newArr;
-  // return newArr.splice(index, 1);
 };
-// const arrayDeleteByIndex = (arr, index) => {
-//   const newArr = [...arr];
-//   return newArr.splice(index, 1);
-// };
 
 export default createStore({
   strict: true, // 正式上線的時候關掉
@@ -28,47 +23,88 @@ export default createStore({
       {
         id: '1111',
         name: 'Javascript筆記',
-        blocks: [],
+        blocks: ['111', '222', '333'],
         parentId: '',
         cover: '',
       },
     ],
-    blocks: [],
+    blocks: [
+      {
+        id: '111',
+        type: 'h2',
+        content: '1111111111111',
+        blocks: [],
+        parentId: '',
+      },
+      {
+        id: '222',
+        type: 'h3',
+        content: '2222222222222',
+        blocks: [],
+        parentId: '',
+      },
+      {
+        id: '333',
+        type: 'p',
+        content: '33333333333333',
+        blocks: [],
+        parentId: '',
+      },
+    ],
     blocktype: [
       {
         type: 'h1',
+        icon: 'heading',
+        style: 'solid',
         name: '大標題',
       },
       {
         type: 'h2',
+        icon: 'heading',
+        style: 'solid',
         name: '中標題',
       },
       {
         type: 'h3',
+        icon: 'heading',
+        style: 'solid',
         name: '小標題',
       },
       {
-        type: 'img',
-        name: '圖片',
-      },
-      {
         type: 'video',
+        icon: 'video',
+        style: 'solid',
         name: '影片',
       },
       {
+        type: 'img',
+        icon: 'images',
+        style: 'regular',
+        name: '圖片',
+      },
+      {
         type: 'p',
+        icon: 'font',
+        style: 'solid',
         name: '文字片段',
       },
       {
         type: 'page',
-        name: '頁面',
+        icon: 'file',
+        style: 'regular',
+        size: '1x',
+        name: '內嵌頁面',
       },
       {
         type: 'numberList',
+        icon: 'list-ol',
+        style: 'solid',
         name: '順序列表',
       },
       {
         type: 'bulletList',
+        icon: 'list-ul',
+        style: 'solid',
         name: '無序列表',
       },
     ],
@@ -76,6 +112,7 @@ export default createStore({
     currentPageIdOnMouse: '',
     currentBlockIdOnMouse: '',
     currentFocusBlockId: '',
+    currentBlocksByAreaSelect: [],
   },
   mutations: {
     // 把FS的資料全部取到state中
@@ -122,10 +159,11 @@ export default createStore({
     },
 
     addIdToBlocksOfPage(state, { page, blockId, index }) {
-      if (index) {
-        page.blocks.splice(index, 0, blockId);
+      const thispage = page || stateFind(state.pages, state.currentPageId);
+      if (index !== undefined) {
+        thispage.blocks.splice(index, 0, blockId);
       } else {
-        page.blocks.push(blockId);
+        thispage.blocks.push(blockId);
       }
     },
     addIdToBlocksOfBlock(state, { block, blockId, index }) {
@@ -136,8 +174,9 @@ export default createStore({
       }
     },
     deleteIdToBlocksOfPage(state, { page, blockId }) {
-      const index = page.blocks.indexOf(blockId);
-      page.blocks.splice(index, 1);
+      const thispage = page || stateFind(state.pages, state.currentPageId);
+      const index = thispage.blocks.indexOf(blockId);
+      thispage.blocks.splice(index, 1);
     },
     deleteIdToBlocksOfBlock(state, { block, blockId }) {
       const index = block.blocks.indexOf(blockId);
@@ -153,6 +192,9 @@ export default createStore({
       } else {
         state.currentFocusBlockId = '';
       }
+    },
+    changeBlocksByAreaSelect(state, { arr }) {
+      state.currentBlocksByAreaSelect = arr;
     },
 
   },
@@ -177,7 +219,10 @@ export default createStore({
     currentBlocks(state, getters) { // 這邊的問題 應該讓所有block(包含子block)單純放page裡面
       return getters.currentPage.blocks.map((itemId) => stateFind(state.blocks, itemId));
     },
-
+    // 回傳當前page裡面包含的所有blocks的id的陣列
+    currentBlocksIds(state, getters) {
+      return getters.currentPage.blocks;
+    },
     // 回傳帶入的某id所取得的block
     chooseBlock(state) {
       return (id) => stateFind(state.blocks, id);

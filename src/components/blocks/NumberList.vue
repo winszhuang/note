@@ -3,6 +3,7 @@
         v-for="(childBlockId, index) in block.blocks"
         :key="childBlockId">
     <div class="number">{{ index + 1 }}. </div>
+    <!-- <Block :block="getBlockById(childBlockId)"/> -->
     <P :block="getBlockById(childBlockId)"/>
   </div>
 </template>
@@ -12,11 +13,11 @@ import {
   computed, onMounted, onUpdated, // nextTick,
 } from 'vue';
 import { useStore } from 'vuex';
-import P from './P.vue';
+import Block from '../Block.vue';
 
 export default {
   name: 'NumberList',
-  component: { P },
+  component: { Block },
   props: ['block'],
   setup(props) {
     const store = useStore();
