@@ -1,9 +1,10 @@
 <template>
-  <div class="container" v-if="currentPage">
-    <div class="ps-1 pe-3 pt-3 pb-3">
+  <div class="contain" v-if="currentPage">
+    <div class="header">
       <Breadcrumb :page="currentPage"/>
     </div>
-    <div class="cover"
+    <!-- <div class="decoration"></div> -->
+    <!-- <div class="cover"
         style="background-image: url(https://images.unsplash.com/photo-1496681859237-6039cd585c4e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80);"
         @mouseover="hoverHandle(true)"
         @mouseout="hoverHandle(false)"
@@ -14,7 +15,7 @@
               @click="editCoverCardHandle(true)"
         >編輯圖片</button>
       </div>
-    </div>
+    </div> -->
     <!-- <div>rootCurrentBlocks: </div>
       <div v-if="rootCurrentBlocks.length > 0">
         <div
@@ -31,20 +32,20 @@
         </div>
       </div> -->
     <div class="workspace">
-      <AreaSelect/>
-      <div class="title ">
+      <AreaSelect :ids="currentBlocksIds" />
+      <div class="title">
         <input class="title-input"
             type="text"
             placeholder="請輸入標題"
             :value="currentPage.name"
             @input="editPageData('name', $event.target.value)"
         >
+        <div class="prefix-line"></div>
       </div>
       <div class="content" ref="content" v-if="currentBlocks">
-        <template v-for="(block) in rootCurrentBlocks"
-                  :key="block.id">
-          <Block :block="block"/>
-        </template>
+        <Block :block="block"
+                v-for="(block) in rootCurrentBlocks"
+                :key="block.id"/>
       </div>
       <hr>
       <div v-if="currentBlocksByAreaSelect">
@@ -119,6 +120,8 @@ export default {
     const currentFocusBlock = computed(() => store.getters.currentFocusBlock);
     const currentBlocksNum = computed(() => store.getters.currentBlocksNum);
     const currentBlocksByAreaSelect = computed(() => store.getters.currentBlocksByAreaSelect);
+    const currentBlocksIds = computed(() => store.getters.currentBlocksIds);
+
     const { editPageData } = commonUpdateEffect();
     const {
       currentFocusBlockId, pages, // pages, blocks,
@@ -147,7 +150,15 @@ export default {
             if (!content.value) return;
             if (!currentFocusBlockId.value) return;
 
-            document.getElementById(currentFocusBlockId.value).focus();
+            const focusDom = document.getElementById(currentFocusBlockId.value);
+            if (!focusDom) return;
+            // console.log(focusDom.tagName);
+            if (focusDom.tagName === 'INPUT') {
+              focusDom.focus();
+            }
+            if (focusDom.tagName === 'IMG') {
+              focusDom.previousElementSibling.focus();
+            }
             // console.log(rootCurrentBlocks.value);
           });
         },
@@ -194,6 +205,7 @@ export default {
       currentPage,
       editPageData,
       currentBlocks,
+      currentBlocksIds,
       rootCurrentBlocks,
       currentFocusBlockId,
       currentFocusBlock,
@@ -208,9 +220,30 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.container{
-  background: #FCFFFC;
+<style lang="scss" scoped>
+@import '../../style/color.scss';
+
+.contain{
+  flex: 1;
+  height: 100vh;
+  background: #F1F0EA;
+  // background: #faf9f2;
+  position: relative;
+  overflow-y: auto;
+}
+
+.decoration{
+  position: absolute;
+  top: 0;
+  right: 20%;
+  width: 3rem;
+  height: 7rem;
+  background: $web-orange;
+}
+
+.header{
+  padding: 1.5rem .5rem 1.5rem 2rem;
+  margin-bottom: 4.5rem;
 }
 
 .content{
@@ -223,12 +256,6 @@ export default {
 .workspace{
   flex-grow:1;
   padding: 0 15% 0 15%;
-  overflow-y: auto;
-  // position: absolute;
-  // bottom: 0;
-  // top: 2rem;
-  // left: 18rem;
-  // right: 0;
   @media (max-width:900px){
     left: 0;
   }
@@ -238,12 +265,21 @@ export default {
 }
 .title{
   margin-top: 2rem;
-  margin-bottom: 3rem;
+  margin-bottom: 5rem;
+  position: relative;
   input{
     font-family: 'Noto Sans TC', sans-serif;
     font-weight: 700;
-    color: #464646;
-    font-size: 3rem;
+    font-size: 4rem;
+  }
+  .prefix-line{
+    position:absolute;
+    bottom: -.2rem;
+    left: 0;
+    width: 2rem;
+    height: .3rem;
+    background: $web-orange;
+    // background: #F3C87A;
   }
 }
 .pageinfo{
@@ -254,7 +290,8 @@ export default {
   height: 16rem;
   background-size: cover;
   background-origin: content-box;
-  margin: 0 -10.5px 0 -10.5px;
+  width: 100%;
+  // margin: 0 -10.5px 0 -10.5px;
   &-edit{
     position: absolute;
     right: 1rem;
@@ -263,20 +300,6 @@ export default {
       color: #f3f3f3;
       background: rgba($color: #000000, $alpha: 0.3);
     }
-  }
-  // &-input{
-  // }
-}
-
-input, textarea{
-  background: transparent;
-  border: none;
-  outline: none;
-  &:hover{
-    border: none;
-  }
-  &::placeholder{
-    color: #f3f3f3;
   }
 }
 

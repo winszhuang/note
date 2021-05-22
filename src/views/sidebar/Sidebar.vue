@@ -2,7 +2,26 @@
 /* eslint-disable no-restricted-syntax */
 <template>
   <div class="sidebar">
+      <Modal v-if="isOpenModal"
+            :mode="'component'"
+            :is-bg-static="false"
+            @close="openModal(false)">
+        <template #component>
+          <Search/>
+        </template>
+      </Modal>
       <UserInfo/>
+      <div class="customlist-group bb">
+        <div class="customlist-group-item customlist-group-item-action"
+              type="button"
+              @click="openModal(true)">
+          <div class="customlist-item block-icon me-1">
+            <font-awesome-icon
+                :icon="['fas', 'search']" />
+          </div>
+          <div class="customlist-item block-name">搜尋區塊</div>
+        </div>
+      </div>
       <!-- <div v-if="currentPage">
         {{ currentPage.blocks }}
       </div> -->
@@ -35,7 +54,7 @@
         </div>
       </div>
       <div class="sidebar-footer">
-        <div class="addpage" type="button" @click="addPage">
+        <div class="addpage bt" type="button" @click="addPage">
           <div class="addpage-text">+ 新頁面</div>
         </div>
       </div>
@@ -45,22 +64,34 @@
 <script>
 import { useStore } from 'vuex';
 import {
-  toRefs, ref, computed, // reactive
+  toRefs, ref, computed, onMounted, // reactive
 } from 'vue';
 import UserInfo from './UserInfo.vue';
 import CustomList from '../../components/CustomList.vue';
+import Modal from '../../components/Modal.vue';
+import Search from '../Search.vue';
 
 export default {
   name: 'Sidebar',
-  components: { UserInfo, CustomList },
+  components: {
+    UserInfo,
+    CustomList,
+    Modal,
+    Search,
+  },
   setup() {
     const store = useStore();
     const list = ref(null);
+    const isOpenModal = ref('false');
     const currentPage = computed(() => store.getters.currentPage);
     const rootPages = computed(() => store.getters.childrenPages(''));
     const {
       pages, blocks, blocktype, currentPageId, currentPageIdOnMouse,
     } = toRefs(store.state);
+
+    onMounted(() => {
+      isOpenModal.value = false;
+    });
 
     const style = {
       solid: 'fas',
@@ -85,6 +116,10 @@ export default {
       }
     };
 
+    const openModal = (choose) => {
+      isOpenModal.value = choose;
+    };
+
     return {
       pages,
       rootPages,
@@ -95,8 +130,10 @@ export default {
       currentPageId,
       currentPageIdOnMouse,
       addBlock,
+      openModal,
       list,
       style,
+      isOpenModal,
     };
   },
 };
@@ -113,7 +150,6 @@ export default {
 .addpage{
   width: 100%;
   line-height: 2.5rem;
-  border-top: .02rem solid #e4e4e4;
   color: #909090;
   &-text{
     padding-left: 35%;

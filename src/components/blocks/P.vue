@@ -27,7 +27,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-input{
-  display: block;
-}
 </style>

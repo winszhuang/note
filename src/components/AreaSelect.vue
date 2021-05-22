@@ -1,24 +1,18 @@
 <template>
   <div
     id="area-select"
+    ref="select"
   ></div>
+  <!-- <teleport to="#app">
+  </teleport> -->
 </template>
 
 <script>
-import { computed, onMounted } from 'vue';
+import {
+  computed, onMounted, watch, // onMounted, toRef,
+} from 'vue';
 import { useStore } from 'vuex';
-import { commonArrEffect } from './commonEffect';
-
-const useCollisionEffect = () => {
-  const boxCollisionDetection = (a, b) => {
-    if (a.right > b.left && a.left < b.right && a.top < b.bottom && a.bottom > b.top) {
-      return true;
-    }
-    return false;
-  };
-
-  return { boxCollisionDetection };
-};
+import { commonCollisionEffect, commonArrEffect } from './commonEffect';
 
 const useKeyboardEffect = () => {
   const store = useStore();
@@ -34,17 +28,12 @@ const useKeyboardEffect = () => {
   return { areaSelectDelete };
 };
 
-const useMouseEffect = (el, boxCollisionDetection) => {
-  const { areaSelectDelete } = useKeyboardEffect();
+const useAreaSelectEffect = (el, boxCollisionDetection) => {
   const store = useStore();
-  const allCurrentBlocksIds = computed(() => store.getters.currentBlocksIds).value;
+  const { areaSelectDelete } = useKeyboardEffect();
   const { arrayList } = commonArrEffect();
   const selectIdsList = arrayList();
-  // const {
-  //   addClass,
-  //   removeClass,
-  //   // getElementsByIdsInArr,
-  // } = commonDomEffect();
+
   const dom = el;
   const moveState = {
     value: false,
@@ -63,16 +52,27 @@ const useMouseEffect = (el, boxCollisionDetection) => {
     },
   };
 
+  const allIds = {
+    value: [],
+  };
+
+  const setAllIds = (ids) => {
+    allIds.value = ids;
+  };
+
   document.addEventListener('keydown', (e) => {
     if (e.keyCode === 8 && selectIdsList.getArr() !== 0) {
       areaSelectDelete(selectIdsList.getArr());
     }
   });
 
-  const changeElementsClassByIds = (allIds, selectIds, className) => {
-    allIds.forEach((id) => {
+  const changeElementsClassByIds = (selectIds, className) => {
+    allIds.value.forEach((id) => {
       const element = document.getElementById(id);
-      element.classList.remove(className);
+      if (element === null) return;
+      if (element.classList.contains(className)) {
+        element.classList.remove(className);
+      }
     });
 
     if (selectIds.length === 0) return;
@@ -99,8 +99,8 @@ const useMouseEffect = (el, boxCollisionDetection) => {
       console.log('碰到drag或input');
       return;
     }
-    selectIdsList.setArr([]); // 點一下初始化
-    changeElementsClassByIds(allCurrentBlocksIds, selectIdsList.getArr(), 'block-selected');
+    selectIdsList.setArr([]); // 點一下初始
+    changeElementsClassByIds(selectIdsList.getArr(), 'block-selected');
 
     moveState.value = true;
     dom.hidden = 0;
@@ -115,9 +115,6 @@ const useMouseEffect = (el, boxCollisionDetection) => {
   const mouseUp = () => {
     moveState.value = false;
     dom.hidden = 1;
-    // store.commit('changeBlocksByAreaSelect', {
-    //   arr: selectIdsList.getArr,
-    // });
   };
 
   const updateAreaSelectBlocks = (boxData) => {
@@ -142,9 +139,8 @@ const useMouseEffect = (el, boxCollisionDetection) => {
       } else {
         selectIdsList.deleteArrId(block.id);
       }
-      changeElementsClassByIds(allCurrentBlocksIds, selectIdsList.getArr(), 'block-selected');
+      changeElementsClassByIds(selectIdsList.getArr(), 'block-selected');
     });
-    // console.log('3333333333333333');
     // console.log(selectIdsList.getArr());
   };
 
@@ -178,6 +174,7 @@ const useMouseEffect = (el, boxCollisionDetection) => {
   };
 
   return {
+    setAllIds,
     mouseDown,
     mouseUp,
     mouseMove,
@@ -187,14 +184,24 @@ const useMouseEffect = (el, boxCollisionDetection) => {
 
 export default {
   name: 'AreaSelect',
-  setup() {
-    let areaSelect = '';
+  props: ['ids'],
+  setup(props) {
+    const { boxCollisionDetection } = commonCollisionEffect();
 
     onMounted(() => {
-      areaSelect = document.getElementById('area-select');
+      const select = document.getElementById('area-select');
+      const {
+        mouseDown,
+        mouseUp,
+        mouseMove,
+        setAllIds,
+      } = useAreaSelectEffect(select, boxCollisionDetection);
 
-      const { boxCollisionDetection } = useCollisionEffect();
-      const { mouseDown, mouseUp, mouseMove } = useMouseEffect(areaSelect, boxCollisionDetection);
+      watch(() => props.ids, () => {
+        setAllIds(props.ids);
+      },
+      { immediate: true });
+      // areaSelect.value = document.getElementById('area-select');
 
       document.addEventListener('mousedown', mouseDown);
       document.addEventListener('mouseup', mouseUp);
@@ -206,7 +213,11 @@ export default {
 
 <style lang="scss" scoped>
 #area-select{
-  position: absolute;
+  position: fixed;
+  left: 0;
+  top: 0;
+  // width: 100%;
+  // height: 100%;
   background: rgb(71, 71, 71);
   z-index: 3;
   opacity: .2;

@@ -7,7 +7,7 @@
     <div class="block-drag" >
       <DragItem :block="block" v-show="isDragShow" v-if="block.blocks.length === 0"/>
     </div>
-    <div
+    <div style="width: 100%"
         @drop="handleDrop($event)"
         @dragenter="cancelDefault($event, true)"
         @dragleave="handleLeave($event)"
@@ -25,7 +25,7 @@
 <script>
 import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
-import commonEffect from '../views/commonEffect';
+import { commonStringEffect } from './commonEffect';
 import DragItem from './DragItem.vue';
 
 export default {
@@ -36,7 +36,7 @@ export default {
     const store = useStore();
     const { currentBlockIdOnMouse } = toRefs(store.state);
     const currentPage = computed(() => store.getters.currentPage).value;
-    const { getFirstToUpper } = commonEffect();
+    const { getFirstToUpper } = commonStringEffect();
     const isDragShow = ref(false);
 
     const hoverHandle = (id) => {
@@ -140,6 +140,7 @@ export default {
 
 <style lang="scss" scoped>
 .block{
+  width: 100%;
   position: relative;
   display: flex;
   margin-left: -1.5rem;

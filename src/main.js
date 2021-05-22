@@ -2,6 +2,7 @@ import { createApp } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faPlusSquare, faFile, faImages } from '@fortawesome/free-regular-svg-icons';
+import { faGooglePlusSquare, faFacebookSquare, faTwitterSquare } from '@fortawesome/free-brands-svg-icons';
 import {
   faCaretRight,
   faCaretDown,
@@ -13,7 +14,11 @@ import {
   faFont,
   faListUl,
   faListOl,
+  faTimes,
+  faSearch,
 } from '@fortawesome/free-solid-svg-icons';
+
+import 'bootstrap';
 
 import H1 from './components/blocks/H1.vue';
 import H2 from './components/blocks/H2.vue';
@@ -42,6 +47,12 @@ library.add(faVideo);
 library.add(faFont);
 library.add(faListUl);
 library.add(faListOl);
+library.add(faTimes);
+library.add(faSearch);
+
+library.add(faGooglePlusSquare);
+library.add(faFacebookSquare);
+library.add(faTwitterSquare);
 
 createApp(App).component('font-awesome-icon', FontAwesomeIcon)
   .component('H1', H1)

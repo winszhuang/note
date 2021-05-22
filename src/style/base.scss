@@ -1,12 +1,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;300;400;500;700&display=swap');
 
-input {
-  display: block;
-  color: #464646;
-}
 html {
   font-family: 'Noto Sans TC', sans-serif;
   font-size: 14px;
+}
+
+body {
+  height: 100%;
+}
+
+input, textarea{
+  display: block;
+  color: #464646;
+  background: transparent;
+  border: none;
+  outline: none;
+  &:hover{
+    border: none;
+  }
+  &::placeholder{
+    color: #f3f3f3;
+  }
 }
 
 .pageblock{
@@ -23,11 +37,19 @@ html {
 }
 
 .bb{
-  border-bottom: .02rem solid #e4e4e4;
+  border-bottom: .01rem solid #4d454e;
 }
+
 .bb-light{
-  border-bottom: .02rem solid #f0f0f0;
+  border-bottom: .01rem solid #949494;
 }
+
+.bt{
+  border-top: .01rem solid #4d454e;
+}
+// .bb-light{
+//   border-bottom: .02rem solid #f0f0f0;
+// }
 .line-break{
   margin-bottom: 1rem;
 }
@@ -37,6 +59,8 @@ html {
 }
 
 .block-selected{
+  opacity: .7;
+  filter: grayscale(100%);
   background:rgba($color: rgb(131, 214, 235), $alpha: 0.2);
   border-radius: .2rem;
 }

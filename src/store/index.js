@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 // import { nextTick } from 'vue';
 import { createStore } from 'vuex';
-import { db } from './db';
+import { db } from './firebase';
 
 const stateFind = (collection, id) => collection.find((item) => item.id === id);
 const arrayDeleteByValue = (arr, value) => {
@@ -21,32 +21,130 @@ export default createStore({
   state: {
     pages: [
       {
-        id: '1111',
+        id: 'page1',
         name: 'Javascript筆記',
-        blocks: ['111', '222', '333'],
+        blocks: ['js1', 'js2', 'js3', 'js4', 'js5', 'js6', 'js7'],
+        parentId: '',
+        cover: '',
+      },
+      {
+        id: 'page2',
+        name: 'vue筆記',
+        blocks: ['vue1', 'vue2', 'vue3', 'vue4', 'vue5', 'vue6', 'vue7', 'vue8', 'vue9'],
         parentId: '',
         cover: '',
       },
     ],
     blocks: [
       {
-        id: '111',
+        id: 'js1',
         type: 'h2',
-        content: '1111111111111',
+        content: 'Array方法',
         blocks: [],
         parentId: '',
       },
       {
-        id: '222',
-        type: 'h3',
-        content: '2222222222222',
-        blocks: [],
-        parentId: '',
-      },
-      {
-        id: '333',
+        id: 'js2',
         type: 'p',
-        content: '33333333333333',
+        content: 'find',
+        blocks: [],
+        parentId: '',
+      },
+      {
+        id: 'js3',
+        type: 'p',
+        content: 'forEach',
+        blocks: [],
+        parentId: '',
+      },
+      {
+        id: 'js4',
+        type: 'p',
+        content: 'map',
+        blocks: [],
+        parentId: '',
+      },
+      {
+        id: 'js5',
+        type: 'h2',
+        content: 'String方法',
+        blocks: [],
+        parentId: '',
+      },
+      {
+        id: 'js6',
+        type: 'p',
+        content: 'includes',
+        blocks: [],
+        parentId: '',
+      },
+      {
+        id: 'js7',
+        type: 'p',
+        content: 'indexOf',
+        blocks: [],
+        parentId: '',
+      },
+      {
+        id: 'vue1',
+        type: 'h2',
+        content: '指令',
+        blocks: [],
+        parentId: '',
+      },
+      {
+        id: 'vue2',
+        type: 'p',
+        content: 'v-model',
+        blocks: [],
+        parentId: '',
+      },
+      {
+        id: 'vue3',
+        type: 'p',
+        content: 'v-for',
+        blocks: [],
+        parentId: '',
+      },
+      {
+        id: 'vue4',
+        type: 'p',
+        content: 'v-if',
+        blocks: [],
+        parentId: '',
+      },
+      {
+        id: 'vue5',
+        type: 'p',
+        content: 'v-show',
+        blocks: [],
+        parentId: '',
+      },
+      {
+        id: 'vue6',
+        type: 'h2',
+        content: '生命週期',
+        blocks: [],
+        parentId: '',
+      },
+      {
+        id: 'vue7',
+        type: 'p',
+        content: 'onMounted',
+        blocks: [],
+        parentId: '',
+      },
+      {
+        id: 'vue8',
+        type: 'p',
+        content: 'onUpdate',
+        blocks: [],
+        parentId: '',
+      },
+      {
+        id: 'vue9',
+        type: 'p',
+        content: 'unMounted',
         blocks: [],
         parentId: '',
       },
@@ -235,6 +333,14 @@ export default createStore({
     currentFocusBlock(state, getters) {
       return stateFind(getters.currentBlocks, state.currentFocusBlockId);
     },
+
+    searchBlocks(state) {
+      return (str) => (str !== '' ? state.blocks.filter((block) => block.content.includes(str)) : null);
+    },
+
+    getPageByBlockId(state) {
+      return (blockId) => state.pages.find((page) => page.blocks.includes(blockId));
+    },
     // 回傳當前page裡面被選中的block是第幾順位的數字
     // indexOfCurrentBlock(state, getters) {
     //   return getters.currentPage.blocks.indexOf(state.currentFocusBlockId);
@@ -379,6 +485,11 @@ export default createStore({
       if (childrenPages && childrenPages.length !== 0) {
         childrenPages.forEach((page) => store.dispatch('deletePageWithIcon', page));
       }
+    },
+
+    goBlockPosition(store, { page, block }) {
+      store.commit('changeCurrentPage', page.id);
+      store.commit('changeFocusBlock', block.id);
     },
   },
   modules: {

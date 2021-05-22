@@ -53,7 +53,7 @@
     z-index: 1; // Place hover/focus items above their siblings for proper border styling
     color: $list-group-action-hover-color;
     text-decoration: none;
-    background-color: #e0e0e0;
+    background-color: $listhover;
   }
 
   &:active {
@@ -66,5 +66,5 @@
 .customlist-item {
   padding-left: .25rem;
   padding-right: .25rem;
-  color: #6b6b6b;
+  color: #969293;
 }
