@@ -1,14 +1,14 @@
 <template>
-  <input
+  <div
     type="text"
-    class="h2"
-    placeholder="請輸入"
+    class="h3"
+    contenteditable="true"
+    placeholder="請輸入標題"
     :id=block.id
     :value="block.content"
-    @input="editBlockData(block.id, $event.target.value)"
+    @input="editBlockData(block.id, $event.target.innerHTML)"
     @keydown="keydownHandle(block, $event)"
-    @focus="getFocusBlock(block.id)"
-  >
+    @focus="getFocusBlock(block.id)">{{ block.content }}</div>
 </template>
 
 <script>
@@ -26,4 +26,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.h3{
+  margin: .5rem 0;
+  line-height: 3rem;
+}
 </style>

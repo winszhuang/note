@@ -1,51 +1,53 @@
 <template>
-  <!-- <div class="blockimg"
-    :style="{ backgroundImage: `url(${block.content})` }"
-    @focus="getFocusBlock(block.id)">
-  </div> -->
-  <textarea
+  <div
     type="text"
+    contenteditable="true"
     placeholder="ctrl + v 貼上複製的圖片"
     :value="block.content"
-    v-show="!isShowImg"
-    @input="editBlockData(block.id, $event.target.value)"
-    @paste="paste($event)"
+    v-show="!isShow"
+    @input="editBlockData(block.id, $event.target.innerHTML)"
+    @paste="paste($event, block.id)"
     @keydown="keydownHandle(block, $event)"
-    @focus="getFocusBlock(block.id)">
-    </textarea>
-  <img :id=block.id v-show="isShowImg"/>
+    @focus="getFocusBlock(block.id)">{{ block.content }}</div>
+  <ScaleController v-show="isShow">
+    <img :id=block.id />
+  </ScaleController>
 </template>
 
 <script>
 import { onMounted, ref } from 'vue';
-import { commonDomEffect } from '../commonEffect';
+import ScaleController from '../ScaleController.vue';
+import commonDomEffect from '../commonDomEffect';
 import commonUpdateEffect from '../../views/commonUpdataEffect';
 
 export default {
   name: 'Img',
   props: ['block'],
+  components: { ScaleController },
   setup() {
-    const isShowImg = ref('');
-    onMounted(() => {
-      isShowImg.value = false;
-    });
-    const { pasteImage } = commonDomEffect();
+    const { pasteImage, showEffect } = commonDomEffect();
+    const { isShow, handleShow } = showEffect();
     const { editBlockData, getFocusBlock, keydownHandle } = commonUpdateEffect();
 
-    const paste = (e) => {
-      pasteImage(e);
-      isShowImg.value = true;
+    onMounted(() => {
+      handleShow(false);
+    });
+
+    const paste = (e, id) => {
+      pasteImage(e, id);
+      handleShow(true);
     };
 
     const url = ref('');
 
     return {
       url,
-      isShowImg,
       editBlockData,
       getFocusBlock,
       keydownHandle,
       paste,
+      isShow,
+      handleShow,
     };
   },
 };
@@ -57,11 +59,7 @@ export default {
   height: 300px;
   ;
 }
-textarea{
-  color: rgb(119, 119, 119) !important;
-  background: transparent;
-  &::placeholder{
-    color: rgb(202, 202, 202) !important;
-  }
+img{
+  width: 100%;
 }
 </style>

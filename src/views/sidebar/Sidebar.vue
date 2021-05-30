@@ -102,18 +102,30 @@ export default {
       store.commit('addPage', {});
     };
 
-    const addBlock = (typeName) => {
+    const addBlock = (type) => {
       if (currentPageId.value === '') {
         console.log('請先選擇頁面');
         return;
       }
-      if (typeName === 'page') {
+
+      if (type === 'page') {
         store.dispatch('addPageInside');
-      } else {
-        store.dispatch('addBlock', {
-          typeName,
-        });
+        return;
       }
+
+      if (type === 'numberItem' || type === 'bulletItem') {
+        const groupId = (new Date().getTime() - 2).toString();
+        store.commit('addGroup', groupId);
+        store.dispatch('addBlockInGroup', {
+          type,
+          groupId,
+        });
+        return;
+      }
+
+      store.dispatch('addBlock', {
+        type,
+      });
     };
 
     const openModal = (choose) => {

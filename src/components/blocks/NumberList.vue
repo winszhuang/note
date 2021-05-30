@@ -3,8 +3,8 @@
         v-for="(childBlockId, index) in block.blocks"
         :key="childBlockId">
     <div class="number">{{ index + 1 }}. </div>
-    <!-- <Block :block="getBlockById(childBlockId)"/> -->
-    <P :block="getBlockById(childBlockId)"/>
+    <Block :block="getBlockById(childBlockId)"/>
+    <!-- <P :block="getBlockById(childBlockId)"/> -->
   </div>
 </template>
 
@@ -42,7 +42,7 @@ export default {
 
 <style lang="scss" scoped>
 .number{
-  margin-right: .5rem;
+  margin-right: 3rem;
   line-height: 2rem;
 }
 </style>

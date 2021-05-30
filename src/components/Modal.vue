@@ -1,6 +1,4 @@
 <template>
-  <!-- <teleport to='' >
-  </teleport> -->
     <div class="modal-mask" @click="closeModal($event)">
       <div class="modal-wrapper">
 

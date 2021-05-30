@@ -1,13 +1,15 @@
 <template>
-  <input
+  <div
+    class="p"
     type="text"
-    placeholder="請輸入"
+    contenteditable="true"
+    spellcheck="false"
+    placeholder="請輸入文字"
     :id=block.id
     :value="block.content"
-    @input="editBlockData(block.id, $event.target.value)"
+    @input="editBlockData(block.id, $event.target.innerHTML)"
     @keydown="keydownHandle(block, $event)"
-    @focus="getFocusBlock(block.id)"
-  >
+    @focus="getFocusBlock(block.id)">{{ block.content }}</div>
 </template>
 
 <script>
@@ -27,4 +29,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.p {
+    line-height: 1.8rem;
+    overflow: auto;
+    margin: .2rem 0;
+    padding-left: .1rem;
+}
 </style>

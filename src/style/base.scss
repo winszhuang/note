@@ -9,9 +9,8 @@ body {
   height: 100%;
 }
 
-input, textarea{
-  display: block;
-  color: #464646;
+div[contenteditable=true] {
+  color: #494949;
   background: transparent;
   border: none;
   outline: none;
@@ -19,7 +18,68 @@ input, textarea{
     border: none;
   }
   &::placeholder{
-    color: #f3f3f3;
+    color: #a3a3a3;
+  }
+
+  &:empty:focus::before{
+    content: attr(placeholder);
+    color: #a3a3a3;
+  }
+  &:empty:not(:focus)::before{
+    content: '';
+  }
+  &::selection{
+    background-color: #bddaeb;
+  }
+}
+
+.v-enter-active,
+.v-leave-active{
+  transition: opacity 0.3s ease;
+}
+
+.v-enter-from,
+.v-leave-to{
+  opacity: 0;
+}
+
+.v-enter-to,
+.v-leave-from{
+  opacity: 1;
+}
+
+.p{
+  padding-top: .1rem;
+  padding-left: .5rem;
+  line-height: 1.8rem;
+}
+
+$drag-width: 1.5rem;
+.block{
+  position: relative;
+  &-content{
+    width: 100%;
+  }
+  &-drag{
+    position: absolute;
+    left: -$drag-width;
+    width: $drag-width;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    
+  }
+  &-border-top{
+    border-top: .1rem dashed rgb(173, 173, 173);
+  }
+  &-border-bottom{
+    border-bottom: .1rem dashed rgb(173, 173, 173);
+  }
+  &-selected{
+    opacity: .9;
+    filter: grayscale(100%);
+    background:rgba($color: rgb(131, 214, 235), $alpha: 0.2);
+    border-radius: .2rem;
   }
 }
 
@@ -58,12 +118,6 @@ input, textarea{
   font-weight: 700;
 }
 
-.block-selected{
-  opacity: .7;
-  filter: grayscale(100%);
-  background:rgba($color: rgb(131, 214, 235), $alpha: 0.2);
-  border-radius: .2rem;
-}
 
 [draggable="true"] {
   /*

@@ -8,7 +8,7 @@
   >
     <div :style="{ 'padding-left': `${count*14}px` }"></div> <!--調間距用-->
     <div class="customlist-item icon-button"
-        @click="toggleCollapse(page.id)"
+        @click="toggleShow()"
     >
       <font-awesome-icon :icon="caretIcon"/>
     </div>
@@ -30,7 +30,7 @@
     </div>
   </div>
 
-  <div v-if="childrenPages.length !== 0" v-show="collapes">
+  <div v-if="childrenPages.length !== 0" v-show="isShow">
     <CustomList
       v-for="item in childrenPages"
       :key="item.id"
@@ -45,7 +45,7 @@
 
 <script>
 import {
-  toRefs, computed, ref, // onMounted
+  toRefs, computed, // onMounted
 } from 'vue';
 import { useStore } from 'vuex';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -53,6 +53,7 @@ import {
   faCaretRight, faCaretDown,
 } from '@fortawesome/free-solid-svg-icons';
 import commonUpdateEffect from '../views/commonUpdataEffect';
+import commonDomEffect from './commonDomEffect';
 
 export default {
   name: 'CustomList',
@@ -73,8 +74,9 @@ export default {
     const childrenPages = computed(() => store.getters.childrenPages(props.page.id));
     const { currentPageId, currentPageIdOnMouse } = toRefs(store.state);
     const { goCurrentPage } = commonUpdateEffect();
-    const collapes = ref(true);
-    const caretIcon = computed(() => (collapes.value ? faCaretRight : faCaretDown));
+    const { showEffect } = commonDomEffect();
+    const { isShow, handleShow, toggleShow } = showEffect();
+    const caretIcon = computed(() => (isShow.value ? faCaretRight : faCaretDown));
 
     // eslint-disable-next-line vue/no-setup-props-destructure
     const count = props.number; // 用來指定目前page是第幾層
@@ -85,16 +87,11 @@ export default {
 
     const addPageInside = (page) => {
       store.dispatch('addPageInside', page);
+      handleShow(true);
     };
 
     const deletePage = (item) => {
       store.dispatch('deletePageWithIcon', item);
-    };
-
-    const toggleCollapse = (id) => {
-      collapes.value = !collapes.value;
-      console.log(collapes.value);
-      console.log(id);
     };
 
     return {
@@ -106,9 +103,9 @@ export default {
       addPageInside,
       hoverHandle,
       count,
-      collapes,
       caretIcon,
-      toggleCollapse,
+      isShow,
+      toggleShow,
     };
   },
 };

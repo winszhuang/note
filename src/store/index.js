@@ -42,6 +42,7 @@ export default createStore({
         content: 'Array方法',
         blocks: [],
         parentId: '',
+        group: '',
       },
       {
         id: 'js2',
@@ -49,6 +50,7 @@ export default createStore({
         content: 'find',
         blocks: [],
         parentId: '',
+        group: '',
       },
       {
         id: 'js3',
@@ -56,6 +58,7 @@ export default createStore({
         content: 'forEach',
         blocks: [],
         parentId: '',
+        group: '',
       },
       {
         id: 'js4',
@@ -63,6 +66,7 @@ export default createStore({
         content: 'map',
         blocks: [],
         parentId: '',
+        group: '',
       },
       {
         id: 'js5',
@@ -70,6 +74,7 @@ export default createStore({
         content: 'String方法',
         blocks: [],
         parentId: '',
+        group: '',
       },
       {
         id: 'js6',
@@ -77,6 +82,7 @@ export default createStore({
         content: 'includes',
         blocks: [],
         parentId: '',
+        group: '',
       },
       {
         id: 'js7',
@@ -84,6 +90,7 @@ export default createStore({
         content: 'indexOf',
         blocks: [],
         parentId: '',
+        group: '',
       },
       {
         id: 'vue1',
@@ -91,6 +98,7 @@ export default createStore({
         content: '指令',
         blocks: [],
         parentId: '',
+        group: '',
       },
       {
         id: 'vue2',
@@ -98,6 +106,7 @@ export default createStore({
         content: 'v-model',
         blocks: [],
         parentId: '',
+        group: '',
       },
       {
         id: 'vue3',
@@ -105,6 +114,7 @@ export default createStore({
         content: 'v-for',
         blocks: [],
         parentId: '',
+        group: '',
       },
       {
         id: 'vue4',
@@ -112,6 +122,7 @@ export default createStore({
         content: 'v-if',
         blocks: [],
         parentId: '',
+        group: '',
       },
       {
         id: 'vue5',
@@ -119,6 +130,7 @@ export default createStore({
         content: 'v-show',
         blocks: [],
         parentId: '',
+        group: '',
       },
       {
         id: 'vue6',
@@ -126,6 +138,7 @@ export default createStore({
         content: '生命週期',
         blocks: [],
         parentId: '',
+        group: '',
       },
       {
         id: 'vue7',
@@ -133,6 +146,7 @@ export default createStore({
         content: 'onMounted',
         blocks: [],
         parentId: '',
+        group: '',
       },
       {
         id: 'vue8',
@@ -140,6 +154,7 @@ export default createStore({
         content: 'onUpdate',
         blocks: [],
         parentId: '',
+        group: '',
       },
       {
         id: 'vue9',
@@ -147,6 +162,7 @@ export default createStore({
         content: 'unMounted',
         blocks: [],
         parentId: '',
+        group: '',
       },
     ],
     blocktype: [
@@ -194,23 +210,43 @@ export default createStore({
         name: '內嵌頁面',
       },
       {
-        type: 'numberList',
+        type: 'numberItem',
         icon: 'list-ol',
         style: 'solid',
         name: '順序列表',
       },
       {
-        type: 'bulletList',
+        type: 'bulletItem',
         icon: 'list-ul',
         style: 'solid',
         name: '無序列表',
       },
+      {
+        type: 'toggleList',
+        icon: 'caret-right',
+        style: 'solid',
+        size: '1x',
+        name: '切換列表',
+      },
+      {
+        type: 'todoItem',
+        icon: 'check-square',
+        style: 'regular',
+        name: '核取框',
+      },
+      {
+        type: 'dividingLine',
+        icon: 'window-minimize',
+        style: 'regular',
+        name: '分割線',
+      },
     ],
+    groups: [],
     currentPageId: '', // 存當前頁面id 不用放數據庫
     currentPageIdOnMouse: '',
-    currentBlockIdOnMouse: '',
     currentFocusBlockId: '',
     currentBlocksByAreaSelect: [],
+    hiddenBlocksIds: [],
   },
   mutations: {
     // 把FS的資料全部取到state中
@@ -239,21 +275,22 @@ export default createStore({
       const editPageId = pageId || state.currentPageId;
       stateFind(state.pages, editPageId)[property] = value;
     },
+
     changeCurrentPage(state, id) {
       state.currentPageId = id;
     },
+
     addBlock(state, item) {
       state.blocks.push(item);
     },
+
     deleteBlock(state, item) {
       const index = state.blocks.indexOf(item);
       state.blocks.splice(index, 1);
     },
+
     changeCurrentPageIdOnMouse(state, id) {
       state.currentPageIdOnMouse = id;
-    },
-    changeCurrentBlockIdOnMouse(state, id) {
-      state.currentBlockIdOnMouse = id;
     },
 
     addIdToBlocksOfPage(state, { page, blockId, index }) {
@@ -264,37 +301,97 @@ export default createStore({
         thispage.blocks.push(blockId);
       }
     },
+
     addIdToBlocksOfBlock(state, { block, blockId, index }) {
-      if (index) {
+      if (index !== undefined) {
         block.blocks.splice(index, 0, blockId);
       } else {
         block.blocks.push(blockId);
       }
     },
+
     deleteIdToBlocksOfPage(state, { page, blockId }) {
       const thispage = page || stateFind(state.pages, state.currentPageId);
       const index = thispage.blocks.indexOf(blockId);
       thispage.blocks.splice(index, 1);
     },
+
     deleteIdToBlocksOfBlock(state, { block, blockId }) {
       const index = block.blocks.indexOf(blockId);
       block.blocks.splice(index, 1);
     },
-    editBlockData(state, { id, key = 'content', value }) {
+
+    editBlockData(state, { id, value, key = 'content' }) {
       if (state.currentPageId === '') return;
       stateFind(state.blocks, id)[key] = value;
     },
+
     changeFocusBlock(state, id) {
-      if (id) {
-        state.currentFocusBlockId = id;
-      } else {
-        state.currentFocusBlockId = '';
-      }
+      state.currentFocusBlockId = id;
     },
+
     changeBlocksByAreaSelect(state, { arr }) {
       state.currentBlocksByAreaSelect = arr;
     },
 
+    // 此部分處理group邏輯
+    addGroup(state, groupId) {
+      const group = {
+        id: groupId || new Date().getTime().toString(),
+        value: [],
+      };
+      state.groups.push(group);
+    },
+
+    addIdToGroup(state, { groupId, id, index }) {
+      const group = stateFind(state.groups, groupId);
+      if (index !== undefined) {
+        group.value.splice(index, 0, id);
+      } else {
+        group.value.push(id);
+      }
+    },
+
+    addIdsToGroup(state, { groupId, ids }) {
+      const group = stateFind(state.groups, groupId);
+      group.value = [...group.value, ...ids];
+    },
+
+    deleteIdToGroup(state, { groupId, id }) {
+      const group = stateFind(state.groups, groupId);
+      const index = group.value.indexOf(id);
+      group.value.splice(index, 1);
+    },
+
+    deleteGroup(state, group) {
+      const index = state.groups.indexOf(group);
+      state.groups.splice(index, 1);
+    },
+
+    changeGroupIdFromBlockId(state, { blockId, groupId }) {
+      stateFind(state.blocks, blockId).group = groupId;
+    },
+
+    addIdsToHiddenBlocksIds(state, ids) {
+      ids.forEach((id) => {
+        if (!state.hiddenBlocksIds.includes(id)) {
+          state.hiddenBlocksIds.push(id);
+        }
+      });
+    },
+
+    deleteIdsToHiddenBlocksIds(state, ids) {
+      ids.forEach((id) => {
+        if (state.hiddenBlocksIds.includes(id)) {
+          const index = state.hiddenBlocksIds.indexOf(id);
+          state.hiddenBlocksIds.splice(index, 1);
+        }
+      });
+    },
+
+    resetHiddenBlocksIds(state) {
+      state.hiddenBlocksIds = [];
+    },
   },
   getters: {
     // 回傳帶入的page的id所取得的所有子集pages ; 帶入''回傳根pages
@@ -341,10 +438,22 @@ export default createStore({
     getPageByBlockId(state) {
       return (blockId) => state.pages.find((page) => page.blocks.includes(blockId));
     },
-    // 回傳當前page裡面被選中的block是第幾順位的數字
-    // indexOfCurrentBlock(state, getters) {
-    //   return getters.currentPage.blocks.indexOf(state.currentFocusBlockId);
-    // },
+
+    getGroupByBlock(state) {
+      return (block) => stateFind(state.groups, block.group);
+    },
+
+    getIndexFromGroupByBlock(state) {
+      return (block) => stateFind(state.groups, block.group).value.indexOf(block.id);
+    },
+
+    getGroups(state) {
+      return state.groups;
+    },
+
+    isIdInHiddenBlocksIds(state) {
+      return (id) => state.hiddenBlocksIds.includes(id);
+    },
   },
   actions: {
     getAllData(store, collection) {
@@ -392,22 +501,23 @@ export default createStore({
         parentPageId: parentPage.id,
       });
       store.dispatch('addBlock', {
-        typeName: 'page',
+        type: 'page',
         page: parentPage,
         value: id,
       });
     },
     // 添加block到某page，須帶入參數含
     addBlock(store, {
-      page, typeName, value, id, blocks, parentId, // 若typeName是page，value存新id
+      page, type, value, id, blocks, parentId, group, // 若type是page，value存新id
     }) {
       const newBlockId = id || (new Date().getTime() + 3).toString();
       const newBlock = {
         id: newBlockId,
-        type: typeName,
+        type,
         content: value || '',
         blocks: blocks || [],
         parentId: parentId || '',
+        group: group || '',
       };
 
       // 此段處理block的id被加入某page中的blocks陣列裡的某位置
@@ -418,7 +528,7 @@ export default createStore({
       store.commit('addIdToBlocksOfPage', {
         page: thisPage,
         blockId: newBlockId,
-        index: isSelect ? index + 1 : null,
+        index: isSelect ? index + 1 : undefined,
       });
       store.commit('addBlock', newBlock);
       store.commit('changeFocusBlock', newBlockId);
@@ -431,16 +541,37 @@ export default createStore({
       const id = new Date().getTime().toString(); // 創一個新的blockId
 
       store.dispatch('addBlock', {
-        typeName: 'p',
+        type: 'p',
         id,
         parentId: parentBlock.id,
       });
 
-      const newBlocks = [...parentBlock.blocks, id];
-      store.commit('editBlockData', {
-        id: parentBlock.id, // 此處id為父集id
-        key: 'blocks',
-        value: newBlocks,
+      store.commit('addIdToBlocksOfBlock', {
+        block: parentBlock,
+        blockId: id,
+      });
+
+      // const newBlocks = [...parentBlock.blocks, id];
+      // store.commit('editBlockData', {
+      //   id: parentBlock.id, // 此處id為父集id
+      //   key: 'blocks',
+      //   value: newBlocks,
+      // });
+    },
+
+    addBlockInGroup(store, { type, groupId }) {
+      const blockId = (new Date().getTime() + 3).toString();
+      const newGroupId = groupId || (new Date().getTime() + 5).toString();
+
+      store.dispatch('addBlock', {
+        type,
+        id: blockId,
+        group: newGroupId,
+      });
+
+      store.commit('addIdToGroup', {
+        groupId: newGroupId,
+        id: blockId,
       });
     },
 
@@ -460,6 +591,13 @@ export default createStore({
       } else { // 單純的刪除page裡面某位置的blockId
         const index = page.blocks.indexOf(thisBlock.id);
         store.commit('changeFocusBlock', page.blocks[index - 1]);
+      }
+
+      if (thisBlock.group !== '') { // 如果此block有包含在某個group，就把group中此id刪除
+        store.commit('deleteIdToGroup', {
+          groupId: thisBlock.group,
+          id: thisBlock.id,
+        });
       }
 
       // 刪除當前page的blocks裡面對應的id
@@ -490,6 +628,24 @@ export default createStore({
     goBlockPosition(store, { page, block }) {
       store.commit('changeCurrentPage', page.id);
       store.commit('changeFocusBlock', block.id);
+    },
+
+    deleteIdsToGroup(store, { groupId, ids }) {
+      ids.forEach((id) => {
+        store.commit('deleteIdToGroup', {
+          groupId,
+          id,
+        });
+      });
+    },
+
+    changeGroupIdFromBlocksIds(store, { blocksIds, groupId }) {
+      blocksIds.forEach((blockId) => {
+        store.commit('changeGroupIdFromBlockId', {
+          blockId,
+          groupId,
+        });
+      });
     },
   },
   modules: {

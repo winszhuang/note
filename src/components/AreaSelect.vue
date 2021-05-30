@@ -3,8 +3,6 @@
     id="area-select"
     ref="select"
   ></div>
-  <!-- <teleport to="#app">
-  </teleport> -->
 </template>
 
 <script>
@@ -68,7 +66,7 @@ const useAreaSelectEffect = (el, boxCollisionDetection) => {
 
   const changeElementsClassByIds = (selectIds, className) => {
     allIds.value.forEach((id) => {
-      const element = document.getElementById(id);
+      const element = document.getElementById(id).closest('.block-content');
       if (element === null) return;
       if (element.classList.contains(className)) {
         element.classList.remove(className);
@@ -78,7 +76,7 @@ const useAreaSelectEffect = (el, boxCollisionDetection) => {
     if (selectIds.length === 0) return;
 
     selectIds.forEach((id) => {
-      const element = document.getElementById(id);
+      const element = document.getElementById(id).closest('.block-content');
       element.classList.add(className);
     });
   };
@@ -95,10 +93,8 @@ const useAreaSelectEffect = (el, boxCollisionDetection) => {
 
   const mouseDown = (e) => {
     if (moveState.value === true) return;
-    if (e.target.tagName === 'svg' || e.target.tagName === 'path' || e.target.tagName === 'INPUT') {
-      console.log('碰到drag或input');
-      return;
-    }
+    if (e.target.closest('.block')) return;
+
     selectIdsList.setArr([]); // 點一下初始
     changeElementsClassByIds(selectIdsList.getArr(), 'block-selected');
 
@@ -113,6 +109,7 @@ const useAreaSelectEffect = (el, boxCollisionDetection) => {
   };
 
   const mouseUp = () => {
+    // console.log('7777777777777');
     moveState.value = false;
     dom.hidden = 1;
   };

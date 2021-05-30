@@ -1,8 +1,7 @@
 <template>
   <div class="dragicon"
       draggable="true"
-      @dragstart="handleDrag($event)"
-  >
+      @dragstart="handleDrag($event)">
     <font-awesome-icon :icon="['fas', 'expand-arrows-alt']" size="xs"/>
   </div>
 </template>
@@ -24,9 +23,13 @@ export default {
 
 <style lang="scss">
 .dragicon{
+  display: flex;
+  align-items: center;
+  height: 100%;
+  line-height: 100%;
   width: 1rem;
-
   color: #c0c0c0;
+  transition: color .3s ease-out;
   &:hover{
     color: #747474;
   }

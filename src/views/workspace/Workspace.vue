@@ -1,5 +1,5 @@
 <template>
-  <div class="contain" v-if="currentPage">
+  <div class="workspace" v-if="currentPage" @mousemove="checkElement($event)">
     <div class="header">
       <Breadcrumb :page="currentPage"/>
     </div>
@@ -31,23 +31,40 @@
           </ul>
         </div>
       </div> -->
-    <div class="workspace">
+    <div class="content">
       <AreaSelect :ids="currentBlocksIds" />
+      <template v-if="groups.length !== 0">
+        <div v-for="(item) in groups" :key="item.id">
+          <ul>
+              <li>id ------ {{ item.id }}</li>
+              <li>value ---- {{ item.value }}</li>
+              <hr>
+          </ul>
+        </div>
+      </template>
       <div class="title">
-        <input class="title-input"
+        <div class="title-input"
+            contenteditable=true
+            spellcheck="false"
             type="text"
             placeholder="請輸入標題"
             :value="currentPage.name"
-            @input="editPageData('name', $event.target.value)"
-        >
+            @input="editPageData('name', $event.target.innerHTML)">{{ currentPage.name }}</div>
         <div class="prefix-line"></div>
       </div>
-      <div class="content" ref="content" v-if="currentBlocks">
-        <Block :block="block"
-                v-for="(block) in rootCurrentBlocks"
-                :key="block.id"/>
+      <div class="blockcontent" v-if="currentBlocks">
+        <template v-for="(block) in currentBlocks" :key="block.id">
+          <Block :block="block"
+                :showdrag="block.id === currentIdOnMouse ? true : false"
+                v-show="!hiddenBlocksIds.includes(block.id)"/>
+        </template>
       </div>
       <hr>
+      <div v-if="hiddenBlocksIds">
+        <div>hiddenBlocksIds:
+          {{ hiddenBlocksIds }}
+        </div>
+      </div>
       <div v-if="currentBlocksByAreaSelect">
         {{ currentBlocksByAreaSelect }}
       </div>
@@ -70,6 +87,8 @@
             <li>id ------ {{ currentFocusBlock.id }}</li>
             <li>parentId ------ {{ currentFocusBlock.parentId }}</li>
             <li>blocks ------ {{ currentFocusBlock.blocks }}</li>
+            <li>group ------ {{ currentFocusBlock.group }}</li>
+            <li>check ------ {{ currentFocusBlock.check }}</li>
             <hr>
           </ul>
         </div>
@@ -91,6 +110,7 @@
             <li>id ------ {{ block.id }}</li>
             <li>parentId ------ {{ block.parentId }}</li>
             <li>blocks ------ {{ block.blocks }}</li>
+            <li>group ------ {{ block.group }}</li>
             <hr>
           </ul>
         </div>
@@ -101,7 +121,7 @@
 
 <script>
 import {
-  computed, toRefs, ref, watch, nextTick,
+  computed, toRefs, ref, watch, nextTick, onMounted,
 } from 'vue';
 import { useStore } from 'vuex';
 import commonUpdateEffect from '../commonUpdataEffect';
@@ -114,6 +134,7 @@ export default {
   components: { Block, Breadcrumb, AreaSelect },
   setup() {
     const store = useStore();
+    const groups = computed(() => store.getters.getGroups);
     const currentPage = computed(() => store.getters.currentPage);
     const currentBlocks = computed(() => store.getters.currentBlocks);
     const rootCurrentBlocks = computed(() => store.getters.childrenCurrentBlocks(''));
@@ -124,9 +145,8 @@ export default {
 
     const { editPageData } = commonUpdateEffect();
     const {
-      currentFocusBlockId, pages, // pages, blocks,
+      currentFocusBlockId, pages, hiddenBlocksIds, // pages, blocks,
     } = toRefs(store.state);
-      // const indexOfCurrentBlock = computed(() => store.getters.indexOfCurrentBlock);
 
     const isShowEditCoverButton = ref(false);
     const hoverHandle = (choose) => {
@@ -137,33 +157,59 @@ export default {
     const editCoverCardHandle = (choose) => {
       isShowEditCoverCard.value = choose;
     };
-    // const hoverHandle = (choose) => {
-    //   isShowEditImageCard.value = choose;
-    // };
 
-    const content = ref(null);
-    if (currentFocusBlockId) {
+    const currentIdOnMouse = ref('');
+    const checkElement = (e) => {
+      const blockEl = e.target.closest('.block');
+      if (!blockEl) {
+        currentIdOnMouse.value = '';
+        return;
+      }
+      const hasIdEl = blockEl.querySelector('[id]');
+      // console.log(hasIdEl);
+      currentIdOnMouse.value = hasIdEl.getAttribute('id');
+    };
+
+    onMounted(() => {
       watch( // 監聽是否切換到其他元素
         currentFocusBlockId,
-        () => {
+        (curr, prev) => {
           nextTick(() => {
-            if (!content.value) return;
-            if (!currentFocusBlockId.value) return;
+            if (!curr) return;
 
-            const focusDom = document.getElementById(currentFocusBlockId.value);
-            if (!focusDom) return;
-            // console.log(focusDom.tagName);
-            if (focusDom.tagName === 'INPUT') {
-              focusDom.focus();
-            }
-            if (focusDom.tagName === 'IMG') {
-              focusDom.previousElementSibling.focus();
-            }
-            // console.log(rootCurrentBlocks.value);
+            const getEditableElementById = (id) => {
+              const el = document.getElementById(id);
+              if (!el) return null;
+
+              return el.closest('.block').querySelector('[contenteditable]');
+            };
+
+            const setCursorToEnd = (el) => {
+              const range = window.getSelection();
+              range.selectAllChildren(el);
+              range.collapseToEnd();
+            };
+
+            const currFocusDom = getEditableElementById(curr);
+            const prevFocusDom = getEditableElementById(prev);
+
+            if (!currFocusDom) return;
+            currFocusDom.focus();
+            setCursorToEnd(currFocusDom);
+
+            if (prevFocusDom === null) return;
+            prevFocusDom.placeholder = '';
           });
         },
       );
-    }
+    });
+
+    // watch(
+    //   hiddenBlocksIds,
+    //   (curr) => {
+    //     console.log(curr);
+    //   }
+    // )
 
     // watch(
 
@@ -201,7 +247,6 @@ export default {
 
     return {
       pages,
-      content,
       currentPage,
       editPageData,
       currentBlocks,
@@ -215,6 +260,10 @@ export default {
       isShowEditCoverCard,
       editCoverCardHandle,
       currentBlocksByAreaSelect,
+      groups,
+      currentIdOnMouse,
+      checkElement,
+      hiddenBlocksIds,
     };
   },
 };
@@ -223,7 +272,7 @@ export default {
 <style lang="scss" scoped>
 @import '../../style/color.scss';
 
-.contain{
+.workspace{
   flex: 1;
   height: 100vh;
   background: #F1F0EA;
@@ -246,31 +295,32 @@ export default {
   margin-bottom: 4.5rem;
 }
 
-.content{
+.blockcontent{
   width: 100%;
   &-input{
     width: inherit;
     min-height: 50px;
   }
 }
-.workspace{
+.content{
   flex-grow:1;
-  padding: 0 15% 0 15%;
-  @media (max-width:900px){
-    left: 0;
-  }
+  padding: 0 20%;
+  // padding: 0 20% 0 20%;
   @media (min-width:1100px){
-    padding: 0 20% 0 20%;
+    padding: 0 25%;
   }
 }
 .title{
   margin-top: 2rem;
   margin-bottom: 5rem;
   position: relative;
-  input{
+  &-input{
+    // resize: none;
+    // height: auto;
+    // width: 100%;
     font-family: 'Noto Sans TC', sans-serif;
     font-weight: 700;
-    font-size: 4rem;
+    font-size: 3.5rem;
   }
   .prefix-line{
     position:absolute;
