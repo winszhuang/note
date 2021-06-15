@@ -1,6 +1,8 @@
 <template>
-  <div class="ms-2 d-flex">
-    <div class="bullet">⦁</div>
+  <div class="d-flex">
+    <div class="p-prefix">
+      <div class="bullet">⦁</div>
+    </div>
     <P :block="block"/>
   </div>
 </template>
@@ -25,10 +27,8 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .bullet{
-  padding-left: .2rem;
-  margin-right: .2rem;
-  line-height: 1.9rem;
+  padding-left: .1rem;
 }
 </style>

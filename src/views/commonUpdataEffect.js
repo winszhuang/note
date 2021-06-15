@@ -13,6 +13,7 @@ const commonUpdateEffect = () => {
       value,
     });
   };
+
   const editBlockData = (id, value, key) => {
     store.commit('editBlockData', {
       id,
@@ -20,7 +21,25 @@ const commonUpdateEffect = () => {
       key,
     });
   };
-  const keydownHandle = (block, e) => {
+
+  const getFocusBlock = (id) => {
+    store.commit('changeFocusBlock', id);
+  };
+
+  const checkKeydownInPageData = (page, e) => {
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      if (page.blocks.length === 0) {
+        store.dispatch('addBlock', {
+          type: 'p',
+        });
+        return;
+      }
+      getFocusBlock(page.blocks[0]);
+    }
+  };
+
+  const checkKeydownInBlockContent = (block, e) => {
     if (block.content === '' && e.keyCode === 8) {
       e.preventDefault();
       store.dispatch('deleteBlock', {});
@@ -55,16 +74,16 @@ const commonUpdateEffect = () => {
       });
     }
   };
-  const getFocusBlock = (id) => {
-    store.commit('changeFocusBlock', id);
-  };
+
   const goCurrentPage = (id) => {
-    store.commit('changeCurrentPage', id);
+    store.dispatch('changeCurrentPage', id);
   };
+
   return {
     editBlockData,
     editPageData,
-    keydownHandle,
+    checkKeydownInBlockContent,
+    checkKeydownInPageData,
     getFocusBlock,
     goCurrentPage,
   };

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;300;400;500;700;900&display=swap');
 
 html {
   font-family: 'Noto Sans TC', sans-serif;
@@ -9,7 +9,25 @@ body {
   height: 100%;
 }
 
-div[contenteditable=true] {
+a {
+  text-decoration: none;
+}
+
+.fullscreen {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  padding: 15px;
+  margin: auto;
+  z-index: 4;
+  background: $coffee;
+}
+
+input,
+div[contenteditable] {
+  width: 100%;
   color: #494949;
   background: transparent;
   border: none;
@@ -48,12 +66,6 @@ div[contenteditable=true] {
   opacity: 1;
 }
 
-.p{
-  padding-top: .1rem;
-  padding-left: .5rem;
-  line-height: 1.8rem;
-}
-
 $drag-width: 1.5rem;
 .block{
   position: relative;
@@ -80,6 +92,23 @@ $drag-width: 1.5rem;
     filter: grayscale(100%);
     background:rgba($color: rgb(131, 214, 235), $alpha: 0.2);
     border-radius: .2rem;
+  }
+}
+
+$p-height: 1.8rem;
+$p-margin: .2rem 0;
+.p {
+  color: #646464 !important;
+  line-height: $p-height;
+  overflow: auto;
+  margin: $p-margin;
+  padding-left: .1rem;
+  &-prefix{
+    width: 1rem;
+    line-height: $p-height;
+    height: $p-height;
+    margin: .2rem .5rem .2rem .2rem;
+    padding-left: .2rem;
   }
 }
 

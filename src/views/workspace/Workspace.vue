@@ -2,6 +2,15 @@
   <div class="workspace" v-if="currentPage" @mousemove="checkElement($event)">
     <div class="header">
       <Breadcrumb :page="currentPage"/>
+      <div class="update" type="button" @click="updateToFS">
+        <div class="update-icon" v-if="!isUpdating">
+          <font-awesome-icon :icon="['fas', 'database']"/>
+        </div>
+        <div class="update-icon" v-else>
+          <font-awesome-icon :icon="['fas', 'sync-alt']"/>
+        </div>
+        <div class="update-text">更新到數據庫</div>
+      </div>
     </div>
     <!-- <div class="decoration"></div> -->
     <!-- <div class="cover"
@@ -33,6 +42,23 @@
       </div> -->
     <div class="content">
       <AreaSelect :ids="currentBlocksIds" />
+      <StyleTool/>
+      <div class="title">
+        <PageEditable
+            :page="currentPage"
+            :placeholder="'請輸入標題'"
+            :className="'title-input'"/>
+        <!-- <div class="prefix-line"></div> -->
+      </div>
+      <PageInfo :page="currentPage"/>
+      <div class="blockcontent" v-if="currentBlocks">
+        <template v-for="(block) in currentBlocks" :key="block.id">
+          <Block :block="block"
+                :showdrag="block.id === currentIdOnMouse ? true : false"
+                v-show="!hiddenBlocksIds.includes(block.id)"/>
+        </template>
+      </div>
+      <hr>
       <template v-if="groups.length !== 0">
         <div v-for="(item) in groups" :key="item.id">
           <ul>
@@ -42,23 +68,6 @@
           </ul>
         </div>
       </template>
-      <div class="title">
-        <div class="title-input"
-            contenteditable=true
-            spellcheck="false"
-            type="text"
-            placeholder="請輸入標題"
-            :value="currentPage.name"
-            @input="editPageData('name', $event.target.innerHTML)">{{ currentPage.name }}</div>
-        <div class="prefix-line"></div>
-      </div>
-      <div class="blockcontent" v-if="currentBlocks">
-        <template v-for="(block) in currentBlocks" :key="block.id">
-          <Block :block="block"
-                :showdrag="block.id === currentIdOnMouse ? true : false"
-                v-show="!hiddenBlocksIds.includes(block.id)"/>
-        </template>
-      </div>
       <hr>
       <div v-if="hiddenBlocksIds">
         <div>hiddenBlocksIds:
@@ -128,12 +137,27 @@ import commonUpdateEffect from '../commonUpdataEffect';
 import Breadcrumb from './Breadcrumb.vue';
 import Block from '../../components/Block.vue';
 import AreaSelect from '../../components/AreaSelect.vue';
+import PageEditable from '../../components/input/PageEditable.vue';
+import StyleTool from '../../components/StyleTool.vue';
+import PageInfo from './PageInfo.vue';
+import { updateStoreToFS } from '../../store/firestore';
+import watchStoreEffect from '../../store/watchStoreEffect';
 
 export default {
   name: 'Workspace',
-  components: { Block, Breadcrumb, AreaSelect },
+  components: {
+    Block,
+    Breadcrumb,
+    AreaSelect,
+    PageEditable,
+    StyleTool,
+    PageInfo,
+  },
   setup() {
     const store = useStore();
+
+    watchStoreEffect().updateEditTimeOfPageBySubscribe();
+
     const groups = computed(() => store.getters.getGroups);
     const currentPage = computed(() => store.getters.currentPage);
     const currentBlocks = computed(() => store.getters.currentBlocks);
@@ -158,6 +182,11 @@ export default {
       isShowEditCoverCard.value = choose;
     };
 
+    const isUpdating = ref(false);
+    const isUpdatingHandle = (choose) => {
+      isUpdating.value = choose;
+    };
+
     const currentIdOnMouse = ref('');
     const checkElement = (e) => {
       const blockEl = e.target.closest('.block');
@@ -168,6 +197,17 @@ export default {
       const hasIdEl = blockEl.querySelector('[id]');
       // console.log(hasIdEl);
       currentIdOnMouse.value = hasIdEl.getAttribute('id');
+    };
+
+    const updateToFS = async () => {
+      isUpdatingHandle(true);
+      try {
+        await updateStoreToFS();
+        isUpdatingHandle(false);
+      } catch (error) {
+        console.log(error);
+        isUpdatingHandle(false);
+      }
     };
 
     onMounted(() => {
@@ -264,6 +304,8 @@ export default {
       currentIdOnMouse,
       checkElement,
       hiddenBlocksIds,
+      updateToFS,
+      isUpdating,
     };
   },
 };
@@ -275,10 +317,36 @@ export default {
 .workspace{
   flex: 1;
   height: 100vh;
-  background: #F1F0EA;
-  // background: #faf9f2;
+  // background: #F1F0EA;
+  background: #faf9f2;
   position: relative;
   overflow-y: auto;
+}
+
+.header{
+  background: #faf9f2;
+  position: sticky;
+  top: 0;
+  display: flex;
+  padding: 1.5rem .5rem 1.5rem 2rem;
+  margin-bottom: 6rem;
+  z-index: 7;
+}
+
+.update{
+  top: 0;
+  border-radius: .3rem;
+  color: #646464;
+  padding: 0 .3rem;
+  margin-left: auto;
+  margin-right: 1rem;
+  display: flex;
+  &:hover{
+    background: #dbdbdb;
+  }
+  &-text{
+    margin-left: .5rem;
+  }
 }
 
 .decoration{
@@ -288,11 +356,6 @@ export default {
   width: 3rem;
   height: 7rem;
   background: $web-orange;
-}
-
-.header{
-  padding: 1.5rem .5rem 1.5rem 2rem;
-  margin-bottom: 4.5rem;
 }
 
 .blockcontent{
@@ -309,18 +372,16 @@ export default {
   @media (min-width:1100px){
     padding: 0 25%;
   }
+  // @media (min-width:1200px){
+  //   padding: 0 27%;
+  // }
 }
 .title{
-  margin-top: 2rem;
-  margin-bottom: 5rem;
   position: relative;
   &-input{
-    // resize: none;
-    // height: auto;
-    // width: 100%;
     font-family: 'Noto Sans TC', sans-serif;
     font-weight: 700;
-    font-size: 3.5rem;
+    font-size: 3rem;
   }
   .prefix-line{
     position:absolute;

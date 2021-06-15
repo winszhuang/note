@@ -1,32 +1,22 @@
 <template>
-  <div
-    type="text"
-    class="h5"
-    contenteditable="true"
-    placeholder="請輸入標題"
-    :id=block.id
-    :value="block.content"
-    @input="editBlockData(block.id, $event.target.innerHTML)"
-    @keydown="keydownHandle(block, $event)"
-    @focus="getFocusBlock(block.id)">{{ block.content }}</div>
+  <BlockEditable
+          :block="block"
+          :placeholder="'請輸入標題'"
+          :className="'h4'"/>
 </template>
 
 <script>
-import commonUpdateEffect from '../../views/commonUpdataEffect';
+import BlockEditable from '../input/BlockEditable.vue';
 
 export default {
   name: 'H3',
   props: ['block'],
-  setup() {
-    const { editBlockData, getFocusBlock, keydownHandle } = commonUpdateEffect();
-
-    return { editBlockData, getFocusBlock, keydownHandle };
-  },
+  components: { BlockEditable },
 };
 </script>
 
 <style lang="scss" scoped>
-.h5{
+.h4{
   margin: .2rem 0;
   line-height: 2rem;
   font-weight: 700;

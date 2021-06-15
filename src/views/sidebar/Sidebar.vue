@@ -1,25 +1,27 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-restricted-syntax */
 <template>
+  <Modal v-if="isShow"
+        @close="handleShow(false)"
+        :mode="'component'"
+        :is-bg-static="false">
+    <template #component>
+      <Search @close="handleShow(false)"/>
+    </template>
+  </Modal>
   <div class="sidebar">
-      <Modal v-if="isOpenModal"
-            :mode="'component'"
-            :is-bg-static="false"
-            @close="openModal(false)">
-        <template #component>
-          <Search/>
-        </template>
-      </Modal>
-      <UserInfo/>
+      <router-link to="/userinfo">
+        <UserField/>
+      </router-link>
       <div class="customlist-group bb">
         <div class="customlist-group-item customlist-group-item-action"
               type="button"
-              @click="openModal(true)">
-          <div class="customlist-item block-icon me-1">
+              @click="handleShow(true)">
+          <div class="customlist-item block-icon" style="margin-left: 1rem;">
             <font-awesome-icon
                 :icon="['fas', 'search']" />
           </div>
-          <div class="customlist-item block-name">搜尋區塊</div>
+          <div class="customlist-item block-name ">搜尋區塊</div>
         </div>
       </div>
       <!-- <div v-if="currentPage">
@@ -29,12 +31,10 @@
         <CustomList
           v-for="item in rootPages"
           :key="item.id"
-          :page="item"
-        />
+          :page="item"/>
         <div class="customlist-group-item customlist-group-item-action"
             type="button"
-            @click="addPage"
-        >
+            @click="addPage">
           + <div class="ms-2">增加頁面</div>
         </div>
       </div>
@@ -43,9 +43,8 @@
               type="button"
               v-for="item in blocktype"
               :key="item.type"
-              @click="addBlock(item.type)"
-        >
-          <div class="customlist-item block-icon">
+              @click="addBlock(item.type)">
+          <div class="customlist-item block-icon ms-3">
             <font-awesome-icon
                 :icon="[style[item.style], item.icon || 'heading']" :size="item.size || 'xs'"/>
             <!-- {{ item.type }} -->
@@ -66,15 +65,16 @@ import { useStore } from 'vuex';
 import {
   toRefs, ref, computed, onMounted, // reactive
 } from 'vue';
-import UserInfo from './UserInfo.vue';
+import UserField from './UserField.vue';
 import CustomList from '../../components/CustomList.vue';
 import Modal from '../../components/Modal.vue';
 import Search from '../Search.vue';
+import { showEffect } from '../../components/commonEffect';
 
 export default {
   name: 'Sidebar',
   components: {
-    UserInfo,
+    UserField,
     CustomList,
     Modal,
     Search,
@@ -82,15 +82,15 @@ export default {
   setup() {
     const store = useStore();
     const list = ref(null);
-    const isOpenModal = ref('false');
     const currentPage = computed(() => store.getters.currentPage);
     const rootPages = computed(() => store.getters.childrenPages(''));
+    const { isShow, handleShow } = showEffect();
     const {
       pages, blocks, blocktype, currentPageId, currentPageIdOnMouse,
     } = toRefs(store.state);
 
     onMounted(() => {
-      isOpenModal.value = false;
+      handleShow(false);
     });
 
     const style = {
@@ -128,10 +128,6 @@ export default {
       });
     };
 
-    const openModal = (choose) => {
-      isOpenModal.value = choose;
-    };
-
     return {
       pages,
       rootPages,
@@ -142,10 +138,10 @@ export default {
       currentPageId,
       currentPageIdOnMouse,
       addBlock,
-      openModal,
       list,
       style,
-      isOpenModal,
+      isShow,
+      handleShow,
     };
   },
 };

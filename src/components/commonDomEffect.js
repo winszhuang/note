@@ -1,19 +1,6 @@
 import { ref, reactive } from 'vue';
 
 const commonDomEffect = () => {
-  const addClass = (el, className) => {
-    el.classList.add(className);
-  };
-
-  const removeClass = (el, className) => {
-    el.classList.remove(className);
-  };
-
-  const editStyle = (el, property, value, extra) => {
-    // eslint-disable-next-line no-param-reassign
-    el.style[property] = value || extra;
-  };
-
   const getElementsByIdsInArr = (arr) => {
     let selectors = '';
     arr.forEach((id, key, array) => {
@@ -44,24 +31,6 @@ const commonDomEffect = () => {
       };
       reader.readAsDataURL(blob);
     }
-  };
-
-  const showEffect = () => {
-    const isShow = ref(false);
-
-    const handleShow = (isTrueOrFalse) => {
-      isShow.value = isTrueOrFalse;
-    };
-
-    const toggleShow = () => {
-      isShow.value = !isShow.value;
-    };
-
-    return {
-      isShow,
-      handleShow,
-      toggleShow,
-    };
   };
 
   const mouseDownMoveUpEffect = () => {
@@ -126,29 +95,6 @@ const commonDomEffect = () => {
     return true;
   };
 
-  // class DomObject {
-  //   constructor(dom, data) {
-  //     this.dom = dom;
-  //     this.data = data;
-  //   }
-
-  //   get dom() {
-  //     return this.dom;
-  //   }
-
-  //   set dom(dom) {
-  //     this.dom = dom;
-  //   }
-
-  //   get data() {
-  //     return this.data;
-  //   }
-
-  //   set data(data) {
-  //     this.data = data;
-  //   }
-  // }
-
   const dragDropEffect = () => {
     const domObject = () => {
       const data = {
@@ -176,20 +122,16 @@ const commonDomEffect = () => {
         },
       };
     };
-
     return { domObject };
-
     // const catchObject = domObject();
     // const targetObjetc = domObject();
   };
 
+  // const
+
   return {
-    addClass,
-    removeClass,
-    editStyle,
     getElementsByIdsInArr,
     pasteImage,
-    showEffect,
     dragDropEffect,
     mouseDownMoveUpEffect,
     isMouseInsideElement,
@@ -197,3 +139,39 @@ const commonDomEffect = () => {
 };
 
 export default commonDomEffect;
+
+// class DomObject {
+//   constructor(dom, data) {
+//     this.dom = dom;
+//     this.data = data;
+//   }
+
+//   get dom() {
+//     return this.dom;
+//   }
+
+//   set dom(dom) {
+//     this.dom = dom;
+//   }
+
+//   get data() {
+//     return this.data;
+//   }
+
+//   set data(data) {
+//     this.data = data;
+//   }
+// }
+
+// const addClass = (el, className) => {
+//   el.classList.add(className);
+// };
+
+// const removeClass = (el, className) => {
+//   el.classList.remove(className);
+// };
+
+// const editStyle = (el, property, value, extra) => {
+//   // eslint-disable-next-line no-param-reassign
+//   el.style[property] = value || extra;
+// };

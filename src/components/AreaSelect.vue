@@ -66,7 +66,9 @@ const useAreaSelectEffect = (el, boxCollisionDetection) => {
 
   const changeElementsClassByIds = (selectIds, className) => {
     allIds.value.forEach((id) => {
-      const element = document.getElementById(id).closest('.block-content');
+      const innerEl = document.getElementById(id);
+      // if (innerEl) return;
+      const element = innerEl.closest('.block-content');
       if (element === null) return;
       if (element.classList.contains(className)) {
         element.classList.remove(className);
@@ -94,6 +96,8 @@ const useAreaSelectEffect = (el, boxCollisionDetection) => {
   const mouseDown = (e) => {
     if (moveState.value === true) return;
     if (e.target.closest('.block')) return;
+    if (e.target.hasAttribute('contenteditable')) return;
+    // if (e.target.innerText !== undefined) return;
 
     selectIdsList.setArr([]); // 點一下初始
     changeElementsClassByIds(selectIdsList.getArr(), 'block-selected');

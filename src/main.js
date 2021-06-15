@@ -5,6 +5,7 @@ import { faGooglePlusSquare, faFacebookSquare, faTwitterSquare } from '@fortawes
 import {
   faPlusSquare,
   faFile,
+  faClock,
   faImages,
   faCheckSquare,
   faWindowMinimize,
@@ -22,6 +23,18 @@ import {
   faListOl,
   faTimes,
   faSearch,
+  faUserEdit,
+  faTags,
+  faDatabase,
+  faBold,
+  faItalic,
+  faUnderline,
+  faStrikethrough,
+  faSubscript,
+  faPalette,
+  faSyncAlt,
+  faLaptopCode,
+  faClock as fasClock,
 } from '@fortawesome/free-solid-svg-icons';
 
 import 'bootstrap';
@@ -38,6 +51,7 @@ import NumberItem from './components/blocks/NumberItem.vue';
 import BulletItem from './components/blocks/BulletItem.vue';
 import DividingLine from './components/blocks/DividingLine.vue';
 import ToggleList from './components/blocks/ToggleList.vue';
+import CodeEditor from './components/blocks/CodeEditor.vue';
 import App from './App.vue';
 import router from './router';
 import store from './store';
@@ -60,10 +74,26 @@ library.add(faTimes);
 library.add(faSearch);
 library.add(faCheckSquare);
 library.add(faWindowMinimize);
+library.add(faUserEdit);
+library.add(faTags);
+library.add(faClock);
+library.add(fasClock);
+library.add(faDatabase);
+library.add(faSyncAlt);
+library.add(faLaptopCode);
 
+// 社群圖標
 library.add(faGooglePlusSquare);
 library.add(faFacebookSquare);
 library.add(faTwitterSquare);
+
+// 文字樣式工具
+library.add(faBold);
+library.add(faItalic);
+library.add(faUnderline);
+library.add(faStrikethrough);
+library.add(faSubscript);
+library.add(faPalette);
 
 createApp(App).component('font-awesome-icon', FontAwesomeIcon)
   .component('H1', H1)
@@ -78,6 +108,7 @@ createApp(App).component('font-awesome-icon', FontAwesomeIcon)
   .component('TodoItem', TodoItem)
   .component('DividingLine', DividingLine)
   .component('ToggleList', ToggleList)
+  .component('CodeEditor', CodeEditor)
   .use(store)
   .use(router)
   .mount('#app');

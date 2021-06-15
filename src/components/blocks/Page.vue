@@ -27,11 +27,7 @@ export default {
   setup(props) {
     const { goCurrentPage } = commonUpdateEffect();
     const { block } = toRefs(props);
-    // console.log(block.value.content);
-    // onMounted(() => {
-    //   console.log(props.block);
-    // });
-    // const { editBlockData, getFocusBlock, keydownHandle } = commonUpdateEffect();
+
     const store = useStore();
     const targetPage = computed(() => store.getters.choosePage(block.value.content));
     return {

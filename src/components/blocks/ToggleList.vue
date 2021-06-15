@@ -1,6 +1,6 @@
 <template>
-  <div class="toggle-list">
-    <div class="toggle-button" @click="toggleShowAndUpdateHiddenBlocks" type="button">
+  <div class="d-flex">
+    <div class="p-prefix toggle-button" @click="toggleShowAndUpdateHiddenBlocks" type="button">
       <font-awesome-icon :icon="['fas', iconName]" :key="iconName" size="1x"/>
     </div>
     <P :block="block"/>
@@ -11,7 +11,7 @@
 import { computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import P from './P.vue';
-import commonDomEffect from '../commonDomEffect';
+import { showEffect } from '../commonEffect';
 
 export default {
   name: 'ToggleList',
@@ -19,7 +19,6 @@ export default {
   components: { P },
   setup(props) {
     const store = useStore();
-    const { showEffect } = commonDomEffect();
     const { isShow, toggleShow, handleShow } = showEffect();
     const iconName = computed(() => (isShow.value ? 'caret-down' : 'caret-right'));
 
@@ -51,20 +50,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.toggle{
-  &-button{
-    padding-left: .5rem;
-    padding-top: .2rem;
-    width: 1rem;
-    text-align: center;
-    margin-right: .3rem;
-    &:hover{
-      color: #777;
-    }
-  }
-  &-list{
-    display: flex;
+.toggle-button{
+  &:hover{
+    color: #777;
   }
 }
-
 </style>

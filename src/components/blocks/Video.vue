@@ -1,12 +1,13 @@
 <template>
-  <div type="text"
-        contenteditable="true"
-        placeholder="請輸入影片(youtube)網址"
-        :value="block.content"
+  <BlockEditable
         v-show="url === ''"
-        @input="editBlockData(block.id, $event.target.innerHTML)">
-        {{ block.content }}</div>
-  <ScaleController v-show="url !== ''" :aspect-ratio="[16, 9]">
+        :block="block"
+        :no-id="true"
+        :placeholder="'請輸入影片(youtube)網址'"
+        :className="'p'"/>
+  <ScaleController
+        v-show="url !== ''"
+        :aspect-ratio="[16, 9]">
     <iframe
         :id="block.id"
         :src="url" frameborder="0"
@@ -18,15 +19,14 @@
 
 <script>
 import { computed } from 'vue';
+import BlockEditable from '../input/BlockEditable.vue';
 import ScaleController from '../ScaleController.vue';
-import commonUpdateEffect from '../../views/commonUpdataEffect';
 
 export default {
   name: 'Video',
   props: ['block'],
-  components: { ScaleController },
+  components: { ScaleController, BlockEditable },
   setup(props) {
-    const { editBlockData } = commonUpdateEffect();
     // https://www.youtube.com/watch?v=au1z7L0TK5Q&ab_channel=%EB%8F%84%EB%AA%A8%EB%B0%B0%EC%B0%8C
     // https://www.youtube.com/watch?v=SBQprWeOx8g&ab_channel=RedBuster
     // https://www.youtube.com/embed/Ni7YTBYLNpA
@@ -45,7 +45,6 @@ export default {
 
     return {
       url,
-      editBlockData,
     };
   },
 };

@@ -1,6 +1,6 @@
 <template>
-  <div class="ms-2 d-flex">
-    <div class="number">{{ index + 1 }}. </div>
+  <div class="d-flex">
+    <div class="p-prefix">{{ index + 1 }}. </div>
     <P :block="block" :data-group-id="group.id"/>
   </div>
 </template>
@@ -26,10 +26,5 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.number{
-  padding-left: .2rem;
-  margin-right: .2rem;
-  line-height: 1.9rem;
-}
+<style lang="scss" scoped>
 </style>

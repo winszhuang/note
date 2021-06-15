@@ -1,3 +1,5 @@
+import { ref } from 'vue';
+
 const commonArrEffect = () => {
   const arrayList = () => {
     const arr = {
@@ -33,21 +35,8 @@ const commonArrEffect = () => {
 
 const commonStringEffect = () => {
   const getFirstToUpper = (string) => string[0].toUpperCase() + string.slice(1);
+
   return { getFirstToUpper };
-};
-
-const commonLocalStorageEffect = () => {
-  const setDataToLS = (key, value) => {
-    let stringValue = '';
-    if (typeof value === 'object' || value.isArray) {
-      stringValue = JSON.stringify(value);
-    }
-    localStorage.setItem(key, stringValue);
-  };
-
-  const getDataFromLS = (key) => JSON.parse(localStorage.getItem(key));
-
-  return { setDataToLS, getDataFromLS };
 };
 
 const commonCollisionEffect = () => {
@@ -61,9 +50,36 @@ const commonCollisionEffect = () => {
   return { boxCollisionDetection };
 };
 
+const showEffect = () => {
+  const isShow = ref(false);
+
+  const handleShow = (isTrueOrFalse) => {
+    isShow.value = isTrueOrFalse;
+  };
+
+  const toggleShow = () => {
+    isShow.value = !isShow.value;
+  };
+
+  return {
+    isShow,
+    handleShow,
+    toggleShow,
+  };
+};
+
+const transTimeStampToLocalTime = (timestamp) => {
+  let number = timestamp;
+  if (typeof timestamp === 'string') {
+    number = parseInt(timestamp, 10);
+  }
+  return new Date(number).toLocaleString();
+};
+
 export {
   commonArrEffect,
-  commonLocalStorageEffect,
   commonStringEffect,
   commonCollisionEffect,
+  showEffect,
+  transTimeStampToLocalTime,
 };

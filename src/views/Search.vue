@@ -1,31 +1,52 @@
 <template>
   <div class="search">
     <div class="search-input">
-      <div class="me-2">
+      <div class="me-2 search-icon">
         <font-awesome-icon :icon="['fas', 'search']" size="1x"/>
       </div>
       <input type="text" v-model="searchInput" placeholder="輸入搜尋內容">
     </div>
-    <div class="search-list" v-if="searchBlocks">
-      <div class="search-item"
-            type="button"
-            @click="goBlockPosition(getPage(block.id), block)"
-            v-for="(block) in searchBlocks"
-            :key="block.id">
-        <div class="d-flex">
+    <div class="search-divide"></div>
+    <template v-if="searchBlocks">
+      <div class="search-list" >
+        <div class="search-item"
+              type="button"
+              @click="goBlockPosition(getPage(block.id), block)"
+              v-for="(block) in searchBlocks"
+              :key="block.id">
+          <div class="d-flex">
+            <div class="search-item-page-icon">
+              <font-awesome-icon :icon="['far', 'file']" size="1x"/>
+            </div>
+            <div class="search-item-page">
+              {{ getPage(block.id).name }}
+            </div>
+          </div>
+          {{ block.content }}
+        </div>
+      </div>
+    </template>
+    <template v-else>
+      <div class="recent">
+        <div class="recent-subtitle">最近造訪</div>
+        <div class="recent-page">
           <div class="search-item-page-icon">
             <font-awesome-icon :icon="['far', 'file']" size="1x"/>
           </div>
           <div class="search-item-page">
-            {{ getPage(block.id).name }}
+            javascript筆記
           </div>
         </div>
-        {{ block.content }}
+        <div class="recent-page">
+          <div class="search-item-page-icon">
+            <font-awesome-icon :icon="['far', 'file']" size="1x"/>
+          </div>
+          <div class="search-item-page">
+            javascript筆記
+          </div>
+        </div>
       </div>
-    </div>
-    <div v-else>
-      請輸入block內容以搜尋
-    </div>
+    </template>
   </div>
 </template>
 
@@ -62,16 +83,21 @@ export default {
 
 <style lang="scss" scoped>
 .search{
-  padding: 1.5rem;
+  padding: .8rem 1.5rem;
+  &-icon{
+    color: rgb(167, 167, 167);
+  }
   &-input{
     display: flex;
-    border-bottom: .05rem solid rgb(212, 212, 212);
     padding-top: .4rem;
     margin-bottom: 1rem;
   }
-  // &-list{
-
-  // }
+  &-divide{
+    height: .05rem;
+    width: 100;
+    background: rgb(212, 212, 212);
+    margin: 0 -1.5rem;
+  }
   &-item{
     margin: 0 -1.5rem 0 -1.5rem;
     padding: .4rem 2rem;
@@ -86,6 +112,21 @@ export default {
         color: rgb(122, 122, 122);
       }
     }
+  }
+}
+
+.recent{
+  margin-top: 1rem;
+  &-page{
+    display: flex;
+    line-height: 2rem;
+    font-weight: 700;
+  }
+  &-subtitle{
+    font-size: 1rem;
+    transform: scale(.8);
+    transform-origin: left;
+    color: #4e95e6;
   }
 }
 

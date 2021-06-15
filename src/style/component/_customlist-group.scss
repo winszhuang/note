@@ -28,7 +28,8 @@
   &.active {
     z-index: 2; // Place active items above their siblings for proper border styling
     color: $list-group-active-color;
-    background-color: $list-group-active-bg;
+    background-color: rgb(243, 73, 73);
+    // background-color: $list-group-active-bg;
     // border-color: $list-group-active-border-color;
   }
 
@@ -64,6 +65,7 @@
 
 // 單個list裡面的文字
 .customlist-item {
+  // font-weight: 100;
   padding-left: .25rem;
   padding-right: .25rem;
   color: #969293;

@@ -4,42 +4,48 @@
       :class="{'bg-listhover': page.id === currentPageId }"
       @click="goCurrentPage(page.id)"
       @mouseover="hoverHandle(page.id)"
-      @mouseout="hoverHandle('')"
-  >
-    <div :style="{ 'padding-left': `${count*14}px` }"></div> <!--調間距用-->
-    <div class="customlist-item icon-button"
-        @click="toggleShow()"
-    >
+      @mouseout="hoverHandle('')">
+
+    <div :style="{ 'padding-left': `${count}rem` }"></div> <!--調間距用-->
+
+    <div class="customlist-item icon-button" @click="toggleShow"> <!--切換顯示子集-->
       <font-awesome-icon :icon="caretIcon"/>
     </div>
+
     <div class="customlist-item">
       <font-awesome-icon :icon="['far', 'file']"/>
     </div>
+
     <div class="customlist-item">{{ page.name }}</div>
+
     <div class="customlist-item ms-auto icon-button"
         v-show="page.id === currentPageIdOnMouse"
-        @click="deletePage(page)"
-    >
+        @click="deletePage(page)">
       <font-awesome-icon :icon="['fas', 'ellipsis-h']" style="color: #999999" size="sm"/>
     </div>
+
     <div class="customlist-item icon-button"
         v-show="page.id === currentPageIdOnMouse"
-        @click="addPageInside(page)"
-    >
+        @click="addPageInside(page)">
       <font-awesome-icon :icon="['far', 'plus-square']" style="color: #999999"/>
     </div>
+
   </div>
 
-  <div v-if="childrenPages.length !== 0" v-show="isShow">
-    <CustomList
-      v-for="item in childrenPages"
-      :key="item.id"
-      :page="item"
-      :number="count+1"
-    />
-  </div>
-  <div class="children-list-nopage" v-else>
-    沒有頁面
+  <div v-show="isShow">
+    <template v-if="childrenPages.length !== 0">
+      <CustomList
+        v-for="item in childrenPages"
+        :key="item.id"
+        :page="item"
+        :number="count+1"
+      />
+    </template>
+    <template v-else>
+      <div class="children-list-nopage" :style="{ 'padding-left': `${3.5 + count}rem` }">
+        沒有頁面
+      </div>
+    </template>
   </div>
 </template>
 
@@ -53,7 +59,7 @@ import {
   faCaretRight, faCaretDown,
 } from '@fortawesome/free-solid-svg-icons';
 import commonUpdateEffect from '../views/commonUpdataEffect';
-import commonDomEffect from './commonDomEffect';
+import { showEffect } from './commonEffect';
 
 export default {
   name: 'CustomList',
@@ -74,7 +80,6 @@ export default {
     const childrenPages = computed(() => store.getters.childrenPages(props.page.id));
     const { currentPageId, currentPageIdOnMouse } = toRefs(store.state);
     const { goCurrentPage } = commonUpdateEffect();
-    const { showEffect } = commonDomEffect();
     const { isShow, handleShow, toggleShow } = showEffect();
     const caretIcon = computed(() => (isShow.value ? faCaretRight : faCaretDown));
 
@@ -114,8 +119,9 @@ export default {
 <style lang="scss">
 .children-list{
   &-nopage{
-    padding-left: 3rem;
-    color: #b3b3b3;
+    color: #666666;
+    font-size: 10px;
+    line-height: 1.9rem;;
   }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="modal-mask" @click="closeModal($event)">
+    <div class="modal-mask" @click="closeModalByClick($event)">
       <div class="modal-wrapper">
 
         <div class="modal-container" v-if="mode === 'component'">
@@ -30,11 +30,11 @@ export default {
   name: 'Modal',
   props: ['mode', 'isBgStatic'],
   setup(props, { emit }) {
-    const closeModal = (e) => {
+    const closeModalByClick = (e) => {
       if (e.target.className === 'modal-wrapper' || e.target.className === 'modal-mask') emit('close');
     };
 
-    return { closeModal };
+    return { closeModalByClick };
   },
 };
 </script>
@@ -55,8 +55,6 @@ export default {
 
 .modal-wrapper {
   margin-top: 10rem;
-  // display: table-cell;
-  // vertical-align: middle;
 }
 
 .modal-container {

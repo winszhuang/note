@@ -26,6 +26,7 @@
 
 <script>
 import { computed, onMounted, ref } from 'vue';
+import { showEffect } from './commonEffect';
 import commonDomEffect from './commonDomEffect';
 
 export default {
@@ -34,7 +35,7 @@ export default {
   setup(props) {
     const offsetX = ref('');
     const container = document.querySelector('.blockcontent').getBoundingClientRect();
-    const { showEffect, mouseDownMoveUpEffect } = commonDomEffect();
+    const { mouseDownMoveUpEffect } = commonDomEffect();
     const { isShow, handleShow } = showEffect();
     const {
       mouseDownInElement,

@@ -1,8 +1,8 @@
 <template>
-  <div class="todo-item">
+  <div class="d-flex">
     <input type="checkbox"
-            class="todo-item-checkbox"
-            value="true"
+            class="p-prefix checkbox"
+            value="false"
             checked
             @input="editBlockData(block.id, $event.target.value, 'check')">
     <P :block="block" />
@@ -26,16 +26,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.todo-item{
-  padding-left: .5rem;
-  display: flex;
-  width: 100%;
-  height: 100%;
-  &-checkbox{
-    display: block;
-    width: 1rem;
-    margin-top: .42rem;
-    background: transparent;
-  }
+.checkbox{
+  display: block;
+  text-align: center;
 }
 </style>
