@@ -1,17 +1,29 @@
 .sidebar{
   position: relative;
-  overflow-y: auto;
-  background: #3A343B;
+  z-index: 2;
+  background: #433c44;
+  // background: #484049;
   flex: none;
   width: 18rem;
   height: 100vh;
-  box-shadow: 0rem 0rem .3rem rgb(46, 46, 46);
+  box-shadow: .05rem 0rem .2rem .05rem rgb(160, 160, 160);
   // @media (max-width:900px){
   //   display: none;
   // }
   &-footer{
-    width: inherit;
-    bottom: 0;
     position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow-x: hidden;
   }
+}
+
+.scollitem{
+  position: absolute;
+  top: 9.3rem;
+  bottom: 2.5rem;
+  left: 0;
+  right: 0;
+  overflow-y: auto;
 }

@@ -1,6 +1,6 @@
 <template>
   <template v-if="parentPage">
-    <BreadcrumbItem :page="parentPage"/>
+    <BreadcrumbItem :page="parentPage" :number="number + 1" v-if="number < 2"/>
   </template>
   <li
     :class="{'breadcrumb-item': true, effect: page !== currentPage}"
@@ -17,7 +17,15 @@ import commonUpdateEffect from '../commonUpdataEffect';
 
 export default {
   name: 'BreadcrumbItem',
-  props: ['page'],
+  props: {
+    page: {
+      type: Object,
+    },
+    number: {
+      type: Number,
+      default: 0,
+    },
+  },
   setup(props) {
     // console.log(props.page);
     const store = useStore();

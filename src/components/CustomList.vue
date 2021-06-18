@@ -6,7 +6,7 @@
       @mouseover="hoverHandle(page.id)"
       @mouseout="hoverHandle('')">
 
-    <div :style="{ 'padding-left': `${count}rem` }"></div> <!--調間距用-->
+    <div :style="{ 'padding-left': `${number}rem` }"></div> <!--調間距用-->
 
     <div class="customlist-item icon-button" @click="toggleShow"> <!--切換顯示子集-->
       <font-awesome-icon :icon="caretIcon"/>
@@ -38,11 +38,11 @@
         v-for="item in childrenPages"
         :key="item.id"
         :page="item"
-        :number="count+1"
+        :number="number+1"
       />
     </template>
     <template v-else>
-      <div class="children-list-nopage" :style="{ 'padding-left': `${3.5 + count}rem` }">
+      <div class="children-list-nopage" :style="{ 'padding-left': `${3.5 + number}rem` }">
         沒有頁面
       </div>
     </template>
@@ -83,9 +83,6 @@ export default {
     const { isShow, handleShow, toggleShow } = showEffect();
     const caretIcon = computed(() => (isShow.value ? faCaretRight : faCaretDown));
 
-    // eslint-disable-next-line vue/no-setup-props-destructure
-    const count = props.number; // 用來指定目前page是第幾層
-
     const hoverHandle = (id) => {
       store.commit('changeCurrentPageIdOnMouse', id);
     };
@@ -107,7 +104,7 @@ export default {
       deletePage,
       addPageInside,
       hoverHandle,
-      count,
+      // count,
       caretIcon,
       isShow,
       toggleShow,

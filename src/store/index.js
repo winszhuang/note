@@ -264,6 +264,7 @@ export default createStore({
     currentBlocksByAreaSelect: [],
     hiddenBlocksIds: [],
     pageHistory: [],
+    isSidebarCollapse: '',
   },
   mutations: {
     // 把FS的資料全部取到state中
@@ -444,6 +445,10 @@ export default createStore({
       if (state.pageHistory.length > 10) {
         state.pageHistory.splice(0, 1);
       }
+    },
+
+    setSidebarCollapse(state, isTrueOrFalse) {
+      state.isSidebarCollapse = isTrueOrFalse;
     },
   },
   getters: {

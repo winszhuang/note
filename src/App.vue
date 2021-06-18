@@ -28,14 +28,13 @@ export default {
 
     checkAuthState((user) => {
       const isSignInOrOut = user ? 'signin' : 'signout';
-      // console.log(user);
+      console.log(user);
       console.log(user ? '登入狀態喔' : '未登入狀態');
-
       const signinProcedure = async () => {
         try {
           const userData = { value: {} };
           const result = await getUserDataByEmailFromFS(user.email);
-
+          console.log(result);
           if (!result) {
             const userInfo = {
               name: user.displayName,
@@ -47,6 +46,7 @@ export default {
             userData.value = result;
           }
           setUserDataToStore(userData.value);
+          console.log(store.state.userInfo);
 
           if (!isDataInLS('userInfo')) {
             setDataToLS('userInfo', userData.value.userInfo);

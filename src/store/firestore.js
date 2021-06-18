@@ -1,21 +1,20 @@
 /* eslint-disable no-await-in-loop */
 import { toRefs } from 'vue';
-// import { useStore } from 'vuex';
 import store from './index';
 import { db } from './firebase';
-
-// const store = useStore();
-
-// const userInfo = computed(() => store.getters.userInfo);
 
 export const getUserDataByEmailFromFS = async (email) => new Promise((resolve, reject) => {
   db.collection('users')
     .where('userInfo.email', '==', email)
     .get()
     .then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        resolve(doc.data());
-      });
+      if (querySnapshot.empty) {
+        resolve(null);
+      } else {
+        querySnapshot.forEach((doc) => {
+          resolve(doc.data());
+        });
+      }
     })
     .catch((err) => {
       console.log(err);

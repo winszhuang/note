@@ -1,30 +1,45 @@
 <template>
-  <VerificationPage>
-    <template #title>
+  <main class="fullscreen d-flex justify-content-center align-items-center">
+    <form class="text-center">
       <div class="verify-title">註冊</div>
       <div class="verify-subtitle">請輸入email以及密碼</div>
-    </template>
 
-    <template #input="{ update }">
-      <div class="verify-input">
-        <input type="text" placeholder="使用者暱稱" @input="update($event, 'name')">
+      <div :class="{ 'verify-input': true, 'error-border': errorMessage.name !== '' }">
+        <input type="text" placeholder="使用者暱稱"
+            v-model="userInput.name" spellcheck="false">
+        <div class="error-message">{{ errorMessage.name }}</div>
       </div>
-      <div class="verify-input">
-        <input type="text" placeholder="user@gmail.com" @input="update($event, 'email')">
+      <div :class="{ 'verify-input': true, 'error-border': errorMessage.email !== '' }">
+        <input type="email" placeholder="user@gmail.com"
+            v-model="userInput.email" spellcheck="false">
+        <div class="error-message">{{ errorMessage.email }}</div>
       </div>
-      <div class="verify-input">
-        <input type="text" placeholder="密碼" @input="update($event, 'password')">
+      <div :class="{ 'verify-input': true, 'error-border': errorMessage.password !== '' }">
+        <input type="password" placeholder="password"
+            v-model="userInput.password" spellcheck="false">
+        <div class="error-message">{{ errorMessage.password }}</div>
       </div>
-    </template>
 
-    <template #check="{ verify }">
-      <button class="w-100 btn btn-lg btn-primary mb-3"
-              type="button"
-              @click="verify"
-          >註冊</button>
-    </template>
+      <button class="w-100 btn btn-lg btn-primary mb-4"
+            type="button"
+            @click="checkAndSignUp"
+        >註冊</button>
 
-    <template #bottom>
+      <div class=" mb-2" style="color: #5f5f5f;">從其他地方登入</div>
+      <div class="d-flex justify-content-center mb-4">
+        <div class="brand me-2" type="button" @click="socialLogin('google')">
+          <font-awesome-icon :icon="['fab', 'google-plus-square']" size="2x"/>
+        </div>
+        <div class="brand me-2" type="button" @click="socialLogin('facebook')">
+          <font-awesome-icon :icon="['fab', 'facebook-square']"
+                size="2x"/>
+        </div>
+        <div class="brand me-2" type="button" @click="socialLogin('twitter')">
+          <font-awesome-icon :icon="['fab', 'twitter-square']"
+                size="2x"/>
+        </div>
+      </div>
+
       <div class="d-flex justify-content-center">
         <div class="info-bottom w-50">
           <hr>
@@ -35,43 +50,78 @@
           <hr>
         </div>
       </div>
-    </template>
-  </VerificationPage>
+    </form>
+  </main>
 </template>
 
 <script>
-// import { ref } from 'vue';
-// import { reactive } from 'vue';
-import VerificationPage from './VerificationPage.vue';
+import { useRouter } from 'vue-router';
+import userVerifyEffect from './userVerifyEffect';
+import { signUp } from '../../store/firebaseAuth';
+// import { auth } from '../../store/firebase';
 
 export default {
   name: 'Register',
   components: {
-    VerificationPage,
+  },
+  setup() {
+    const router = useRouter();
+    const {
+      userInput,
+      socialLogin,
+      errorMessage,
+      watchErrorMessage,
+    } = userVerifyEffect();
+
+    watchErrorMessage();
+
+    const checkAndSignUp = async () => {
+      if (userInput.name === '') {
+        errorMessage.name = '請輸入暱稱';
+      }
+      if (userInput.email === '') {
+        errorMessage.email = '請輸入email';
+      }
+      if (userInput.password === '') {
+        errorMessage.password = '請輸入密碼';
+      }
+      try {
+        // eslint-disable-next-line max-len
+        // eslint-disable-next-line max-len
+        // const result = await auth.createUserWithEmailAndPassword(userInput.email, userInput.password);
+        // console.log(result);
+        const result = await signUp(userInput.email, userInput.password);
+        console.log(result);
+        console.log('註冊成功');
+        router.push('/signin');
+      } catch (error) {
+        console.log(error);
+        if (error.code === 'auth/invalid-email') {
+          errorMessage.email = '錯誤的email格式';
+        }
+        if (error.code === 'auth/user-not-found') {
+          errorMessage.email = '沒有使用者資料，請先註冊';
+        }
+        if (error.code === 'auth/wrong-password') {
+          errorMessage.password = '密碼輸入錯誤';
+        }
+        if (error.code === 'auth/weak-password') {
+          errorMessage.password = '至少需要輸入6個字元';
+        }
+      }
+    };
+
+    return {
+      userInput,
+      socialLogin,
+      checkAndSignUp,
+      errorMessage,
+    };
   },
 };
 </script>
 
 <style lang="scss" scoped>
-@import '../../style/color.scss';
 @import '../../style/component/_verification.scss';
 
-.info-bottom{
-  display: inline-block;
-  margin-top: 5rem;
-  color: #5f5f5f;
-  a{
-    text-decoration: none;
-  }
-  &-text{
-    color: #afafaf;
-    // color: #8a8a8a;
-    &:hover{
-      color: #c0c0c0;
-    }
-    a{
-      text-decoration: none;
-    }
-  }
-}
 </style>

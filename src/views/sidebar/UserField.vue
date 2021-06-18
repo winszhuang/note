@@ -1,10 +1,21 @@
 <template>
-  <div class="userfield bb" type="button">
-    <div class="userfield-icon" v-html="headshot"></div>
-    <div class="userfield-info">
-      <div class="userfield-info-name">{{ userInfo?.name || '遊客' }}</div>
-      <div class="userfield-info-email">{{ userInfo?.email || 'xxx.gmail.com' }}</div>
+  <div class="topfield">
+    <div :class="{ userfield: true, bb: true, 'p-0': isSidebarCollapse }" type="button"
+        @click="linkToUserInfo">
+        <!-- :style="{ padding: isSidebarCollapse ? '0' :  }" -->
+      <div class="userfield-icon" v-html="headshot"></div>
+      <div class="userfield-info">
+        <div class="userfield-info-name">{{ userInfo?.name || '遊客' }}</div>
+        <div class="userfield-info-email">{{ userInfo?.email || 'xxx.gmail.com' }}</div>
+      </div>
     </div>
+    <HoverButton @clickThen="collapseSidebar" :class-name="'left-collapse'">
+      <template #default="{ isShow }">
+        <div v-show="isShow">
+          <font-awesome-icon :icon="['fas', 'angle-double-left']"/>
+        </div>
+      </template>
+    </HoverButton>
   </div>
   <!-- {{ userInfo }} -->
 </template>
@@ -12,32 +23,56 @@
 <script>
 import { computed, toRefs } from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
+import HoverButton from '../../components/HoverButton.vue';
 
 export default {
   name: 'UserField',
+  components: { HoverButton },
   setup() {
     const store = useStore();
-    const { userInfo } = toRefs(store.state);
+    const router = useRouter();
+    const { userInfo, isSidebarCollapse } = toRefs(store.state);
+
+    const linkToUserInfo = () => {
+      router.push('/userinfo');
+    };
 
     const headshot = computed(() => {
       if (userInfo.value.headshot) {
         return `<img src="${userInfo.value.headshot}">`;
       }
-      return 'C';
+      return '<img src="https://image.flaticon.com/icons/png/512/3135/3135715.png">';
     });
 
-    return { userInfo, headshot };
+    const collapseSidebar = () => {
+      store.commit('setSidebarCollapse', true);
+    };
+
+    return {
+      userInfo,
+      headshot,
+      collapseSidebar,
+      isSidebarCollapse,
+      linkToUserInfo,
+    };
   },
 };
 </script>
 
 <style lang="scss">
 @import '../../style/color.scss';
+.topfield{
+  width: inherit;
+  position: relative;
+}
 .userfield{
-  width: 100%;
+  box-sizing: border-box;
+  width: inherit;
   display: flex;
   padding: 1.2rem 1rem 1rem 1rem;
-  margin-bottom: 1rem;
+  // margin-bottom: 1rem;
+  overflow: hidden;
   &:hover{
     background: #4d454e;
   }
@@ -62,6 +97,7 @@ export default {
       border-radius: 50%;
     }
   &-info{
+    overflow-x: hidden;
     &-name{
       font-size: 1.1rem;
       font-weight: bold;
@@ -80,5 +116,20 @@ export default {
     }
   }
 
+}
+
+.left-collapse{
+  color: #b8b8b8;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &:hover{
+    background: #4d454e;
+  }
 }
 </style>

@@ -34,6 +34,8 @@ import {
   faPalette,
   faSyncAlt,
   faLaptopCode,
+  faAngleDoubleLeft,
+  faAngleDoubleRight,
   faClock as fasClock,
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -81,6 +83,8 @@ library.add(fasClock);
 library.add(faDatabase);
 library.add(faSyncAlt);
 library.add(faLaptopCode);
+library.add(faAngleDoubleLeft);
+library.add(faAngleDoubleRight);
 
 // 社群圖標
 library.add(faGooglePlusSquare);

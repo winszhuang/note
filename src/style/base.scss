@@ -28,7 +28,9 @@ a {
 input,
 div[contenteditable] {
   width: 100%;
-  color: #494949;
+  // color: #494949;
+  // color: #645b66;
+  color: #584d58;
   background: transparent;
   border: none;
   outline: none;
@@ -49,6 +51,27 @@ div[contenteditable] {
   &::selection{
     background-color: #bddaeb;
   }
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #3a343b; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #555; 
+  border-radius: 4px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #888; 
 }
 
 .v-enter-active,

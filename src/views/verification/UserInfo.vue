@@ -1,6 +1,6 @@
 <template>
   <main class="fullscreen d-flex flex-column justify-content-center align-items-center">
-    <img class="userinfo-img" :src="userInfo.headshot" alt="">
+    <img class="userinfo-img" :src="userInfo.headshot || 'https://image.flaticon.com/icons/png/512/3135/3135715.png' " alt="">
     <div class="userinfo-name">{{ userInfo.name }}</div>
     <div class="userinfo-email">{{ userInfo.email }}</div>
     <div class="userinfo-back" type="button" @click="goHome">回到首頁</div>

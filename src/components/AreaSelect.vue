@@ -1,8 +1,5 @@
 <template>
-  <div
-    id="area-select"
-    ref="select"
-  ></div>
+  <div id="area-select"></div>
 </template>
 
 <script>
@@ -94,6 +91,7 @@ const useAreaSelectEffect = (el, boxCollisionDetection) => {
   };
 
   const mouseDown = (e) => {
+    console.log('??????????');
     if (moveState.value === true) return;
     if (e.target.closest('.block')) return;
     if (e.target.hasAttribute('contenteditable')) return;
@@ -207,6 +205,12 @@ export default {
       document.addEventListener('mousedown', mouseDown);
       document.addEventListener('mouseup', mouseUp);
       document.addEventListener('mousemove', mouseMove);
+
+      // onBeforeUnmount(() => {
+      //   document.removeEventListener('mousedown', mouseDown);
+      //   document.removeEventListener('mouseup', mouseUp);
+      //   document.removeEventListener('mousemove', mouseMove);
+      // });
     });
   },
 };
