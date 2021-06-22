@@ -1,34 +1,34 @@
 <template>
     <div class="modal-mask" @click="closeModalByClick($event)">
-      <div class="modal-wrapper">
+      <div :class="containerClass" v-if="mode === 'component'">
+        <slot name="component"></slot>
+      </div>
 
-        <div class="modal-container" v-if="mode === 'component'">
-          <slot name="component"></slot>
+      <div class="modal-container" v-else>
+        <div class="modal-header">
+          <slot name="header">
+          </slot>
         </div>
 
-        <div class="modal-container" v-else>
-          <div class="modal-header">
-            <slot name="header">
-            </slot>
-          </div>
+        <div class="modal-body">
+          <slot name="body"></slot>
+        </div>
 
-          <div class="modal-body">
-            <slot name="body"></slot>
-          </div>
-
-          <div class="modal-footer">
-            <slot name="footer">
-            </slot>
-          </div>
+        <div class="modal-footer">
+          <slot name="footer">
+          </slot>
         </div>
       </div>
+      <!-- <div class="modal-wrapper">
+
+      </div> -->
     </div>
 </template>
 
 <script>
 export default {
   name: 'Modal',
-  props: ['mode', 'isBgStatic'],
+  props: ['mode', 'isBgStatic', 'containerClass'],
   setup(props, { emit }) {
     const closeModalByClick = (e) => {
       if (e.target.className === 'modal-wrapper' || e.target.className === 'modal-mask') emit('close');
@@ -49,24 +49,18 @@ export default {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  display: table;
   transition: opacity 0.3s ease;
-}
-
-.modal-wrapper {
-  margin-top: 10rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .modal-container {
-  width: 500px;
   margin: 0px auto;
-  // padding: 1rem;
-  background-color: #fff;
-  border-radius: .5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+  margin-top: 10rem;
+  width: 500px;
   transition: all 0.3s ease;
   font-family: Helvetica, Arial, sans-serif;
-  background: $alabaster;
 }
 
 .modal-header h3 {

@@ -7,7 +7,7 @@ const commonUpdateEffect = () => {
   const currentFocusBlock = computed(() => store.getters.currentFocusBlock);
 
   const editPageData = (property, value) => {
-    console.log(value);
+    // console.log(value);
     store.commit('editPageData', {
       property,
       value,

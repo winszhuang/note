@@ -1,7 +1,32 @@
 import { useStore } from 'vuex';
+import { setDataToLS } from './localStorageEffect';
 
 const watchStoreEffect = () => {
   const store = useStore();
+
+  const updatePagesToLSByWatching = () => {
+    store.watch((state) => state.pages, (curr) => {
+      setDataToLS('pages', curr);
+    }, { deep: true });
+  };
+
+  const updateBlocksToLSByWatching = () => {
+    store.watch((state) => state.blocks, (curr) => {
+      setDataToLS('blocks', curr);
+    }, { deep: true });
+  };
+
+  const updateGroupsToLSByWatching = () => {
+    store.watch((state) => state.groups, (curr) => {
+      setDataToLS('groups', curr);
+    }, { deep: true });
+  };
+
+  // const listenDelete = () => {
+  //   store.subscribe((mutation, state) => {
+  //     if (mutation.type)
+  //   })
+  // }
 
   const updateEditTimeOfPageBySubscribe = () => {
     store.subscribe((mutation, state) => {
@@ -40,6 +65,9 @@ const watchStoreEffect = () => {
   };
 
   return {
+    updatePagesToLSByWatching,
+    updateBlocksToLSByWatching,
+    updateGroupsToLSByWatching,
     updateEditTimeOfPageBySubscribe,
   };
 };

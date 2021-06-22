@@ -4,51 +4,56 @@
   <Modal v-if="isShow"
         @close="handleShow(false)"
         :mode="'component'"
+        :container-class="'search-container'"
         :is-bg-static="false">
     <template #component>
       <Search @close="handleShow(false)"/>
     </template>
   </Modal>
-  <div class="sidebar" :style="{ width: isSidebarCollapse === true ? '0' : '18rem' }">
+  <div class="sidebar" :style="{ width: isSidebarCollapse === true ? '0' : '23rem' }">
       <UserField/>
-      <div class="customlist-group bb">
-        <div class="customlist-group-item customlist-group-item-action"
+      <div class="field-title">通用 :</div>
+      <div class="customlist-group">
+        <div class="customlist-group-item"
               type="button"
               @click="handleShow(true)">
-          <div class="customlist-item block-icon" style="margin-left: 1rem;">
+          <div class="customlist-item-1 ms-4" style="margin-left: 1rem;">
             <font-awesome-icon
                 :icon="['fas', 'search']" />
           </div>
-          <div class="customlist-item block-name ">搜尋區塊</div>
+          <div class="customlist-item-6 block-name ">搜尋區塊</div>
         </div>
       </div>
       <div class="scollitem">
         <!-- <div v-if="currentPage">
           {{ currentPage.blocks }}
         </div> -->
-        <div class="customlist-group bb mt-4">
+        <div class="field-title">頁面 :</div>
+        <div class="customlist-group">
           <CustomList
             v-for="item in rootPages"
             :key="item.id"
             :page="item"/>
-          <div class="customlist-group-item customlist-group-item-action"
+          <div class="customlist-group-item"
               type="button"
               @click="addPage">
-            + <div class="ms-2">增加頁面</div>
+              <div class="ms-4 customlist-item-1">+</div>
+              <div class="customlist-item-6">增加頁面</div>
           </div>
         </div>
-        <div class="customlist-group bb">
-          <div class="customlist-group-item customlist-group-item-action"
+        <div class="field-title">區塊 :</div>
+        <div class="customlist-group">
+          <div class="customlist-group-item"
                 type="button"
                 v-for="item in blocktype"
                 :key="item.type"
                 @click="addBlock(item.type)">
-            <div class="customlist-item block-icon ms-3">
+            <div class="customlist-item-1 ms-4">
               <font-awesome-icon
                   :icon="[style[item.style], item.icon || 'heading']" :size="item.size || 'xs'"/>
               <!-- {{ item.type }} -->
             </div>
-            <div class="customlist-item block-name">{{ item.name }}</div>
+            <div class="customlist-item-6 block-name">{{ item.name }}</div>
           </div>
         </div>
       </div>
@@ -63,7 +68,7 @@
 <script>
 import { useStore } from 'vuex';
 import {
-  toRefs, ref, computed, onMounted, // reactive
+  toRefs, computed, onMounted, // reactive
 } from 'vue';
 import UserField from './UserField.vue';
 import CustomList from '../../components/CustomList.vue';
@@ -80,18 +85,31 @@ export default {
     Search,
   },
   setup() {
-    const list = ref(null);
     const store = useStore();
-    const { isSidebarCollapse } = toRefs(store.state);
     const currentPage = computed(() => store.getters.currentPage);
     const rootPages = computed(() => store.getters.childrenPages(''));
     const { isShow, handleShow } = showEffect();
     const {
-      pages, blocks, blocktype, currentPageId, currentPageIdOnMouse,
+      pages,
+      blocks,
+      blocktype,
+      currentPageId,
+      isSidebarCollapse,
+      currentPageIdOnMouse,
     } = toRefs(store.state);
 
     onMounted(() => {
       handleShow(false);
+      // const sidebar = document.getElementsByClassName('sidebar')[0];
+      window.addEventListener('resize', () => {
+        if (window.innerWidth < 900) {
+          if (isSidebarCollapse.value === true) return;
+          store.commit('setSidebarCollapse', true);
+        } else {
+          if (isSidebarCollapse.value === false) return;
+          store.commit('setSidebarCollapse', false);
+        }
+      });
     });
 
     const style = {
@@ -139,7 +157,6 @@ export default {
       currentPageId,
       currentPageIdOnMouse,
       addBlock,
-      list,
       style,
       isShow,
       handleShow,
@@ -149,10 +166,15 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" >
 @import '../../style/component/_sidebar.scss';
 .sidebar{
   transition: width .2s ease-out .1s;
+}
+
+.search-container{
+  width: 30%;
+  height: 50%;
 }
 .addpage{
   line-height: 2.5rem;
@@ -162,16 +184,16 @@ export default {
     padding-left: 35%;
   }
   &:hover{
-    background: #ebebeb;
-    color: #787878;
+    background: #5c525e;
+    color: #c9c0c2;
   }
 }
 .caret-right{
   margin-right: .3rem;
 }
-.block-icon{
-  width: 1.3rem;
-}
+// .block-icon{
+//   width: 1.3rem;
+// }
 .block-name{
   padding-top: .05rem;
 }

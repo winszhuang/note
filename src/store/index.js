@@ -468,6 +468,10 @@ export default createStore({
     currentPage(state) {
       return findInStore(state.pages, state.currentPageId);
     },
+
+    searchPages(state) {
+      return (str) => (str !== '' ? state.pages.filter((page) => page.name.includes(str)) : null);
+    },
     // 回傳當前page裡面包含的所有blocks
     currentBlocks(state, getters) { // 這邊的問題 應該讓所有block(包含子block)單純放page裡面
       return getters.currentPage.blocks.map((itemId) => findInStore(state.blocks, itemId));
@@ -529,6 +533,18 @@ export default createStore({
       return allIds;
     },
 
+    selectDistinctPageHistory(state) {
+      return new Set(state.pageHistory);
+    },
+
+    getPageNameListInHistory(state, getters) {
+      const pageNameList = [];
+      getters.selectDistinctPageHistory.forEach((id) => {
+        pageNameList.push(getters.choosePage(id).name);
+      });
+      return pageNameList;
+    },
+
     // isUserInfoExist(state) {
     //   // eslint-disable-next-line no-unneeded-ternary
     //   return state.userInfo.email;
@@ -570,8 +586,9 @@ export default createStore({
     },
 
     changeCurrentPage(store, id) {
+      if (id === store.state.currentPageId) return;
       store.commit('setCurrentPageId', id);
-      // store.commit('addPageHistory', id);
+      store.commit('addPageHistory', id);
     },
 
     // 增加子頁面

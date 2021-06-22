@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;300;400;500;700;900&display=swap');
+@import './color.scss';
 
 html {
   font-family: 'Noto Sans TC', sans-serif;
@@ -11,6 +12,21 @@ body {
 
 a {
   text-decoration: none;
+}
+
+.scale-07{
+  transform: scale(.7);
+  transform-origin: center;
+}
+
+.scale-08{
+  transform: scale(.8);
+  transform-origin: center;
+}
+
+.scale-09{
+  transform: scale(.9);
+  transform-origin: center;
 }
 
 .fullscreen {
@@ -141,15 +157,8 @@ $p-margin: .2rem 0;
   }
 }
 
-.icon-button{
-  &:hover{
-    // border: .1rem solid #ebebeb;
-    background:#c7c7c7;
-  }
-}
-
 .bb{
-  border-bottom: .01rem solid #4d454e;
+  border-bottom: .01rem solid #5c535e;
 }
 
 .bb-light{
@@ -157,7 +166,7 @@ $p-margin: .2rem 0;
 }
 
 .bt{
-  border-top: .01rem solid #4d454e;
+  border-top: .01rem solid #5c535e;
 }
 // .bb-light{
 //   border-bottom: .02rem solid #f0f0f0;

@@ -1,6 +1,6 @@
 <template>
   <div class="topfield">
-    <div :class="{ userfield: true, bb: true, 'p-0': isSidebarCollapse }" type="button"
+    <div :class="{ userfield: true, 'p-0': isSidebarCollapse }" type="button"
         @click="linkToUserInfo">
         <!-- :style="{ padding: isSidebarCollapse ? '0' :  }" -->
       <div class="userfield-icon" v-html="headshot"></div>
@@ -9,13 +9,13 @@
         <div class="userfield-info-email">{{ userInfo?.email || 'xxx.gmail.com' }}</div>
       </div>
     </div>
-    <HoverButton @clickThen="collapseSidebar" :class-name="'left-collapse'">
+    <NinjaButton @clickThen="collapseSidebar" :class-name="'left-collapse'">
       <template #default="{ isShow }">
         <div v-show="isShow">
           <font-awesome-icon :icon="['fas', 'angle-double-left']"/>
         </div>
       </template>
-    </HoverButton>
+    </NinjaButton>
   </div>
   <!-- {{ userInfo }} -->
 </template>
@@ -24,11 +24,11 @@
 import { computed, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import HoverButton from '../../components/HoverButton.vue';
+import NinjaButton from '../../components/NinjaButton.vue';
 
 export default {
   name: 'UserField',
-  components: { HoverButton },
+  components: { NinjaButton },
   setup() {
     const store = useStore();
     const router = useRouter();
@@ -65,17 +65,14 @@ export default {
 .topfield{
   width: inherit;
   position: relative;
+  margin-bottom: 1rem;
 }
 .userfield{
   box-sizing: border-box;
   width: inherit;
   display: flex;
-  padding: 1.2rem 1rem 1rem 1rem;
-  // margin-bottom: 1rem;
+  padding: 1.2rem 1rem 1rem 1.2rem;
   overflow: hidden;
-  &:hover{
-    background: #4d454e;
-  }
   &-icon{
     border-radius: 50%;
     width: 2.5rem;
@@ -106,16 +103,17 @@ export default {
       color: #C4C1BF;
     }
     &-email{
-      // margin-left: .1rem;
-      // font-size: 1rem;
       transform: scale(.8);
       transform-origin: left;
-      color: #7a7a7a;
-      text-decoration: underline;
-      text-decoration-color: #b8b8b8;
+      color: #8b8b8b;
+      // text-decoration: underline;
+      // text-decoration-color: #b8b8b8;
     }
   }
-
+  &:hover{
+    background: #5c525e;
+    color: #c9c0c2;
+  }
 }
 
 .left-collapse{
@@ -129,7 +127,7 @@ export default {
   justify-content: center;
   align-items: center;
   &:hover{
-    background: #4d454e;
+    background: #5c525e;
   }
 }
 </style>

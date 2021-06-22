@@ -2,14 +2,11 @@
   position: relative;
   z-index: 2;
   background: #433c44;
-  // background: #484049;
+  overflow: hidden;
   flex: none;
-  width: 18rem;
+  width: 23rem;
   height: 100vh;
   box-shadow: .05rem 0rem .2rem .05rem rgb(160, 160, 160);
-  // @media (max-width:900px){
-  //   display: none;
-  // }
   &-footer{
     position: absolute;
     bottom: 0;
@@ -19,9 +16,18 @@
   }
 }
 
+.field-title{
+  margin-left: 1rem;
+  color: rgb(124, 119, 119);
+  transform: scale(.85);
+  transform-origin: left;
+  font-weight: 300;
+  // font-weight: 700;
+}
+
 .scollitem{
   position: absolute;
-  top: 9.3rem;
+  top: 11rem;
   bottom: 2.5rem;
   left: 0;
   right: 0;

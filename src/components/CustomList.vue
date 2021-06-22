@@ -1,30 +1,30 @@
 <template>
-  <div class="customlist-group-item customlist-group-item-action"
+  <div class="customlist-group-item"
       type="button"
-      :class="{'bg-listhover': page.id === currentPageId }"
+      :class="{'customlist-group-item-action': page.id === currentPageId }"
       @click="goCurrentPage(page.id)"
       @mouseover="hoverHandle(page.id)"
       @mouseout="hoverHandle('')">
 
     <div :style="{ 'padding-left': `${number}rem` }"></div> <!--調間距用-->
 
-    <div class="customlist-item icon-button" @click="toggleShow"> <!--切換顯示子集-->
+    <div class="caret-icon customlist-item-1 scale-07 icon-button" @click="toggleShow">
       <font-awesome-icon :icon="caretIcon"/>
     </div>
 
-    <div class="customlist-item">
+    <div class="customlist-item-1">
       <font-awesome-icon :icon="['far', 'file']"/>
     </div>
 
-    <div class="customlist-item">{{ page.name }}</div>
+    <div class="customlist-item-name">{{ page.name }}</div>
 
-    <div class="customlist-item ms-auto icon-button"
+    <div class="ms-auto icon-button"
         v-show="page.id === currentPageIdOnMouse"
         @click="deletePage(page)">
       <font-awesome-icon :icon="['fas', 'ellipsis-h']" style="color: #999999" size="sm"/>
     </div>
 
-    <div class="customlist-item icon-button"
+    <div class="icon-button"
         v-show="page.id === currentPageIdOnMouse"
         @click="addPageInside(page)">
       <font-awesome-icon :icon="['far', 'plus-square']" style="color: #999999"/>
@@ -114,11 +114,26 @@ export default {
 </script>
 
 <style lang="scss">
+@import '../style/base.scss';
+.icon-button{
+  width: 1.5rem;
+  text-align: center;
+  &:hover{
+    background:#847786;
+    color: #c9c0c2;
+  }
+}
 .children-list{
   &-nopage{
     color: #666666;
     font-size: 10px;
     line-height: 1.9rem;;
   }
+}
+.caret-icon{
+  width: 21px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

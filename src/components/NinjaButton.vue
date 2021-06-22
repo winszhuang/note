@@ -15,7 +15,7 @@
 import { showEffect } from './commonEffect';
 
 export default {
-  name: 'HoverButton',
+  name: 'NinjaButton',
   props: ['className'],
   setup() {
     const { isShow, handleShow } = showEffect();

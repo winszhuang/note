@@ -1,6 +1,6 @@
 <template>
   <main class="mainspace">
-    <HoverButton @clickThen="unCollapseSidebar"
+    <NinjaButton @clickThen="unCollapseSidebar"
         :class-name="'uncollapse'"
         v-show="isSidebarCollapse">
       <template #default="{ isShow }">
@@ -8,10 +8,11 @@
           <font-awesome-icon :icon="['fas', 'angle-double-right']"/>
         </div>
       </template>
-    </HoverButton>
+    </NinjaButton>
     <!-- <template v-show="">
     </template> -->
     <div class="workspace" v-if="currentPage" @mousemove="checkElement($event)">
+      <!-- {{ pageHistory }} -->
       <div class="header">
         <Breadcrumb :page="currentPage"/>
         <div class="update" type="button" @click="updateToFS">
@@ -169,7 +170,7 @@ import AreaSelect from '../../components/AreaSelect.vue';
 import PageEditable from '../../components/input/PageEditable.vue';
 import StyleTool from '../../components/StyleTool.vue';
 import PageInfo from './PageInfo.vue';
-import HoverButton from '../../components/HoverButton.vue';
+import NinjaButton from '../../components/NinjaButton.vue';
 import { updateStoreToFS } from '../../store/firestore';
 import watchStoreEffect from '../../store/watchStoreEffect';
 
@@ -182,12 +183,22 @@ export default {
     PageEditable,
     StyleTool,
     PageInfo,
-    HoverButton,
+    NinjaButton,
   },
   setup() {
     const store = useStore();
 
-    watchStoreEffect().updateEditTimeOfPageBySubscribe();
+    const {
+      updatePagesToLSByWatching,
+      updateBlocksToLSByWatching,
+      updateGroupsToLSByWatching,
+      updateEditTimeOfPageBySubscribe,
+    } = watchStoreEffect();
+
+    updatePagesToLSByWatching();
+    updateBlocksToLSByWatching();
+    updateGroupsToLSByWatching();
+    updateEditTimeOfPageBySubscribe();
 
     const groups = computed(() => store.getters.getGroups);
     const currentPage = computed(() => store.getters.currentPage);
@@ -205,7 +216,7 @@ export default {
 
     const { editPageData } = commonUpdateEffect();
     const {
-      currentFocusBlockId, pages, hiddenBlocksIds, // pages, blocks,
+      currentFocusBlockId, pages, hiddenBlocksIds, pageHistory, // pages, blocks,
     } = toRefs(store.state);
 
     const isShowEditCoverButton = ref(false);
@@ -344,6 +355,7 @@ export default {
       isUpdating,
       unCollapseSidebar,
       isSidebarCollapse,
+      pageHistory,
     };
   },
 };
@@ -413,14 +425,12 @@ p{
   @include mainspace;
   display: flex;
   justify-content: center;
-  &-container{
-
-  }
+  align-items: center;
   &-title{
     width: 100%;
     color: #504952;
     height: 12rem;
-    margin-top: 12rem;
+    // margin-top: 12rem;
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -449,6 +459,7 @@ p{
   }
   &-small{
     margin: .7rem;
+    padding-left: .7rem;
     text-align: center;
     color: #999999;
     transform: scale(.85);
@@ -516,6 +527,9 @@ p{
   // padding: 0 20% 0 20%;
   @media (min-width:1100px){
     padding: 0 25%;
+  }
+  @media (max-width:900px){
+    padding: 0 12%;
   }
   // @media (min-width:1200px){
   //   padding: 0 27%;
