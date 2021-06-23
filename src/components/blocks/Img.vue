@@ -7,7 +7,7 @@
         :placeholder="'ctrl + v 貼上複製的圖片'"
         :className="'p'"/>
   </div>
-  <ScaleController v-show="isShow">
+  <ScaleController v-show="isShow" :id="block.id + 'img'">
     <img :id="block.id" />
   </ScaleController>
 </template>

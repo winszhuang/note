@@ -86,17 +86,19 @@ export default {
   },
   setup() {
     const store = useStore();
-    const currentPage = computed(() => store.getters.currentPage);
-    const rootPages = computed(() => store.getters.childrenPages(''));
+    const currentPage = computed(() => store.getters['pages/currentPage']);
+    const rootPages = computed(() => store.getters['pages/childrenPages'](''));
     const { isShow, handleShow } = showEffect();
-    const {
-      pages,
-      blocks,
-      blocktype,
-      currentPageId,
-      isSidebarCollapse,
-      currentPageIdOnMouse,
-    } = toRefs(store.state);
+    const { blocktype, isSidebarCollapse } = toRefs(store.state);
+    const { blocks } = toRefs(store.state.blocks);
+    const { currentPageId, currentPageIdOnMouse } = toRefs(store.state.pages);
+    // const {
+    //   blocks,
+    //   blocktype,
+    //   isSidebarCollapse,
+    //   currentPageId,
+    //   currentPageIdOnMouse,
+    // } = toRefs(store.state);
 
     onMounted(() => {
       handleShow(false);
@@ -118,7 +120,7 @@ export default {
     };
 
     const addPage = () => {
-      store.commit('addPage', {});
+      store.commit('pages/addPage', {});
     };
 
     const addBlock = (type) => {
@@ -128,27 +130,26 @@ export default {
       }
 
       if (type === 'page') {
-        store.dispatch('addPageInside');
+        store.dispatch('pages/addPageInside');
         return;
       }
 
       if (type === 'numberItem' || type === 'bulletItem') {
         const groupId = (new Date().getTime() - 2).toString();
-        store.commit('addGroup', groupId);
-        store.dispatch('addBlockInGroup', {
+        store.commit('groups/addGroup', groupId);
+        store.dispatch('blocks/addBlockInGroup', {
           type,
           groupId,
         });
         return;
       }
 
-      store.dispatch('addBlock', {
+      store.dispatch('blocks/addBlock', {
         type,
       });
     };
 
     return {
-      pages,
       rootPages,
       blocks,
       blocktype,

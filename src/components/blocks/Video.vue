@@ -7,7 +7,8 @@
         :className="'p'"/>
   <ScaleController
         v-show="url !== ''"
-        :aspect-ratio="[16, 9]">
+        :aspect-ratio="[16, 9]"
+        :id="block.id + 'iframe'">
     <iframe
         :id="block.id"
         :src="url" frameborder="0"
@@ -32,6 +33,11 @@ export default {
     // https://www.youtube.com/embed/Ni7YTBYLNpA
     const url = computed(() => {
       const originalUrl = props.block.content;
+
+      if (originalUrl.includes('youtu.be/')) {
+        const videoId = originalUrl.split('youtu.be/')[1].slice(0, 11);
+        return `https://www.youtube.com/embed/${videoId}`;
+      }
       if (originalUrl.includes('youtube.com/embed/')) {
         const videoId = originalUrl.split('embed/')[1].slice(0, 11);
         return `https://www.youtube.com/embed/${videoId}`;
@@ -50,7 +56,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
 iframe{
   width: 100%;

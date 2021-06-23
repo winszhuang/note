@@ -29,7 +29,7 @@ export default {
     const { block } = toRefs(props);
 
     const store = useStore();
-    const targetPage = computed(() => store.getters.choosePage(block.value.content));
+    const targetPage = computed(() => store.getters['pages/choosePage'](block.value.content));
     return {
       targetPage, goCurrentPage,
     };

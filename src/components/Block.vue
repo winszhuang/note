@@ -1,9 +1,12 @@
 <template>
-  <div class="block" :style="{ 'margin-left': `${getLevelOfBlock(block)*1.65}rem` }">
+  <div class="block"
+      @mouseenter="handleShow(true)"
+      @mouseleave="handleShow(false)"
+      :style="{ 'margin-left': `${getLevelOfBlock(block)*1.65}rem` }">
     <div class="block-drag" >
       <transition name="drag">
         <DragItem :block="block"
-                  v-show="showdrag"/>
+                  v-show="isShow"/>
       </transition>
     </div>
     <div class="block-content"
@@ -20,16 +23,17 @@
 </template>
 
 <script>
-import { commonStringEffect } from './commonEffect';
+import { commonStringEffect, showEffect } from './commonEffect';
 import commonBlockEffect from './commonBlockEffect';
 import dragDropActionInBlocks from './dragDropActionInBlocks';
 import DragItem from './DragItem.vue';
 
 export default {
   name: 'Block',
-  props: ['block', 'showdrag'],
+  props: ['block'],
   components: { DragItem },
   setup() {
+    const { isShow, handleShow } = showEffect();
     const { getLevelOfBlock } = commonBlockEffect();
     const { getFirstToUpper } = commonStringEffect();
     const {
@@ -40,6 +44,8 @@ export default {
     } = dragDropActionInBlocks();
 
     return {
+      isShow,
+      handleShow,
       getFirstToUpper,
       handleDrop,
       cancelDefault,

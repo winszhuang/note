@@ -11,7 +11,7 @@
     </NinjaButton>
     <!-- <template v-show="">
     </template> -->
-    <div class="workspace" v-if="currentPage" @mousemove="checkElement($event)">
+    <div class="workspace" v-if="currentPage">
       <!-- {{ pageHistory }} -->
       <div class="header">
         <Breadcrumb :page="currentPage"/>
@@ -52,7 +52,6 @@
         <div class="blockcontent" v-if="currentBlocks">
           <template v-for="(block) in currentBlocks" :key="block.id">
             <Block :block="block"
-                  :showdrag="block.id === currentIdOnMouse ? true : false"
                   v-show="!hiddenBlocksIds.includes(block.id)"/>
           </template>
         </div>
@@ -82,7 +81,8 @@
             <div>currentFocusBlockId: {{ currentFocusBlockId }}</div>
             <div>currentFocusBlock: </div>
             <ul>
-              <li>content ------ {{ currentFocusBlock.content }}</li>
+              <li style="width: 400px; overflow: hidden; text-overflow: ellipsis;">
+                content ------ {{ currentFocusBlock.content }}</li>
               <li>type ------ {{ currentFocusBlock.type }}</li>
               <li>id ------ {{ currentFocusBlock.id }}</li>
               <li>parentId ------ {{ currentFocusBlock.parentId }}</li>
@@ -105,7 +105,8 @@
             v-for="block in currentBlocks"
             :key="block.id">
             <ul>
-              <li>content ------ {{ block.content }}</li>
+              <li style="width: 400px; overflow: hidden; text-overflow: ellipsis;">
+                content ------ {{ block.content }}</li>
               <li>type ------ {{ block.type }}</li>
               <li>id ------ {{ block.id }}</li>
               <li>parentId ------ {{ block.parentId }}</li>
@@ -200,14 +201,13 @@ export default {
     updateGroupsToLSByWatching();
     updateEditTimeOfPageBySubscribe();
 
-    const groups = computed(() => store.getters.getGroups);
-    const currentPage = computed(() => store.getters.currentPage);
-    const currentBlocks = computed(() => store.getters.currentBlocks);
-    const rootCurrentBlocks = computed(() => store.getters.childrenCurrentBlocks(''));
-    const currentFocusBlock = computed(() => store.getters.currentFocusBlock);
-    const currentBlocksNum = computed(() => store.getters.currentBlocksNum);
-    const currentBlocksByAreaSelect = computed(() => store.getters.currentBlocksByAreaSelect);
-    const currentBlocksIds = computed(() => store.getters.currentBlocksIds);
+    const groups = computed(() => store.getters['groups/getGroups']);
+    const currentPage = computed(() => store.getters['pages/currentPage']);
+    const currentBlocks = computed(() => store.getters['blocks/currentBlocks']);
+    const currentFocusBlock = computed(() => store.getters['blocks/currentFocusBlock']);
+    // eslint-disable-next-line max-len
+    const currentBlocksByAreaSelect = computed(() => store.getters['blocks/currentBlocksByAreaSelect']);
+    const currentBlocksIds = computed(() => store.getters['blocks/currentBlocksIds']);
 
     const { isSidebarCollapse } = toRefs(store.state);
     const unCollapseSidebar = () => {
@@ -216,8 +216,8 @@ export default {
 
     const { editPageData } = commonUpdateEffect();
     const {
-      currentFocusBlockId, pages, hiddenBlocksIds, pageHistory, // pages, blocks,
-    } = toRefs(store.state);
+      currentFocusBlockId, hiddenBlocksIds, // pages, blocks,
+    } = toRefs(store.state.blocks);
 
     const isShowEditCoverButton = ref(false);
     const hoverHandle = (choose) => {
@@ -232,18 +232,6 @@ export default {
     const isUpdating = ref(false);
     const isUpdatingHandle = (choose) => {
       isUpdating.value = choose;
-    };
-
-    const currentIdOnMouse = ref('');
-    const checkElement = (e) => {
-      const blockEl = e.target.closest('.block');
-      if (!blockEl) {
-        currentIdOnMouse.value = '';
-        return;
-      }
-      const hasIdEl = blockEl.querySelector('[id]');
-      // console.log(hasIdEl);
-      currentIdOnMouse.value = hasIdEl.getAttribute('id');
     };
 
     const updateToFS = async () => {
@@ -333,29 +321,23 @@ export default {
     // );
 
     return {
-      pages,
       currentPage,
       editPageData,
       currentBlocks,
       currentBlocksIds,
-      rootCurrentBlocks,
       currentFocusBlockId,
       currentFocusBlock,
-      currentBlocksNum,
       hoverHandle,
       isShowEditCoverButton,
       isShowEditCoverCard,
       editCoverCardHandle,
       currentBlocksByAreaSelect,
       groups,
-      currentIdOnMouse,
-      checkElement,
       hiddenBlocksIds,
       updateToFS,
       isUpdating,
       unCollapseSidebar,
       isSidebarCollapse,
-      pageHistory,
     };
   },
 };

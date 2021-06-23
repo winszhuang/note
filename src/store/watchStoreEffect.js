@@ -5,19 +5,19 @@ const watchStoreEffect = () => {
   const store = useStore();
 
   const updatePagesToLSByWatching = () => {
-    store.watch((state) => state.pages, (curr) => {
+    store.watch((state) => state.pages.pages, (curr) => {
       setDataToLS('pages', curr);
     }, { deep: true });
   };
 
   const updateBlocksToLSByWatching = () => {
-    store.watch((state) => state.blocks, (curr) => {
+    store.watch((state) => state.blocks.blocks, (curr) => {
       setDataToLS('blocks', curr);
     }, { deep: true });
   };
 
   const updateGroupsToLSByWatching = () => {
-    store.watch((state) => state.groups, (curr) => {
+    store.watch((state) => state.groups.groups, (curr) => {
       setDataToLS('groups', curr);
     }, { deep: true });
   };
@@ -37,17 +37,17 @@ const watchStoreEffect = () => {
 
       const mutationsThatDidntRequireRecordingtime = [
         'setStoreData',
-        'setCurrentPageId',
-        'changeCurrentPageIdOnMouse',
-        'changeFocusBlock',
-        'changeBlocksByAreaSelect',
-        'addIdsToHiddenBlocksIds',
-        'deleteIdsToHiddenBlocksIds',
-        'resetHiddenBlocksIds',
-        'setUserInfo',
-        'getUserInfo',
-        'deleteUserInfo',
-        'addPageHistory',
+        'pages/setCurrentPageId',
+        'pages/changeCurrentPageIdOnMouse',
+        'pages/addPageHistory',
+        'blocks/changeFocusBlock',
+        'blocks/changeBlocksByAreaSelect',
+        'blocks/addIdsToHiddenBlocksIds',
+        'blocks/deleteIdsToHiddenBlocksIds',
+        'blocks/resetHiddenBlocksIds',
+        'userInfo/setUserInfo',
+        'userInfo/getUserInfo',
+        'userInfo/deleteUserInfo',
       ];
 
       for (let i = 0; i < mutationsThatDidntRequireRecordingtime.length; i += 1) {
@@ -57,7 +57,7 @@ const watchStoreEffect = () => {
         }
       }
       // console.log('需要紀錄時間');
-      store.commit('editPageData', {
+      store.commit('pages/editPageData', {
         property: 'editTime',
         value: new Date().getTime().toString(),
       });

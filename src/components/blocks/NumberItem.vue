@@ -18,8 +18,8 @@ export default {
   },
   setup(props) {
     const store = useStore();
-    const group = computed(() => store.getters.getGroupByBlock(props.block));
-    const index = computed(() => store.getters.getIndexFromGroupByBlock(props.block));
+    const group = computed(() => store.getters['groups/getGroupByBlock'](props.block));
+    const index = computed(() => store.getters['groups/getIndexFromGroupByBlock'](props.block));
 
     return { group, index };
   },

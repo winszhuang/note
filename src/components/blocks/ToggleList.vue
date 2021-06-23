@@ -27,15 +27,15 @@ export default {
       const childrenBlocksIds = props.block.blocks;
       if (isShow.value) {
         if (childrenBlocksIds.length === 0) return;
-        store.commit('deleteIdsToHiddenBlocksIds', [...childrenBlocksIds]);
+        store.commit('blocks/deleteIdsToHiddenBlocksIds', [...childrenBlocksIds]);
       } else {
-        store.commit('addIdsToHiddenBlocksIds', [...childrenBlocksIds]);
+        store.commit('blocks/addIdsToHiddenBlocksIds', [...childrenBlocksIds]);
       }
     };
 
     onMounted(() => {
-      store.dispatch('addBlockInside', props.block);
-      store.commit('addIdsToHiddenBlocksIds', [...props.block.blocks]);
+      store.dispatch('blocks/addBlockInside', props.block);
+      store.commit('blocks/addIdsToHiddenBlocksIds', [...props.block.blocks]);
       handleShow(false);
     });
 

@@ -4,18 +4,18 @@ import { useStore } from 'vuex';
 
 const commonUpdateEffect = () => {
   const store = useStore();
-  const currentFocusBlock = computed(() => store.getters.currentFocusBlock);
+  const currentFocusBlock = computed(() => store.getters['blocks/currentFocusBlock']);
 
   const editPageData = (property, value) => {
     // console.log(value);
-    store.commit('editPageData', {
+    store.commit('pages/editPageData', {
       property,
       value,
     });
   };
 
   const editBlockData = (id, value, key) => {
-    store.commit('editBlockData', {
+    store.commit('blocks/editBlockData', {
       id,
       value,
       key,
@@ -23,14 +23,14 @@ const commonUpdateEffect = () => {
   };
 
   const getFocusBlock = (id) => {
-    store.commit('changeFocusBlock', id);
+    store.commit('blocks/changeFocusBlock', id);
   };
 
   const checkKeydownInPageData = (page, e) => {
     if (e.keyCode === 13) {
       e.preventDefault();
       if (page.blocks.length === 0) {
-        store.dispatch('addBlock', {
+        store.dispatch('blocks/addBlock', {
           type: 'p',
         });
         return;
@@ -42,20 +42,20 @@ const commonUpdateEffect = () => {
   const checkKeydownInBlockContent = (block, e) => {
     if (block.content === '' && e.keyCode === 8) {
       e.preventDefault();
-      store.dispatch('deleteBlock', {});
+      store.dispatch('blocks/deleteBlock', {});
     }
 
     if (e.keyCode === 13) {
       e.preventDefault();
       const { parentId, group, type } = currentFocusBlock.value;
       if (parentId !== '') {
-        const parentBlock = computed(() => store.getters.chooseBlock(parentId));
-        store.dispatch('addBlockInside', parentBlock.value);
+        const parentBlock = computed(() => store.getters['blocks/chooseBlock'](parentId));
+        store.dispatch('blocks/addBlockInside', parentBlock.value);
         return;
       }
 
       if (group !== '') {
-        store.dispatch('addBlockInGroup', {
+        store.dispatch('blocks/addBlockInGroup', {
           type,
           groupId: group,
         });
@@ -63,20 +63,20 @@ const commonUpdateEffect = () => {
       }
 
       if (type === 'todoItem') {
-        store.dispatch('addBlock', {
+        store.dispatch('blocks/addBlock', {
           type: 'todoItem',
         });
         return;
       }
 
-      store.dispatch('addBlock', {
+      store.dispatch('blocks/addBlock', {
         type: 'p',
       });
     }
   };
 
   const goCurrentPage = (id) => {
-    store.dispatch('changeCurrentPage', id);
+    store.dispatch('pages/changeCurrentPage', id);
   };
 
   return {

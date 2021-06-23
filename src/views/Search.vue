@@ -84,14 +84,14 @@ export default {
     const store = useStore();
     const { goCurrentPage } = commonUpdateEffect();
     const searchInput = ref('');
-    const searchBlocks = computed(() => store.getters.searchBlocks(searchInput.value));
-    const searchPages = computed(() => store.getters.searchPages(searchInput.value));
-    const getPageNameListInHistory = computed(() => store.getters.getPageNameListInHistory);
-    const getPage = (blockId) => computed(() => store.getters.getPageByBlockId(blockId)).value;
+    const searchBlocks = computed(() => store.getters['blocks/searchBlocks'](searchInput.value));
+    const searchPages = computed(() => store.getters['pages/searchPages'](searchInput.value));
+    const getPageNameListInHistory = computed(() => store.getters['pages/getPageNameListInHistory']);
+    const getPage = (blockId) => computed(() => store.getters['pages/getPageByBlockId'](blockId)).value;
 
     const goBlockPosition = (page, block) => {
       emit('close');
-      store.dispatch('goBlockPosition', {
+      store.dispatch('blocks/goBlockPosition', {
         page,
         block,
       });

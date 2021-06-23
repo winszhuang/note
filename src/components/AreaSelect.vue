@@ -13,8 +13,8 @@ const useKeyboardEffect = () => {
   const store = useStore();
   const areaSelectDelete = (ids) => {
     ids.forEach((id) => {
-      const chooseBlock = computed(() => store.getters.chooseBlock(id)).value;
-      store.dispatch('deleteBlock', {
+      const chooseBlock = computed(() => store.getters['blocks/chooseBlock'](id)).value;
+      store.dispatch('blocks/deleteBlock', {
         block: chooseBlock,
       });
     });
@@ -64,7 +64,7 @@ const useAreaSelectEffect = (el, boxCollisionDetection) => {
   const changeElementsClassByIds = (selectIds, className) => {
     allIds.value.forEach((id) => {
       const innerEl = document.getElementById(id);
-      // if (innerEl) return;
+      if (!innerEl) return;
       const element = innerEl.closest('.block-content');
       if (element === null) return;
       if (element.classList.contains(className)) {
@@ -123,7 +123,7 @@ const useAreaSelectEffect = (el, boxCollisionDetection) => {
       top: boxData.top,
       bottom: boxData.top + boxData.height,
     };
-    const currentBlocks = computed(() => store.getters.currentBlocks).value;
+    const currentBlocks = computed(() => store.getters['blocks/currentBlocks']).value;
     currentBlocks.forEach((block) => {
       const blockEl = document.getElementById(block.id);
       const rect = blockEl.getBoundingClientRect();

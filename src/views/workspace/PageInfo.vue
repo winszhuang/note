@@ -64,7 +64,7 @@ const usePageTagEffect = () => {
 
   const handleKeyDownIntagInput = (e) => {
     if (e.keyCode === 13) {
-      store.commit('addTag', e.target.value);
+      store.commit('pages/addTag', e.target.value);
       e.target.value = '';
     }
     if (e.keyCode === 8 && e.target.value === '') {
@@ -84,7 +84,7 @@ const usePageTagEffect = () => {
   };
 
   const deleteTag = (e, tag) => {
-    store.commit('deleteTag', tag);
+    store.commit('pages/deleteTag', tag);
     focusToTagInput();
   };
 

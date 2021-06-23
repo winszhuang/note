@@ -29,8 +29,8 @@ export default {
   setup(props) {
     // console.log(props.page);
     const store = useStore();
-    const parentPage = computed(() => store.getters.parentPage(props.page));
-    const currentPage = computed(() => store.getters.currentPage);
+    const parentPage = computed(() => store.getters['pages/parentPage'](props.page));
+    const currentPage = computed(() => store.getters['pages/currentPage']);
     const { goCurrentPage } = commonUpdateEffect();
 
     return { parentPage, currentPage, goCurrentPage };

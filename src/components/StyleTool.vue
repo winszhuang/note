@@ -29,7 +29,7 @@ export default {
   name: 'StyleTool',
   setup() {
     const store = useStore();
-    const currentFocusBlock = computed(() => store.getters.currentFocusBlock);
+    const currentFocusBlock = computed(() => store.getters['blocks/currentFocusBlock']);
     const { isShow, handleShow } = showEffect();
     const textSelection = reactive({
       focusEl: '',

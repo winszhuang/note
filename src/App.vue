@@ -65,7 +65,7 @@ export default {
         if (isDataInLS('userInfo')) {
           deleteDataFromLS('userInfo');
         }
-        store.commit('deleteUserInfo');
+        store.commit('userInfo/deleteUserInfo');
         router.push('/signin');
       };
 

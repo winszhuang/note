@@ -77,23 +77,23 @@ export default {
   },
   setup(props) {
     const store = useStore();
-    const childrenPages = computed(() => store.getters.childrenPages(props.page.id));
+    const childrenPages = computed(() => store.getters['pages/childrenPages'](props.page.id));
     const { currentPageId, currentPageIdOnMouse } = toRefs(store.state);
     const { goCurrentPage } = commonUpdateEffect();
     const { isShow, handleShow, toggleShow } = showEffect();
     const caretIcon = computed(() => (isShow.value ? faCaretRight : faCaretDown));
 
     const hoverHandle = (id) => {
-      store.commit('changeCurrentPageIdOnMouse', id);
+      store.commit('pages/changeCurrentPageIdOnMouse', id);
     };
 
     const addPageInside = (page) => {
-      store.dispatch('addPageInside', page);
+      store.dispatch('pages/addPageInside', page);
       handleShow(true);
     };
 
     const deletePage = (item) => {
-      store.dispatch('deletePageWithIcon', item);
+      store.dispatch('pages/deletePageWithIcon', item);
     };
 
     return {

@@ -20,7 +20,7 @@ export default {
   },
   setup(props) {
     const store = useStore();
-    const index = computed(() => store.getters.getIndexFromGroupByBlock(props.block));
+    const index = computed(() => store.getters['groups/getIndexFromGroupByBlock'](props.block));
 
     return { index };
   },

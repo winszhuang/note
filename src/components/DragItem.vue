@@ -25,8 +25,8 @@ export default {
 .dragicon{
   display: flex;
   align-items: center;
-  height: 100%;
-  line-height: 100%;
+  // height: 100%;
+  // line-height: 100%;
   width: 1rem;
   color: #c0c0c0;
   transition: color .3s ease-out;

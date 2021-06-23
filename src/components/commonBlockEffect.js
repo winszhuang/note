@@ -10,7 +10,7 @@ const commonBlockEffect = () => {
     const block = { value: thisBlock };
 
     while (block.value.parentId !== '') {
-      block.value = computed(() => store.getters.chooseBlock(block.value.parentId)).value;
+      block.value = computed(() => store.getters['blocks/chooseBlock'](block.value.parentId)).value;
       level.value += 1;
     }
 
