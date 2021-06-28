@@ -73,8 +73,15 @@ const transTimeStampToLocalTime = (timestamp) => {
   if (typeof timestamp === 'string') {
     number = parseInt(timestamp, 10);
   }
-  return new Date(number).toLocaleString();
+  return new Date(number).toLocaleString().slice(0, -3);
 };
+
+const waitSecondAndCallBack = async (second, callback) => new Promise((resolve) => {
+  setTimeout(() => {
+    callback();
+    resolve();
+  }, second * 1000);
+});
 
 export {
   commonArrEffect,
@@ -82,4 +89,5 @@ export {
   commonCollisionEffect,
   showEffect,
   transTimeStampToLocalTime,
+  waitSecondAndCallBack,
 };

@@ -10,7 +10,8 @@
       <Search @close="handleShow(false)"/>
     </template>
   </Modal>
-  <div class="sidebar" :style="{ width: isSidebarCollapse === true ? '0' : '23rem' }">
+  <div :class="{ sidebar: true, 'sidebar-float': isSidebarFloating }"
+          :style="{ width: isSidebarCollapse === true ? '0' : '23rem' }">
       <UserField/>
       <div class="field-title">通用 :</div>
       <div class="customlist-group">
@@ -34,7 +35,7 @@
             v-for="item in rootPages"
             :key="item.id"
             :page="item"/>
-          <div class="customlist-group-item"
+          <div class="customlist-group-item addpage-small"
               type="button"
               @click="addPage">
               <div class="ms-4 customlist-item-1">+</div>
@@ -68,7 +69,7 @@
 <script>
 import { useStore } from 'vuex';
 import {
-  toRefs, computed, onMounted, // reactive
+  toRefs, computed, onMounted, watch, // reactive watch
 } from 'vue';
 import UserField from './UserField.vue';
 import CustomList from '../../components/CustomList.vue';
@@ -88,30 +89,38 @@ export default {
     const store = useStore();
     const currentPage = computed(() => store.getters['pages/currentPage']);
     const rootPages = computed(() => store.getters['pages/childrenPages'](''));
-    const { isShow, handleShow } = showEffect();
-    const { blocktype, isSidebarCollapse } = toRefs(store.state);
+    const isSidebarCollapse = computed(() => store.state.sidebarState.isCollapse);
+    const isSidebarFloating = computed(() => store.state.sidebarState.isFloating);
+    const windowWidth = computed(() => store.state.windowWidth);
+    const { blocktype } = toRefs(store.state);
     const { blocks } = toRefs(store.state.blocks);
     const { currentPageId, currentPageIdOnMouse } = toRefs(store.state.pages);
-    // const {
-    //   blocks,
-    //   blocktype,
-    //   isSidebarCollapse,
-    //   currentPageId,
-    //   currentPageIdOnMouse,
-    // } = toRefs(store.state);
+    const { isShow, handleShow } = showEffect();
+
+    const breakpoint = { value: '' };
 
     onMounted(() => {
       handleShow(false);
-      // const sidebar = document.getElementsByClassName('sidebar')[0];
-      window.addEventListener('resize', () => {
-        if (window.innerWidth < 900) {
-          if (isSidebarCollapse.value === true) return;
-          store.commit('setSidebarCollapse', true);
-        } else {
-          if (isSidebarCollapse.value === false) return;
-          store.commit('setSidebarCollapse', false);
-        }
-      });
+      if (window.innerWidth < 992) {
+        breakpoint.value = 'sm';
+      } else {
+        breakpoint.value = 'lg';
+      }
+    });
+
+    watch(() => windowWidth.value, (curr) => {
+      if (curr === '') return;
+      if (curr < 992) {
+        if (breakpoint.value === 'sm') return;
+        breakpoint.value = 'sm';
+        console.log(isSidebarCollapse.value, isSidebarFloating.value);
+        store.dispatch('floatSidebar');
+      } else {
+        if (breakpoint.value === 'lg') return;
+        breakpoint.value = 'lg';
+        console.log(isSidebarCollapse.value, isSidebarFloating.value);
+        store.dispatch('lockSidebar');
+      }
     });
 
     const style = {
@@ -162,6 +171,7 @@ export default {
       isShow,
       handleShow,
       isSidebarCollapse,
+      isSidebarFloating,
     };
   },
 };
@@ -183,6 +193,9 @@ export default {
   color: #909090;
   &-text{
     padding-left: 35%;
+  }
+  &-small{
+    color: #636363;
   }
   &:hover{
     background: #5c525e;

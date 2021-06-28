@@ -95,6 +95,15 @@ const commonDomEffect = () => {
     return true;
   };
 
+  const isMouseUnderTheElement = (el, e) => {
+    const x = e.clientX;
+    const y = e.clientY;
+    const boundingRect = el.getBoundingClientRect();
+    if (x > boundingRect.left && x < boundingRect.left + boundingRect.width
+      && y > boundingRect.top + boundingRect.height) return true;
+    return false;
+  };
+
   const dragDropEffect = () => {
     const domObject = () => {
       const data = {
@@ -135,6 +144,7 @@ const commonDomEffect = () => {
     dragDropEffect,
     mouseDownMoveUpEffect,
     isMouseInsideElement,
+    isMouseUnderTheElement,
   };
 };
 

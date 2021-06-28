@@ -6,10 +6,15 @@ export default {
     pages: [],
     currentPageId: '',
     currentPageIdOnMouse: '',
-    pageHistory: [],
   },
   mutations: {
     // 處理pages
+    resetPages(state) {
+      state.pages = [];
+      state.currentPageId = '';
+      state.currentPageIdOnMouse = '';
+    },
+
     addPage(state, { id, parentPageId }) {
       const newDate = new Date().getTime().toString();
       const newId = id || newDate;
@@ -68,20 +73,13 @@ export default {
 
     // 處理currentPageId
     setCurrentPageId(state, id) {
+      if (id === state.currentPageId) return;
       state.currentPageId = id;
     },
 
     // 處理currentPageIdOnMouse
     changeCurrentPageIdOnMouse(state, id) {
       state.currentPageIdOnMouse = id;
-    },
-
-    // 處理pageHistory
-    addPageHistory(state, id = state.currentPageId) {
-      state.pageHistory.push(id);
-      if (state.pageHistory.length > 10) {
-        state.pageHistory.splice(0, 1);
-      }
     },
   },
   getters: {
@@ -117,27 +115,8 @@ export default {
       });
       return allIds;
     },
-
-    selectDistinctPageHistory(state) {
-      return new Set(state.pageHistory);
-    },
-
-    getPageNameListInHistory(state, getters) {
-      const pageNameList = [];
-      getters.selectDistinctPageHistory.forEach((id) => {
-        pageNameList.push(getters.choosePage(id).name);
-      });
-      return pageNameList;
-    },
-
   },
   actions: {
-    changeCurrentPage({ state, commit }, id) {
-      if (id === state.currentPageId) return;
-      commit('setCurrentPageId', id);
-      commit('addPageHistory', id);
-    },
-
     addPageInside({ getters, commit, dispatch }, page) {
       const parentPage = page || getters.currentPage;
 

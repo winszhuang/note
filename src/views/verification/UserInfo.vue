@@ -4,12 +4,12 @@
     <div class="userinfo-name">{{ userInfo.name }}</div>
     <div class="userinfo-email">{{ userInfo.email }}</div>
     <div class="userinfo-back" type="button" @click="goHome">回到首頁</div>
-    <div type="button" class="signout" @click="signOutAndGoSignIn">登出</div>
+    <div type="button" class="signout" @click="signOut">登出</div>
   </main>
 </template>
 
 <script>
-import { toRefs } from 'vue';
+import { computed } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { signOut } from '../../store/firebaseAuth';
@@ -21,21 +21,15 @@ export default {
   setup() {
     const store = useStore();
     const router = useRouter();
-    const { userInfo, pages, blocks } = toRefs(store.state);
-
-    const signOutAndGoSignIn = () => {
-      signOut();
-    };
+    const userInfo = computed(() => store.state.userInfo.userInfo);
 
     const goHome = () => {
       router.push('/');
     };
 
     return {
-      signOutAndGoSignIn,
+      signOut,
       userInfo,
-      pages,
-      blocks,
       goHome,
     };
   },

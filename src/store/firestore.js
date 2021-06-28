@@ -1,5 +1,5 @@
 /* eslint-disable no-await-in-loop */
-import { toRefs } from 'vue';
+import { computed } from 'vue';
 import store from './index';
 import { db } from './firebase';
 
@@ -20,16 +20,6 @@ export const getUserDataByEmailFromFS = async (email) => new Promise((resolve, r
       console.log(err);
       reject(err);
     });
-  // db.collection('users')
-  //   .doc(email)
-  //   .get()
-  //   .then((doc) => {
-  //     resolve(doc.data());
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //     reject(err);
-  //   });
 });
 
 export const queryEmailFromFS = async (email) => new Promise((resolve, reject) => {
@@ -66,12 +56,11 @@ export const setUserDataToFS = async (data) => new Promise((resolve, reject) => 
 });
 
 export const updateStoreToFS = async () => {
-  const {
-    pages,
-    blocks,
-    groups,
-    userInfo,
-  } = toRefs(store.state);
+  const pages = computed(() => store.state.pages.pages);
+  const blocks = computed(() => store.state.blocks.blocks);
+  const groups = computed(() => store.state.groups.groups);
+  const userInfo = computed(() => store.state.userInfo.userInfo);
+
   console.log(userInfo.value);
   console.log(pages.value);
   const info = {

@@ -4,6 +4,7 @@ import pages from './modules/pages';
 import blocks from './modules/blocks';
 import groups from './modules/groups';
 import userInfo from './modules/userInfo';
+import { waitSecondAndCallBack } from '../components/commonEffect';
 
 export default createStore({
   strict: true, // 正式上線的時候關掉
@@ -89,6 +90,12 @@ export default createStore({
         style: 'solid',
         name: '程式碼',
       },
+      {
+        type: 'quote',
+        icon: 'quote-left',
+        style: 'solid',
+        name: '引言',
+      },
     ],
     colors: [
       'D7EBBA',
@@ -99,16 +106,54 @@ export default createStore({
       'faeca5',
       'E6F8B2',
     ],
-    isSidebarCollapse: '', // 這個放index
+    sidebarState: {
+      isCollapse: '',
+      isFloating: '',
+    },
+    windowWidth: '',
   },
   mutations: {
     // 把FS的資料全部取到state中
     setStoreData(state, { data, name }) { // 這個放這
-      state[name] = data;
+      state[name][name] = data;
+    },
+
+    setWindowWidth(state, width) {
+      state.windowWidth = width;
     },
 
     setSidebarCollapse(state, isTrueOrFalse) { // 這個留這
-      state.isSidebarCollapse = isTrueOrFalse;
+      state.sidebarState.isCollapse = isTrueOrFalse;
+    },
+
+    setSidebarFloating(state, isTrueOrFalse) {
+      state.sidebarState.isFloating = isTrueOrFalse;
+    },
+  },
+  actions: {
+    resetStoreData({ commit }) {
+      commit('pages/resetPages', null, { root: true });
+      commit('blocks/resetBlocks', null, { root: true });
+      commit('groups/resetGroups', null, { root: true });
+      commit('userInfo/resetUserInfo', null, { root: true });
+    },
+
+    async floatSidebar({ commit, state }) {
+      if (state.sidebarState.isCollapse === false) {
+        commit('setSidebarCollapse', true);
+      }
+      await waitSecondAndCallBack(1.2, () => {
+        if (state.sidebarState.isFloating === false) {
+          commit('setSidebarFloating', true);
+        }
+      });
+    },
+
+    async lockSidebar({ commit }) {
+      await waitSecondAndCallBack(0.35, () => {
+        commit('setSidebarFloating', false);
+      });
+      commit('setSidebarCollapse', false);
     },
   },
   modules: {

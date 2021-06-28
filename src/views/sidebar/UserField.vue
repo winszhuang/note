@@ -9,10 +9,21 @@
         <div class="userfield-info-email">{{ userInfo?.email || 'xxx.gmail.com' }}</div>
       </div>
     </div>
-    <NinjaButton @clickThen="collapseSidebar" :class-name="'left-collapse'">
+    <NinjaButton @clickThen="floatSidebar"
+        :class-name="'left-collapse'"
+        v-if="!isSidebarFloating">
       <template #default="{ isShow }">
         <div v-show="isShow">
           <font-awesome-icon :icon="['fas', 'angle-double-left']"/>
+        </div>
+      </template>
+    </NinjaButton>
+    <NinjaButton @clickThen="lockSidebar"
+        :class-name="'left-collapse'"
+        v-if="isSidebarFloating && windowWidth > 992">
+      <template #default="{ isShow }">
+        <div v-show="isShow">
+          <font-awesome-icon :icon="['fas', 'lock']"/>
         </div>
       </template>
     </NinjaButton>
@@ -21,7 +32,7 @@
 </template>
 
 <script>
-import { computed, toRefs } from 'vue';
+import { computed } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import NinjaButton from '../../components/NinjaButton.vue';
@@ -32,7 +43,10 @@ export default {
   setup() {
     const store = useStore();
     const router = useRouter();
-    const { userInfo, isSidebarCollapse } = toRefs(store.state);
+    const userInfo = computed(() => store.state.userInfo.userInfo);
+    const isSidebarCollapse = computed(() => store.state.sidebarState.isCollapse);
+    const isSidebarFloating = computed(() => store.state.sidebarState.isFloating);
+    const windowWidth = computed(() => store.state.windowWidth);
 
     const linkToUserInfo = () => {
       router.push('/userinfo');
@@ -45,16 +59,26 @@ export default {
       return '<img src="https://image.flaticon.com/icons/png/512/3135/3135715.png">';
     });
 
-    const collapseSidebar = () => {
-      store.commit('setSidebarCollapse', true);
+    const floatSidebar = () => {
+      store.dispatch('floatSidebar');
+    };
+
+    const lockSidebar = () => {
+      if (isSidebarCollapse.value === false) {
+        store.commit('setSidebarCollapse', true);
+      }
+      store.dispatch('lockSidebar');
     };
 
     return {
       userInfo,
       headshot,
-      collapseSidebar,
+      floatSidebar,
+      lockSidebar,
       isSidebarCollapse,
+      isSidebarFloating,
       linkToUserInfo,
+      windowWidth,
     };
   },
 };

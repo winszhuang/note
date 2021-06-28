@@ -3,12 +3,19 @@
 </template>
 
 <script>
+import { onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import { checkAuthState } from './store/firebaseAuth';
-import { isDataInLS, setDataToLS, deleteDataFromLS } from './store/localStorageEffect';
+import { getUserDataByEmailFromFS, updateStoreToFS } from './store/firestore';
+// import { waitSecondAndCallBack } from './components/commonEffect';
+import {
+  isDataInLS,
+  setDataToLS,
+  getDataFromLS,
+  deleteDataFromLS,
+} from './store/localStorageEffect';
 // import userInfoEffect from './views/verification/userInfoEffect';
-import { getUserDataByEmailFromFS } from './store/firestore';
 
 export default {
   name: 'App',
@@ -19,10 +26,17 @@ export default {
 
     const setUserDataToStore = (data) => {
       Object.keys(data).forEach((key) => {
+        const value = data[key] || [];
         store.commit('setStoreData', {
-          data: data[key],
+          data: value,
           name: key,
         });
+      });
+    };
+
+    const setUserDataToLS = (data) => {
+      Object.keys(data).forEach((key) => {
+        setDataToLS(key, data[key]);
       });
     };
 
@@ -31,41 +45,59 @@ export default {
       console.log(user);
       console.log(user ? '登入狀態喔' : '未登入狀態');
       const signinProcedure = async () => {
-        try {
-          const userData = { value: {} };
-          const result = await getUserDataByEmailFromFS(user.email);
-          console.log(result);
-          if (!result) {
-            const userInfo = {
-              name: user.displayName,
-              email: user.email,
-              headshot: user.photoURL,
-            };
-            userData.value = { userInfo };
-          } else {
-            userData.value = result;
-          }
-          setUserDataToStore(userData.value);
-          console.log(store.state.userInfo);
+        const userData = { value: {} };
+        const userInfo = getDataFromLS('userInfo');
 
-          if (!isDataInLS('userInfo')) {
-            setDataToLS('userInfo', userData.value.userInfo);
+        if (userInfo && userInfo.email === user.email) {
+          userData.value = {
+            pages: getDataFromLS('pages'),
+            blocks: getDataFromLS('blocks'),
+            groups: getDataFromLS('groups'),
+            userInfo: getDataFromLS('userInfo'),
+          };
+        } else {
+          try {
+            const result = await getUserDataByEmailFromFS(user.email);
+            console.log(result);
+            if (!result) {
+              const info = {
+                name: user.displayName,
+                email: user.email,
+                headshot: user.photoURL,
+                pageHistory: '',
+              };
+              userData.value = { userInfo: info };
+            } else {
+              userData.value = result;
+            }
+          } catch (error) {
+            console.log(error);
           }
+          setUserDataToLS(userData.value);
+        }
 
-          if (route.path === '/signin' || route.path === '/register') {
-            console.log('跳到首頁');
-            router.push('/');
-          }
-        } catch (error) {
-          console.log(error);
+        setUserDataToStore(userData.value);
+        console.log(store.state.userInfo);
+
+        if (route.path === '/signin' || route.path === '/register') {
+          console.log('跳到首頁');
+          router.push('/');
         }
       };
 
-      const signoutProcedure = () => {
+      const signoutProcedure = async () => {
         if (isDataInLS('userInfo')) {
+          try {
+            await updateStoreToFS();
+          } catch (error) {
+            console.log(error);
+          }
+          store.dispatch('resetStoreData');
+          deleteDataFromLS('pages');
+          deleteDataFromLS('blocks');
+          deleteDataFromLS('groups');
           deleteDataFromLS('userInfo');
         }
-        store.commit('userInfo/deleteUserInfo');
         router.push('/signin');
       };
 
@@ -75,6 +107,21 @@ export default {
       };
 
       actions[isSignInOrOut]();
+    });
+
+    onMounted(() => {
+      if (window.innerWidth < 992) {
+        store.commit('setSidebarCollapse', true);
+        store.commit('setSidebarFloating', true);
+      } else {
+        store.commit('setSidebarFloating', false);
+        store.commit('setSidebarCollapse', true);
+      }
+      store.commit('setWindowWidth', window.innerWidth);
+
+      window.addEventListener('resize', () => {
+        store.commit('setWindowWidth', window.innerWidth);
+      });
     });
   },
 };

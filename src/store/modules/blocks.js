@@ -10,6 +10,13 @@ export default {
   },
   mutations: {
     // 處理blocks
+    resetBlocks(state) {
+      state.blocks = [];
+      state.currentFocusBlockId = '';
+      state.currentBlocksByAreaSelect = [];
+      state.hiddenBlocksIds = [];
+    },
+
     addBlock(state, item) {
       state.blocks.push(item);
     },
@@ -134,13 +141,38 @@ export default {
 
       // 此段處理block的id被加入某page中的blocks陣列裡的某位置
       const thisPage = page || findInStore(rootState.pages.pages, rootState.pages.currentPageId);
-      console.log(thisPage);
       const isSelect = state.currentFocusBlockId !== '';
       const index = thisPage.blocks.indexOf(state.currentFocusBlockId);
       commit('pages/addIdToBlocksOfPage', {
         page: thisPage,
         blockId: id,
         index: isSelect ? index + 1 : undefined,
+      }, { root: true });
+
+      commit('changeFocusBlock', id);
+    },
+
+    pushBlock({ commit }, {
+      type = 'p',
+      id = (new Date().getTime() + 3).toString(),
+      value = '',
+      blocks = [],
+      parentId = '',
+      group = '',
+    }) {
+      const newBlock = {
+        id,
+        type,
+        content: value,
+        blocks,
+        parentId,
+        group,
+      };
+      commit('addBlock', newBlock);
+
+      // 此段處理block的id被加入某page中的blocks陣列裡的某位置
+      commit('pages/addIdToBlocksOfPage', {
+        blockId: id,
       }, { root: true });
 
       commit('changeFocusBlock', id);
@@ -214,8 +246,8 @@ export default {
       commit('deleteBlock', thisBlock); // 徹底刪除此block
     },
 
-    goBlockPosition({ commit, dispatch }, { page, block }) {
-      dispatch('pages/changeCurrentPage', page.id, { root: true });
+    goBlockPosition({ commit }, { page, block }) {
+      commit('pages/setCurrentPageId', page.id, { root: true });
       commit('changeFocusBlock', block.id);
     },
 

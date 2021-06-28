@@ -22,37 +22,35 @@ const watchStoreEffect = () => {
     }, { deep: true });
   };
 
-  // const listenDelete = () => {
-  //   store.subscribe((mutation, state) => {
-  //     if (mutation.type)
-  //   })
-  // }
-
-  const updateEditTimeOfPageBySubscribe = () => {
-    store.subscribe((mutation, state) => {
+  const storeObserver = () => {
+    const updateEditTimeOfPageBySubscribe = (mutation, state) => {
+      if (!state.pages.currentPageId) return;
+      if (mutation.type === 'blocks/changeFocusBlock') return;
+      if (mutation.type === 'pages/changeCurrentPageIdOnMouse') return;
+      if (mutation.type === 'pages/editPageData' && mutation.payload?.property === 'editTime') return;
       // console.log(mutation.type);
       // console.log(mutation.payload);
-      if (!state.currentPageId) return;
-      if (mutation.type === 'editPageData' && mutation.payload?.property === 'editTime') return;
-
       const mutationsThatDidntRequireRecordingtime = [
         'setStoreData',
+        'pages/resetPages',
+        'pages/deletePage',
         'pages/setCurrentPageId',
         'pages/changeCurrentPageIdOnMouse',
-        'pages/addPageHistory',
+        'pages/addIdToPageHistory',
+        'blocks/resetBlocks',
         'blocks/changeFocusBlock',
         'blocks/changeBlocksByAreaSelect',
         'blocks/addIdsToHiddenBlocksIds',
         'blocks/deleteIdsToHiddenBlocksIds',
         'blocks/resetHiddenBlocksIds',
+        'groups/resetGroups',
+        'userInfo/resetUserInfo',
         'userInfo/setUserInfo',
-        'userInfo/getUserInfo',
-        'userInfo/deleteUserInfo',
       ];
 
       for (let i = 0; i < mutationsThatDidntRequireRecordingtime.length; i += 1) {
         if (mutation.type === mutationsThatDidntRequireRecordingtime[i]) {
-          // console.log('不需要紀錄時間');
+          console.log('不需要紀錄時間');
           return;
         }
       }
@@ -61,6 +59,50 @@ const watchStoreEffect = () => {
         property: 'editTime',
         value: new Date().getTime().toString(),
       });
+    };
+
+    const collapseSidebarByAddSomething = (mutation, state) => {
+      if (!(state.sidebarState.isCollapse === false
+        && state.sidebarState.isFloating === true)) return;
+      const mutations = [
+        'pages/deletePage',
+        'pages/setCurrentPageId',
+        'blocks/addBlock',
+      ];
+
+      for (let i = 0; i < mutations.length; i += 1) {
+        if (mutation.type === mutations[i]) {
+          store.commit('setSidebarCollapse', true);
+          return;
+        }
+      }
+    };
+
+    const checkDataInStoreThen = (mutation, callback) => {
+      if (mutation.type === 'setStoreData') {
+        callback();
+      }
+    };
+
+    const updatePageHistory = (mutation) => {
+      if (mutation.type === 'pages/setCurrentPageId') {
+        store.commit('userInfo/addIdToPageHistory', mutation.payload);
+      }
+      if (mutation.type === 'pages/deletePage') {
+        console.log(mutation.payload);
+        store.commit('userInfo/deleteIdFromPageHistory', mutation.payload);
+      }
+    };
+
+    store.subscribe((mutation, state) => {
+      updateEditTimeOfPageBySubscribe(mutation, state);
+      collapseSidebarByAddSomething(mutation, state);
+      checkDataInStoreThen(mutation, () => {
+        if (window.innerWidth > 992) {
+          store.commit('setSidebarCollapse', false);
+        }
+      });
+      updatePageHistory(mutation);
     });
   };
 
@@ -68,7 +110,7 @@ const watchStoreEffect = () => {
     updatePagesToLSByWatching,
     updateBlocksToLSByWatching,
     updateGroupsToLSByWatching,
-    updateEditTimeOfPageBySubscribe,
+    storeObserver,
   };
 };
 

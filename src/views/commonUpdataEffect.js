@@ -76,7 +76,7 @@ const commonUpdateEffect = () => {
   };
 
   const goCurrentPage = (id) => {
-    store.dispatch('pages/changeCurrentPage', id);
+    store.commit('pages/setCurrentPageId', id);
   };
 
   return {

@@ -21,7 +21,7 @@
     <div class="ms-auto icon-button"
         v-show="page.id === currentPageIdOnMouse"
         @click="deletePage(page)">
-      <font-awesome-icon :icon="['fas', 'ellipsis-h']" style="color: #999999" size="sm"/>
+      <font-awesome-icon :icon="['far', 'minus-square']" style="color: #999999" size="sm"/>
     </div>
 
     <div class="icon-button"
@@ -78,7 +78,7 @@ export default {
   setup(props) {
     const store = useStore();
     const childrenPages = computed(() => store.getters['pages/childrenPages'](props.page.id));
-    const { currentPageId, currentPageIdOnMouse } = toRefs(store.state);
+    const { currentPageId, currentPageIdOnMouse } = toRefs(store.state.pages);
     const { goCurrentPage } = commonUpdateEffect();
     const { isShow, handleShow, toggleShow } = showEffect();
     const caretIcon = computed(() => (isShow.value ? faCaretRight : faCaretDown));

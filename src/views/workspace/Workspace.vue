@@ -1,16 +1,5 @@
 <template>
-  <main class="mainspace">
-    <NinjaButton @clickThen="unCollapseSidebar"
-        :class-name="'uncollapse'"
-        v-show="isSidebarCollapse">
-      <template #default="{ isShow }">
-        <div v-show="isShow" class="uncollapse-btn">
-          <font-awesome-icon :icon="['fas', 'angle-double-right']"/>
-        </div>
-      </template>
-    </NinjaButton>
-    <!-- <template v-show="">
-    </template> -->
+  <main class="mainspace" @mousemove="toggleFloatSidebar($event)">
     <div class="workspace" v-if="currentPage">
       <!-- {{ pageHistory }} -->
       <div class="header">
@@ -49,14 +38,16 @@
           <!-- <div class="prefix-line"></div> -->
         </div>
         <PageInfo :page="currentPage"/>
-        <div class="blockcontent" v-if="currentBlocks">
+        <div class="blockcontent" v-if="currentBlocks" @mousedown="clickActionInContent($event)">
           <template v-for="(block) in currentBlocks" :key="block.id">
             <Block :block="block"
                   v-show="!hiddenBlocksIds.includes(block.id)"/>
           </template>
         </div>
-        <hr>
-        <template v-if="groups.length !== 0">
+
+        <!--測試用-->
+        <!-- <hr>
+        <template v-if="groups && groups.length !== 0">
           <div v-for="(item) in groups" :key="item.id">
             <ul>
                 <li>id ------ {{ item.id }}</li>
@@ -94,11 +85,6 @@
           </div>
         </div>
         <hr>
-        <!-- <div v-for="item in pages" :key="item.id">
-          <div>id: {{ item.id }}</div>
-          <div>blocks: {{ item.blocks }}</div>
-          <h1></h1>
-        </div> -->
         <div>currentBlocks: </div>
         <div v-if="currentBlocks.length">
           <div
@@ -115,7 +101,9 @@
               <hr>
             </ul>
           </div>
-        </div>
+        </div> -->
+        <!--測試用-->
+
       </div>
     </div>
     <template v-else>
@@ -165,13 +153,13 @@ import {
 } from 'vue';
 import { useStore } from 'vuex';
 import commonUpdateEffect from '../commonUpdataEffect';
+import commonDomEffect from '../../components/commonDomEffect';
 import Breadcrumb from './Breadcrumb.vue';
 import Block from '../../components/Block.vue';
 import AreaSelect from '../../components/AreaSelect.vue';
 import PageEditable from '../../components/input/PageEditable.vue';
 import StyleTool from '../../components/StyleTool.vue';
 import PageInfo from './PageInfo.vue';
-import NinjaButton from '../../components/NinjaButton.vue';
 import { updateStoreToFS } from '../../store/firestore';
 import watchStoreEffect from '../../store/watchStoreEffect';
 
@@ -184,7 +172,6 @@ export default {
     PageEditable,
     StyleTool,
     PageInfo,
-    NinjaButton,
   },
   setup() {
     const store = useStore();
@@ -193,25 +180,25 @@ export default {
       updatePagesToLSByWatching,
       updateBlocksToLSByWatching,
       updateGroupsToLSByWatching,
-      updateEditTimeOfPageBySubscribe,
+      storeObserver,
     } = watchStoreEffect();
 
     updatePagesToLSByWatching();
     updateBlocksToLSByWatching();
     updateGroupsToLSByWatching();
-    updateEditTimeOfPageBySubscribe();
+    storeObserver();
 
-    const groups = computed(() => store.getters['groups/getGroups']);
+    const groups = computed(() => store.state.groups.groups);
     const currentPage = computed(() => store.getters['pages/currentPage']);
     const currentBlocks = computed(() => store.getters['blocks/currentBlocks']);
     const currentFocusBlock = computed(() => store.getters['blocks/currentFocusBlock']);
     // eslint-disable-next-line max-len
     const currentBlocksByAreaSelect = computed(() => store.getters['blocks/currentBlocksByAreaSelect']);
     const currentBlocksIds = computed(() => store.getters['blocks/currentBlocksIds']);
+    const isSidebarFloating = computed(() => store.state.sidebarState.isFloating);
 
-    const { isSidebarCollapse } = toRefs(store.state);
     const unCollapseSidebar = () => {
-      store.commit('setSidebarCollapse', false);
+      store.dispatch('lockSidebar');
     };
 
     const { editPageData } = commonUpdateEffect();
@@ -242,6 +229,38 @@ export default {
       } catch (error) {
         console.log(error);
         isUpdatingHandle(false);
+      }
+    };
+
+    const { isMouseUnderTheElement } = commonDomEffect();
+    const clickActionInContent = (e) => {
+      const lastBlock = currentBlocks.value[currentBlocks.value.length - 1];
+      if (!lastBlock) {
+        e.preventDefault();
+        store.dispatch('blocks/pushBlock', {
+          type: 'p',
+        });
+        return;
+      }
+      const lastBlockDom = document.getElementById(lastBlock.id);
+      if (isMouseUnderTheElement(lastBlockDom, e)) {
+        e.preventDefault();
+        if (lastBlock.content === '') {
+          lastBlockDom.focus();
+          return;
+        }
+        store.dispatch('blocks/pushBlock', {
+          type: 'p',
+        });
+      }
+    };
+
+    const toggleFloatSidebar = (e) => {
+      if (isSidebarFloating.value === false) return;
+      if (e.clientX < 45) {
+        store.commit('setSidebarCollapse', false);
+      } else {
+        store.commit('setSidebarCollapse', true);
       }
     };
 
@@ -321,6 +340,7 @@ export default {
     // );
 
     return {
+      clickActionInContent,
       currentPage,
       editPageData,
       currentBlocks,
@@ -337,7 +357,7 @@ export default {
       updateToFS,
       isUpdating,
       unCollapseSidebar,
-      isSidebarCollapse,
+      toggleFloatSidebar,
     };
   },
 };
@@ -347,7 +367,6 @@ export default {
 @import '../../style/color.scss';
 
 @mixin mainspace {
-  flex: 1;
   height: 100vh;
   // background: #F1F0EA;
   background: #faf9f2;
@@ -382,6 +401,8 @@ export default {
 
 .workspace{
   @include mainspace;
+  display: flex;
+  flex-direction: column;
 }
 
 p{
@@ -496,26 +517,31 @@ p{
   background: $web-orange;
 }
 
+.content{
+  flex-grow:1;
+  margin: 0 20%;
+  padding-bottom: 7rem;
+  display: flex;
+  flex-direction: column;
+  @media (min-width:1100px){
+    margin: 0 22%;
+  }
+  @media (max-width:992px){
+    margin: 0 12%;
+  }
+
+  transition: margin .3s ease-out;
+  // @media (min-width:1200px){
+  //   padding: 0 27%;
+  // }
+}
 .blockcontent{
   width: 100%;
+  flex-grow: 1;
   &-input{
     width: inherit;
     min-height: 50px;
   }
-}
-.content{
-  flex-grow:1;
-  padding: 0 20%;
-  // padding: 0 20% 0 20%;
-  @media (min-width:1100px){
-    padding: 0 25%;
-  }
-  @media (max-width:900px){
-    padding: 0 12%;
-  }
-  // @media (min-width:1200px){
-  //   padding: 0 27%;
-  // }
 }
 .title{
   position: relative;

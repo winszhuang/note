@@ -6,6 +6,10 @@ export default {
     groups: [],
   },
   mutations: {
+    resetGroups(state) {
+      state.groups = [];
+    },
+
     addGroup(state, groupId) {
       const group = {
         id: groupId || new Date().getTime().toString(),
@@ -46,10 +50,6 @@ export default {
 
     getIndexFromGroupByBlock(state) {
       return (block) => findInStore(state.groups, block.group).value.indexOf(block.id);
-    },
-
-    getGroups(state) {
-      return state.groups;
     },
   },
   actions: {
