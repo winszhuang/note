@@ -28,7 +28,7 @@
         </div>
       </div> -->
       <div class="content">
-        <AreaSelect :ids="currentBlocksIds" />
+        <AreaSelect :ids="currentBlocksIds" :work-area="'.content'"/>
         <StyleTool/>
         <div class="title">
           <PageEditable
@@ -46,7 +46,7 @@
         </div>
 
         <!--測試用-->
-        <!-- <hr>
+        <hr>
         <template v-if="groups && groups.length !== 0">
           <div v-for="(item) in groups" :key="item.id">
             <ul>
@@ -68,8 +68,8 @@
         <hr>
         <div v-if="currentPage">
           <hr>
+          <div>currentFocusBlockId: {{ currentFocusBlockId }}</div>
           <div v-if="currentFocusBlock">
-            <div>currentFocusBlockId: {{ currentFocusBlockId }}</div>
             <div>currentFocusBlock: </div>
             <ul>
               <li style="width: 400px; overflow: hidden; text-overflow: ellipsis;">
@@ -101,7 +101,7 @@
               <hr>
             </ul>
           </div>
-        </div> -->
+        </div>
         <!--測試用-->
 
       </div>
@@ -519,18 +519,18 @@ p{
 
 .content{
   flex-grow:1;
-  margin: 0 20%;
+  padding: 0 20%;
   padding-bottom: 7rem;
   display: flex;
   flex-direction: column;
   @media (min-width:1100px){
-    margin: 0 22%;
+    padding: 0 22%;
   }
   @media (max-width:992px){
-    margin: 0 12%;
+    padding: 0 12%;
   }
 
-  transition: margin .3s ease-out;
+  transition: padding .3s ease-out;
   // @media (min-width:1200px){
   //   padding: 0 27%;
   // }

@@ -20,13 +20,13 @@
 
     <div class="ms-auto icon-button"
         v-show="page.id === currentPageIdOnMouse"
-        @click="deletePage(page)">
+        @click.stop="deletePage(page)">
       <font-awesome-icon :icon="['far', 'minus-square']" style="color: #999999" size="sm"/>
     </div>
 
     <div class="icon-button"
         v-show="page.id === currentPageIdOnMouse"
-        @click="addPageInside(page)">
+        @click.stop="addPageInside(page)">
       <font-awesome-icon :icon="['far', 'plus-square']" style="color: #999999"/>
     </div>
 

@@ -150,7 +150,7 @@ export default createStore({
     },
 
     async lockSidebar({ commit }) {
-      await waitSecondAndCallBack(0.35, () => {
+      await waitSecondAndCallBack(0.5, () => {
         commit('setSidebarFloating', false);
       });
       commit('setSidebarCollapse', false);

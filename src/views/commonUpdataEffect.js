@@ -22,8 +22,8 @@ const commonUpdateEffect = () => {
     });
   };
 
-  const getFocusBlock = (id) => {
-    store.commit('blocks/changeFocusBlock', id);
+  const setFocusBlock = (id = '') => {
+    store.commit('blocks/setFocusBlockById', id);
   };
 
   const checkKeydownInPageData = (page, e) => {
@@ -35,7 +35,7 @@ const commonUpdateEffect = () => {
         });
         return;
       }
-      getFocusBlock(page.blocks[0]);
+      setFocusBlock(page.blocks[0]);
     }
   };
 
@@ -84,7 +84,7 @@ const commonUpdateEffect = () => {
     editPageData,
     checkKeydownInBlockContent,
     checkKeydownInPageData,
-    getFocusBlock,
+    setFocusBlock,
     goCurrentPage,
   };
 };

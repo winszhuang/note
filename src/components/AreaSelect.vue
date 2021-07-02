@@ -8,6 +8,7 @@ import {
 } from 'vue';
 import { useStore } from 'vuex';
 import { commonCollisionEffect, commonArrEffect } from './commonEffect';
+import commonDomEffect from './commonDomEffect';
 
 const useKeyboardEffect = () => {
   const store = useStore();
@@ -183,12 +184,14 @@ const useAreaSelectEffect = (el, boxCollisionDetection) => {
 
 export default {
   name: 'AreaSelect',
-  props: ['ids'],
+  props: ['ids', 'workArea'],
   setup(props) {
     const { boxCollisionDetection } = commonCollisionEffect();
+    const { getElementBySelector } = commonDomEffect();
 
     onMounted(() => {
       const select = document.getElementById('area-select');
+      const workArea = getElementBySelector(props.workArea);
       const {
         mouseDown,
         mouseUp,
@@ -200,9 +203,8 @@ export default {
         setAllIds(props.ids);
       },
       { immediate: true });
-      // areaSelect.value = document.getElementById('area-select');
 
-      document.addEventListener('mousedown', mouseDown);
+      workArea.addEventListener('mousedown', mouseDown);
       document.addEventListener('mouseup', mouseUp);
       document.addEventListener('mousemove', mouseMove);
 

@@ -6,7 +6,8 @@
         :value="block.content"
         @input="inputToBlockContent"
         @keydown="keydownAction"
-        @focus="focusToBlock"/>
+        @focus="focusToBlock"
+        @blur="unFocusToBlock"/>
 </template>
 
 <script>
@@ -18,7 +19,7 @@ export default {
   name: 'BlockEditable',
   props: ['block', 'placeholder', 'className', 'noId'],
   setup(props) {
-    const { editBlockData, getFocusBlock, checkKeydownInBlockContent } = commonUpdateEffect();
+    const { editBlockData, setFocusBlock, checkKeydownInBlockContent } = commonUpdateEffect();
 
     const inputToBlockContent = (e) => {
       editBlockData(props.block.id, e.target.innerHTML);
@@ -29,13 +30,18 @@ export default {
     };
 
     const focusToBlock = () => {
-      getFocusBlock(props.block.id);
+      setFocusBlock(props.block.id);
+    };
+
+    const unFocusToBlock = () => {
+      setFocusBlock('');
     };
 
     return {
       inputToBlockContent,
       keydownAction,
       focusToBlock,
+      unFocusToBlock,
     };
   },
 };

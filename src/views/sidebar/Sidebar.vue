@@ -11,8 +11,12 @@
     </template>
   </Modal>
   <div :class="{ sidebar: true, 'sidebar-float': isSidebarFloating }"
-          :style="{ width: isSidebarCollapse === true ? '0' : '23rem' }">
+          :style="{ width: isSidebarCollapse === true ? '0' : `${sidebarWidth}px` }">
       <UserField/>
+      <Splitter :class-name="'splitter'"
+          v-if="!isSidebarFloating"
+          @getMouseOffset="setSidebarWidth"
+          @stopMouseMove="setPrevSidebarWidth"/>
       <div class="field-title">通用 :</div>
       <div class="customlist-group">
         <div class="customlist-group-item"
@@ -51,7 +55,8 @@
                 @click="addBlock(item.type)">
             <div class="customlist-item-1 ms-4">
               <font-awesome-icon
-                  :icon="[style[item.style], item.icon || 'heading']" :size="item.size || 'xs'"/>
+                  :icon="[transStyleToFAPrefix(item.style),
+                    item.icon || 'heading']" :size="item.size || 'xs'"/>
               <!-- {{ item.type }} -->
             </div>
             <div class="customlist-item-6 block-name">{{ item.name }}</div>
@@ -69,13 +74,88 @@
 <script>
 import { useStore } from 'vuex';
 import {
-  toRefs, computed, onMounted, watch, // reactive watch
+  toRefs, computed, onMounted, watch, ref, // reactive watch
 } from 'vue';
 import UserField from './UserField.vue';
 import CustomList from '../../components/CustomList.vue';
 import Modal from '../../components/Modal.vue';
 import Search from '../Search.vue';
 import { showEffect } from '../../components/commonEffect';
+import Splitter from '../../components/Splitter.vue';
+
+const DEFAULT_SIDEBAR_WIDTH = 300;
+
+const useSidebarWidthEffect = (minWidth, maxWidth) => {
+  const sidebarWidth = ref(0);
+  const prevSidebarWidth = ref(0);
+
+  const getSidebarWidthInRange = (offset) => {
+    sidebarWidth.value = prevSidebarWidth.value + offset.x;
+    if (sidebarWidth.value > maxWidth) sidebarWidth.value = maxWidth;
+    if (sidebarWidth.value < minWidth) sidebarWidth.value = minWidth;
+    return sidebarWidth.value;
+  };
+
+  const setSidebarWidth = (offset) => {
+    sidebarWidth.value = getSidebarWidthInRange(offset);
+  };
+
+  const setPrevSidebarWidth = () => {
+    prevSidebarWidth.value = sidebarWidth.value;
+  };
+
+  onMounted(() => {
+    sidebarWidth.value = DEFAULT_SIDEBAR_WIDTH;
+    prevSidebarWidth.value = DEFAULT_SIDEBAR_WIDTH;
+  });
+
+  return {
+    setSidebarWidth,
+    setPrevSidebarWidth,
+    sidebarWidth,
+    prevSidebarWidth,
+  };
+};
+
+const useSidebarStateEffect = () => {
+  const store = useStore();
+  const breakpoint = { value: '' };
+  const windowWidth = computed(() => store.state.windowWidth);
+  const isSidebarCollapse = computed(() => store.state.sidebarState.isCollapse);
+  const isSidebarFloating = computed(() => store.state.sidebarState.isFloating);
+  const { isShow, handleShow } = showEffect();
+
+  onMounted(() => {
+    handleShow(false);
+    if (window.innerWidth < 992) {
+      breakpoint.value = 'sm';
+    } else {
+      breakpoint.value = 'lg';
+    }
+  });
+
+  watch(() => windowWidth.value, (curr) => {
+    if (curr === '') return;
+    if (curr < 992) {
+      if (breakpoint.value === 'sm') return;
+      breakpoint.value = 'sm';
+      console.log(isSidebarCollapse.value, isSidebarFloating.value);
+      store.dispatch('floatSidebar');
+    } else {
+      if (breakpoint.value === 'lg') return;
+      breakpoint.value = 'lg';
+      console.log(isSidebarCollapse.value, isSidebarFloating.value);
+      store.dispatch('lockSidebar');
+    }
+  });
+
+  return {
+    isShow,
+    handleShow,
+    isSidebarCollapse,
+    isSidebarFloating,
+  };
+};
 
 export default {
   name: 'Sidebar',
@@ -84,49 +164,26 @@ export default {
     CustomList,
     Modal,
     Search,
+    Splitter,
   },
   setup() {
     const store = useStore();
-    const currentPage = computed(() => store.getters['pages/currentPage']);
     const rootPages = computed(() => store.getters['pages/childrenPages'](''));
-    const isSidebarCollapse = computed(() => store.state.sidebarState.isCollapse);
-    const isSidebarFloating = computed(() => store.state.sidebarState.isFloating);
-    const windowWidth = computed(() => store.state.windowWidth);
     const { blocktype } = toRefs(store.state);
-    const { blocks } = toRefs(store.state.blocks);
     const { currentPageId, currentPageIdOnMouse } = toRefs(store.state.pages);
-    const { isShow, handleShow } = showEffect();
+    const {
+      setSidebarWidth,
+      setPrevSidebarWidth,
+      sidebarWidth,
+    } = useSidebarWidthEffect(220, 420);
+    const {
+      isShow,
+      handleShow,
+      isSidebarCollapse,
+      isSidebarFloating,
+    } = useSidebarStateEffect();
 
-    const breakpoint = { value: '' };
-
-    onMounted(() => {
-      handleShow(false);
-      if (window.innerWidth < 992) {
-        breakpoint.value = 'sm';
-      } else {
-        breakpoint.value = 'lg';
-      }
-    });
-
-    watch(() => windowWidth.value, (curr) => {
-      if (curr === '') return;
-      if (curr < 992) {
-        if (breakpoint.value === 'sm') return;
-        breakpoint.value = 'sm';
-        console.log(isSidebarCollapse.value, isSidebarFloating.value);
-        store.dispatch('floatSidebar');
-      } else {
-        if (breakpoint.value === 'lg') return;
-        breakpoint.value = 'lg';
-        console.log(isSidebarCollapse.value, isSidebarFloating.value);
-        store.dispatch('lockSidebar');
-      }
-    });
-
-    const style = {
-      solid: 'fas',
-      regular: 'far',
-    };
+    const transStyleToFAPrefix = (style) => `fa${style.charAt(0)}`;
 
     const addPage = () => {
       store.commit('pages/addPage', {});
@@ -160,18 +217,19 @@ export default {
 
     return {
       rootPages,
-      blocks,
       blocktype,
       addPage,
-      currentPage,
       currentPageId,
       currentPageIdOnMouse,
       addBlock,
-      style,
+      transStyleToFAPrefix,
       isShow,
       handleShow,
       isSidebarCollapse,
       isSidebarFloating,
+      sidebarWidth,
+      setSidebarWidth,
+      setPrevSidebarWidth,
     };
   },
 };
@@ -180,13 +238,27 @@ export default {
 <style lang="scss" >
 @import '../../style/component/_sidebar.scss';
 .sidebar{
-  transition: width .2s ease-out .1s;
+  transition: width .4s ease-in-out .1s;
 }
 
 .search-container{
   width: 30%;
   height: 50%;
 }
+
+.splitter{
+  position: absolute;
+  right: 0rem;
+  top: 73px;
+  bottom: 35px;
+  width: .7rem;
+  // background: rgb(235, 78, 78);
+  z-index: 20;
+  &:hover{
+    cursor: col-resize;
+  }
+}
+
 .addpage{
   line-height: 2.5rem;
   // height: 2.5rem;

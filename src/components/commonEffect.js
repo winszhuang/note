@@ -83,6 +83,33 @@ const waitSecondAndCallBack = async (second, callback) => new Promise((resolve) 
   }, second * 1000);
 });
 
+// const sizeChangeEffect = (minSize, maxSize) => {
+//   const size = ref(0);
+//   const prevSize = ref(0);
+
+//   const getSizeInRange = (offset) => {
+//     size.value = prevSize.value + offset;
+//     if (size.value > maxSize) size.value = maxSize;
+//     if (size.value < minSize) size.value = minSize;
+//     return size.value;
+//   };
+
+//   const setSize = (value) => {
+//     size.value = value;
+//   };
+
+//   const get
+
+//   const setPrevSize = (value) => {
+//     prevSize.value = value;
+//   }
+
+//   const setSizeToPrevSize = () => {
+//     prevSize.value = size.value;
+//   };
+
+// }
+
 export {
   commonArrEffect,
   commonStringEffect,

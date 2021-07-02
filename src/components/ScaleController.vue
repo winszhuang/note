@@ -27,7 +27,6 @@
 <script>
 import { computed, onMounted, ref } from 'vue';
 import { showEffect } from './commonEffect';
-// import commonDomEffect from './commonDomEffect';
 
 export default {
   name: 'ScaleController',
@@ -47,6 +46,14 @@ export default {
     });
 
     onMounted(() => {
+      // const scaleHandleLeft = document.getElementsByClassName('scale-handle-left')[0];
+      // const scaleHandleRight = document.getElementsByClassName('scale-handle-right')[0];
+      // const {
+      //   mouseDown,
+      //   mouseMove,
+      //   mouseUp,
+      // } = getMouseOffsetByClickElAndMove();
+
       let rightX = 0;
       let leftX = 0;
 
@@ -56,7 +63,6 @@ export default {
         offsetX.value = e.clientX - leftX;
         width.value = prevWidth + offsetX.value;
         if (width.value < 0) width.value = 0;
-        // console.log(width.value);
       };
 
       const mouseMoveRight = (e) => {
@@ -102,13 +108,6 @@ export default {
 
       scaleObject.querySelector('.scale-handle-left').addEventListener('mousedown', mouseDownLeft);
       scaleObject.querySelector('.scale-handle-right').addEventListener('mousedown', mouseDownRight);
-
-      // workspace.addEventListener('mouseup', (e) => mouseUp(e));
-      // eslint-disable-next-line max-len
-      // workspace.addEventListener('mousedown', (e) => mouseDownInElement(e, handleItems[0], setOffsetX));
-      // eslint-disable-next-line max-len
-      // workspace.addEventListener('mousedown', (e) => mouseDownInElement(e, handleItems[1], setOffsetX));
-      // workspace.addEventListener('mousemove', (e) => multiEvent(e));
     });
 
     return {

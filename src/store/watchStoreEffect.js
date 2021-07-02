@@ -24,12 +24,12 @@ const watchStoreEffect = () => {
 
   const storeObserver = () => {
     const updateEditTimeOfPageBySubscribe = (mutation, state) => {
+      console.log(mutation.type);
       if (!state.pages.currentPageId) return;
-      if (mutation.type === 'blocks/changeFocusBlock') return;
+      if (mutation.type === 'blocks/setFocusBlockById') return;
       if (mutation.type === 'pages/changeCurrentPageIdOnMouse') return;
       if (mutation.type === 'pages/editPageData' && mutation.payload?.property === 'editTime') return;
-      // console.log(mutation.type);
-      // console.log(mutation.payload);
+
       const mutationsThatDidntRequireRecordingtime = [
         'setStoreData',
         'pages/resetPages',
@@ -37,15 +37,19 @@ const watchStoreEffect = () => {
         'pages/setCurrentPageId',
         'pages/changeCurrentPageIdOnMouse',
         'pages/addIdToPageHistory',
+        'blocks/deleteBlock',
         'blocks/resetBlocks',
-        'blocks/changeFocusBlock',
+        'blocks/setFocusBlockById',
         'blocks/changeBlocksByAreaSelect',
         'blocks/addIdsToHiddenBlocksIds',
+        'blocks/deleteIdToBlocksOfBlock',
+        'blocks/deleteIdToBlocksOfPage',
         'blocks/deleteIdsToHiddenBlocksIds',
         'blocks/resetHiddenBlocksIds',
         'groups/resetGroups',
         'userInfo/resetUserInfo',
         'userInfo/setUserInfo',
+        'userInfo/deleteIdFromPageHistory',
       ];
 
       for (let i = 0; i < mutationsThatDidntRequireRecordingtime.length; i += 1) {
@@ -54,6 +58,8 @@ const watchStoreEffect = () => {
           return;
         }
       }
+      // pages/deleteIdToBlocksOfPage需要紀錄
+      console.log(mutation.type);
       // console.log('需要紀錄時間');
       store.commit('pages/editPageData', {
         property: 'editTime',
@@ -94,6 +100,13 @@ const watchStoreEffect = () => {
       }
     };
 
+    const listenBlockDeleteAnd = (mutation) => {
+      if (mutation.type !== 'blocks/deleteBlock') return;
+      const block = mutation.payload;
+      const blockId = mutation.payload.id;
+      console.log(block, blockId);
+    };
+
     store.subscribe((mutation, state) => {
       updateEditTimeOfPageBySubscribe(mutation, state);
       collapseSidebarByAddSomething(mutation, state);
@@ -103,6 +116,7 @@ const watchStoreEffect = () => {
         }
       });
       updatePageHistory(mutation);
+      listenBlockDeleteAnd(mutation);
     });
   };
 

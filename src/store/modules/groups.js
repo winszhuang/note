@@ -1,4 +1,4 @@
-import { findInStore } from './commonStoreEffect';
+import { findInStoreById } from './commonStoreEffect';
 
 export default {
   namespaced: true,
@@ -19,7 +19,7 @@ export default {
     },
 
     addIdToGroup(state, { groupId, id, index }) {
-      const group = findInStore(state.groups, groupId);
+      const group = findInStoreById(state.groups, groupId);
       if (index !== undefined) {
         group.value.splice(index, 0, id);
       } else {
@@ -28,12 +28,12 @@ export default {
     },
 
     addIdsToGroup(state, { groupId, ids }) {
-      const group = findInStore(state.groups, groupId);
+      const group = findInStoreById(state.groups, groupId);
       group.value = [...group.value, ...ids];
     },
 
     deleteIdToGroup(state, { groupId, id }) {
-      const group = findInStore(state.groups, groupId);
+      const group = findInStoreById(state.groups, groupId);
       const index = group.value.indexOf(id);
       group.value.splice(index, 1);
     },
@@ -45,11 +45,11 @@ export default {
   },
   getters: {
     getGroupByBlock(state) {
-      return (block) => findInStore(state.groups, block.group);
+      return (block) => findInStoreById(state.groups, block.group);
     },
 
     getIndexFromGroupByBlock(state) {
-      return (block) => findInStore(state.groups, block.group).value.indexOf(block.id);
+      return (block) => findInStoreById(state.groups, block.group).value.indexOf(block.id);
     },
   },
   actions: {

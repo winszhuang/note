@@ -6,7 +6,8 @@
     :value="value"
     @input="$emit('input', $event)"
     @keydown="$emit('keydown', $event)"
-    @focus="$emit('focus', $event)">{{ value }}</div>
+    @focus="$emit('focus', $event)"
+    @blur="$emit('blur', $event)">{{ value }}</div>
 </template>
 
 <script>
@@ -16,6 +17,7 @@ export default {
     'input',
     'keydown',
     'focus',
+    'blur',
   ],
   props: [
     'placeholder',

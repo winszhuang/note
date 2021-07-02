@@ -1,4 +1,4 @@
-import { findInStore } from './commonStoreEffect';
+import { findInStoreById } from './commonStoreEffect';
 
 export default {
   namespaced: true,
@@ -40,16 +40,16 @@ export default {
     },
 
     changeGroupIdFromBlockId(state, { blockId, groupId }) {
-      findInStore(state.blocks, blockId).group = groupId;
+      findInStoreById(state.blocks, blockId).group = groupId;
     },
 
     // 處理currentFocusBlockId
     editBlockData(state, { id = state.currentFocusBlockId, value, key = 'content' }) {
       if (state.currentPageId === '') return;
-      findInStore(state.blocks, id)[key] = value;
+      findInStoreById(state.blocks, id)[key] = value;
     },
 
-    changeFocusBlock(state, id) {
+    setFocusBlockById(state, id) {
       state.currentFocusBlockId = id;
     },
 
@@ -84,7 +84,7 @@ export default {
     // 回傳當前page裡面包含的所有blocks
     currentBlocks(state, getters, rootState, rootGetters) { // 這邊的問題 應該讓所有block(包含子block)單純放page裡面
       // eslint-disable-next-line max-len
-      return rootGetters['pages/currentPage'].blocks.map((itemId) => findInStore(state.blocks, itemId));
+      return rootGetters['pages/currentPage'].blocks.map((itemId) => findInStoreById(state.blocks, itemId));
     },
     // 回傳當前page裡面包含的所有blocks的id的陣列
     currentBlocksIds(state, getters, rootState, rootGetters) {
@@ -92,7 +92,7 @@ export default {
     },
     // 回傳帶入的某id所取得的block
     chooseBlock(state) {
-      return (id) => findInStore(state.blocks, id);
+      return (id) => findInStoreById(state.blocks, id);
     },
     // 回傳帶入的block的id所取得的所有子集blocks ; 帶入''回傳當前頁有的根blocks
     childrenCurrentBlocks(state, getters) {
@@ -100,7 +100,7 @@ export default {
     },
     // 回傳當前page裡面被選中的block
     currentFocusBlock(state, getters) {
-      return findInStore(getters.currentBlocks, state.currentFocusBlockId);
+      return findInStoreById(getters.currentBlocks, state.currentFocusBlockId);
     },
 
     searchBlocks(state) {
@@ -120,8 +120,10 @@ export default {
     },
   },
   actions: {
-    addBlock({ state, commit, rootState }, {
-      page,
+    addBlock({
+      state, commit, rootState,
+    }, {
+      page = findInStoreById(rootState.pages.pages, rootState.pages.currentPageId),
       type = 'p',
       id = (new Date().getTime() + 3).toString(),
       value = '',
@@ -140,16 +142,27 @@ export default {
       commit('addBlock', newBlock);
 
       // 此段處理block的id被加入某page中的blocks陣列裡的某位置
-      const thisPage = page || findInStore(rootState.pages.pages, rootState.pages.currentPageId);
       const isSelect = state.currentFocusBlockId !== '';
-      const index = thisPage.blocks.indexOf(state.currentFocusBlockId);
-      commit('pages/addIdToBlocksOfPage', {
-        page: thisPage,
-        blockId: id,
-        index: isSelect ? index + 1 : undefined,
-      }, { root: true });
+      if (isSelect) {
+        const index = page.blocks.indexOf(state.currentFocusBlockId);
+        commit('pages/addIdToBlocksOfPage', {
+          page,
+          blockId: id,
+          index: index + 1,
+        }, { root: true });
+      } else {
+        commit('pages/addIdToBlocksOfPage', {
+          page,
+          blockId: id,
+        }, { root: true });
+      }
 
-      commit('changeFocusBlock', id);
+      // const lastBlock = findInStoreById(rootState.blocks.blocks, state.currentFocusBlockId);
+      // if (lastBlock.content === '') {
+      //   dispatch('deleteBlock', { block: lastBlock });
+      // }
+
+      commit('setFocusBlockById', id);
     },
 
     pushBlock({ commit }, {
@@ -175,7 +188,7 @@ export default {
         blockId: id,
       }, { root: true });
 
-      commit('changeFocusBlock', id);
+      commit('setFocusBlockById', id);
     },
 
     // 增加子block
@@ -212,43 +225,38 @@ export default {
       }, { root: true });
     },
 
-    deleteBlock({ state, rootState, commit }, { containPage, block }) {
-      const page = containPage || findInStore(rootState.pages.pages, rootState.pages.currentPageId);
-      const thisBlock = block || findInStore(state.blocks, state.currentFocusBlockId);
-
+    deleteBlock({ state, rootState, commit }, {
+      containPage = findInStoreById(rootState.pages.pages, rootState.pages.currentPageId),
+      block = findInStoreById(state.blocks, state.currentFocusBlockId),
+    }) {
       // 如果刪除的block是包在某父集block裡面的情況，就刪除父集block屬性blocks中的對應ID
-      if (thisBlock.parentId !== '') {
-        const parentBlock = findInStore(state.blocks, thisBlock.parentId);
-        const index = parentBlock.blocks.indexOf(thisBlock.id);
-        commit('changeFocusBlock', parentBlock.blocks[index - 1]);
+      if (block.parentId !== '') {
+        const parentBlock = findInStoreById(state.blocks, block.parentId);
         commit('deleteIdToBlocksOfBlock', {
           block: parentBlock,
-          blockId: thisBlock.id,
+          blockId: block.id,
         });
-      } else { // 單純的刪除page裡面某位置的blockId
-        const index = page.blocks.indexOf(thisBlock.id);
-        commit('changeFocusBlock', page.blocks[index - 1]);
       }
 
-      if (thisBlock.group !== '') { // 如果此block有包含在某個group，就把group中此id刪除
+      if (block.group !== '') { // 如果此block有包含在某個group，就把group中此id刪除
         commit('groups/deleteIdToGroup', {
-          groupId: thisBlock.group,
-          id: thisBlock.id,
+          groupId: block.group,
+          id: block.id,
         }, { root: true });
       }
 
       // 刪除當前page的blocks裡面對應的id
       commit('pages/deleteIdToBlocksOfPage', {
-        page,
-        blockId: thisBlock.id,
+        page: containPage,
+        blockId: block.id,
       }, { root: true });
 
-      commit('deleteBlock', thisBlock); // 徹底刪除此block
+      commit('deleteBlock', block); // 徹底刪除此block
     },
 
     goBlockPosition({ commit }, { page, block }) {
       commit('pages/setCurrentPageId', page.id, { root: true });
-      commit('changeFocusBlock', block.id);
+      commit('setFocusBlockById', block.id);
     },
 
     changeGroupIdFromBlocksIds({ commit }, { blocksIds, groupId }) {

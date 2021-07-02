@@ -6,7 +6,7 @@
         :value="page.name"
         @input="inputToPageContent"
         @keydown="keydownAction"
-        @focus="focusEvent"/>
+        @focus="setFocusBlock('')"/>
 </template>
 
 <script>
@@ -23,7 +23,7 @@ export default {
     'noId',
   ],
   setup(props) {
-    const { editPageData, checkKeydownInPageData, getFocusBlock } = commonUpdateEffect();
+    const { editPageData, checkKeydownInPageData, setFocusBlock } = commonUpdateEffect();
 
     const inputToPageContent = (e) => {
       editPageData('name', e.target.innerHTML);
@@ -33,14 +33,10 @@ export default {
       checkKeydownInPageData(props.page, e);
     };
 
-    const focusEvent = () => {
-      getFocusBlock('');
-    };
-
     return {
       inputToPageContent,
       keydownAction,
-      focusEvent,
+      setFocusBlock,
     };
   },
 };

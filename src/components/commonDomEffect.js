@@ -1,4 +1,4 @@
-import { ref, reactive } from 'vue';
+import { reactive } from 'vue';
 
 const commonDomEffect = () => {
   const getElementsByIdsInArr = (arr) => {
@@ -9,6 +9,20 @@ const commonDomEffect = () => {
     });
     console.log(selectors);
     return document.querySelectorAll(selectors);
+  };
+
+  const getElementBySelector = (selector) => {
+    let element = '';
+    if (selector.charAt(0) === '.') {
+      console.log('是class');
+      // eslint-disable-next-line prefer-destructuring
+      element = document.getElementsByClassName(selector.slice(1))[0];
+    }
+    if (selector.charAt(0) === '#') {
+      console.log('是id');
+      element = document.getElementById(selector.slice(1));
+    }
+    return element;
   };
 
   const pasteImage = (ev, id) => {
@@ -33,56 +47,61 @@ const commonDomEffect = () => {
     }
   };
 
-  const mouseDownMoveUpEffect = () => {
-    const isMouseAction = ref(false);
-    const mousePosition = reactive({
+  const getMouseOffsetByClickElAndMove = () => {
+    let isTrigger = false;
+    const startPoint = {
+      x: '',
+      y: '',
+    };
+
+    const setStartPoint = (x, y) => {
+      startPoint.x = x;
+      startPoint.y = y;
+    };
+
+    const mouseOffset = reactive({
       x: '',
       y: '',
     });
 
-    const setMousePosition = (e) => {
-      mousePosition.x = e.clientX;
-      mousePosition.y = e.clientY;
-    };
-
-    const cancelDefault = (e) => {
-      e.preventDefault();
+    const setOffset = (x, y) => {
+      mouseOffset.x = x;
+      mouseOffset.y = y;
     };
 
     const mouseDown = (e, callback) => {
-      isMouseAction.value = true;
-      setMousePosition(e);
-      if (callback) callback(e);
-    };
-
-    const mouseDownInElement = (e, target, callback) => {
-      if (!target) return;
-      if (e.target !== target) return;
-      mouseDown(e, callback);
+      e.preventDefault();
+      setStartPoint(e.clientX, e.clientY);
+      setOffset(0, 0);
+      isTrigger = true;
+      callback(mouseOffset);
     };
 
     const mouseMove = (e, callback) => {
-      if (isMouseAction.value === false) return;
-      // cancelDefault(e);
-      setMousePosition(e);
-      if (callback) callback(e);
+      if (isTrigger === true) {
+        e.preventDefault();
+        setOffset(e.clientX - startPoint.x, e.clientY - startPoint.y);
+        callback(mouseOffset);
+      }
     };
 
     const mouseUp = (e, callback) => {
-      if (isMouseAction.value === false) return;
-      console.log('停止');
-      cancelDefault(e);
-      isMouseAction.value = false;
-      setMousePosition(e);
-      if (callback) callback(e);
+      e.preventDefault();
+      isTrigger = false;
+      callback(mouseOffset);
     };
+
+    // for (let i = 0; i < elements.length; i += 1) {
+    //   elements[i].addEventListener('mousedown', (e) => mouseDown(e, mouseDownThen));
+    // }
+    // document.addEventListener('mousemove', (e) => mouseMove(e, mouseMoveThen));
+    // document.addEventListener('mouseup', (e) => mouseUp(e, mouseUpThen));
 
     return {
       mouseDown,
       mouseMove,
-      mouseDownInElement,
       mouseUp,
-      mousePosition,
+      mouseOffset,
     };
   };
 
@@ -140,9 +159,10 @@ const commonDomEffect = () => {
 
   return {
     getElementsByIdsInArr,
+    getElementBySelector,
     pasteImage,
     dragDropEffect,
-    mouseDownMoveUpEffect,
+    getMouseOffsetByClickElAndMove,
     isMouseInsideElement,
     isMouseUnderTheElement,
   };

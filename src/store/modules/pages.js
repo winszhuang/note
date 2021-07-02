@@ -1,4 +1,4 @@
-import { findInStore, arrayDeleteByValue } from './commonStoreEffect';
+import { findInStoreById, arrayDeleteByValue } from './commonStoreEffect';
 
 export default {
   namespaced: true,
@@ -36,26 +36,30 @@ export default {
     },
 
     editPageData(state, { property, value, pageId = state.currentPageId }) {
-      findInStore(state.pages, pageId)[property] = value;
+      const page = findInStoreById(state.pages, pageId);
+      if (page) {
+        page[property] = value;
+      }
     },
 
     addIdToBlocksOfPage(state, { page, blockId, index }) {
-      const thispage = page || findInStore(state.pages, state.currentPageId);
+      const thispage = page || findInStoreById(state.pages, state.currentPageId);
       if (index !== undefined) {
         thispage.blocks.splice(index, 0, blockId);
       } else {
+        console.log('9999999999999999');
         thispage.blocks.push(blockId);
       }
     },
 
     deleteIdToBlocksOfPage(state, { page, blockId }) {
-      const thispage = page || findInStore(state.pages, state.currentPageId);
+      const thispage = page || findInStoreById(state.pages, state.currentPageId);
       const index = thispage.blocks.indexOf(blockId);
       thispage.blocks.splice(index, 1);
     },
 
     addTag(state, name) {
-      const thisPage = findInStore(state.pages, state.currentPageId);
+      const thisPage = findInStoreById(state.pages, state.currentPageId);
       const tagIndex = thisPage.tags.length;
       console.log(tagIndex);
       const tag = {
@@ -66,7 +70,7 @@ export default {
     },
 
     deleteTag(state, tag) {
-      const { tags } = findInStore(state.pages, state.currentPageId);
+      const { tags } = findInStoreById(state.pages, state.currentPageId);
       const index = tags.indexOf(tag);
       tags.splice(index, 1);
     },
@@ -89,15 +93,15 @@ export default {
     },
     // 回傳帶入的page所取得的父page
     parentPage(state) {
-      return (page) => findInStore(state.pages, page.parentId);
+      return (page) => findInStoreById(state.pages, page.parentId);
     },
     // 回傳帶入的某id所取得的page
     choosePage(state) {
-      return (id) => findInStore(state.pages, id);
+      return (id) => findInStoreById(state.pages, id);
     },
     // 回傳當前workspace顯示的page
     currentPage(state) {
-      return findInStore(state.pages, state.currentPageId);
+      return findInStoreById(state.pages, state.currentPageId);
     },
 
     searchPages(state) {
@@ -149,11 +153,21 @@ export default {
       state, rootState, commit, dispatch,
     }, item) {
       if (item.parentId !== '') {
+        console.log('山上面');
         dispatch('blocks/deleteBlock', {
-          containPage: findInStore(state.pages, item.parentId),
+          containPage: findInStoreById(state.pages, item.parentId),
           block: rootState.blocks.blocks.find((block) => block.content === item.id),
         }, { root: true });
       }
+
+      const blockList = [...item.blocks];
+      blockList.forEach((blockId) => {
+        const blockInPage = rootState.blocks.blocks.find((block) => block.id === blockId);
+        dispatch('blocks/deleteBlock', {
+          containPage: item,
+          block: blockInPage,
+        }, { root: true });
+      });
       commit('deletePage', item);
 
       const childrenPages = state.pages.filter((page) => page.parentId === item.id);
