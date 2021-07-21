@@ -4,7 +4,7 @@
       <div class="scale-compression"
             :style="{ width: width > 0 ? `${width}px` : 0 }"></div>
       <div class="scale-object" :style="{ height: `${getHeight}` }" :id="id">
-        <slot></slot>
+        <slot :isActive="isActive"></slot>
         <transition>
           <div class="scale-handle-left" v-show="isShow">
             <div class="scale-handle-item">
@@ -30,22 +30,23 @@ import { showEffect } from './commonEffect';
 
 export default {
   name: 'ScaleController',
-  props: ['aspectRatio', 'id'],
+  props: ['aspectRatio', 'id', 'min-width'],
   setup(props) {
     let prevWidth = 0;
     const offsetX = ref('');
     const width = ref(0);
+    const isActive = ref('false');
     const { isShow, handleShow } = showEffect();
 
     const getHeight = computed(() => {
       if (!props.aspectRatio) return 'auto';
       const aspectRatio = props.aspectRatio[0] / props.aspectRatio[1];
       const container = document.getElementsByClassName('blockcontent')[0].getBoundingClientRect();
-      console.log(container.width);
       return `${(container.width - width.value * 2) / aspectRatio}px`;
     });
 
     onMounted(() => {
+      isActive.value = false;
       // const scaleHandleLeft = document.getElementsByClassName('scale-handle-left')[0];
       // const scaleHandleRight = document.getElementsByClassName('scale-handle-right')[0];
       // const {
@@ -56,46 +57,57 @@ export default {
 
       let rightX = 0;
       let leftX = 0;
+      let leftOrRightHandle = '';
 
       const scaleObject = document.getElementById(props.id);
 
       const mouseMoveLeft = (e) => {
+        if (isActive.value === false) return;
+        if (leftOrRightHandle === 'right') return;
         offsetX.value = e.clientX - leftX;
         width.value = prevWidth + offsetX.value;
-        if (width.value < 0) width.value = 0;
-      };
-
-      const mouseMoveRight = (e) => {
-        offsetX.value = rightX - e.clientX;
-        console.log(offsetX.value);
-        width.value = prevWidth + offsetX.value;
-        if (width.value * 2 > scaleObject.clientWidth) {
-          width.value = scaleObject.clientWidth / 2;
+        if (width.value > props.minWidth / 2) {
+          width.value = props.minWidth / 2;
         }
         if (width.value < 0) {
           width.value = 0;
         }
-        console.log(width.value);
+      };
+
+      const mouseMoveRight = (e) => {
+        if (isActive.value === false) return;
+        if (leftOrRightHandle === 'left') return;
+        offsetX.value = rightX - e.clientX;
+        width.value = prevWidth + offsetX.value;
+        if (width.value > props.minWidth / 2) {
+          width.value = props.minWidth / 2;
+        }
+        if (width.value < 0) {
+          width.value = 0;
+        }
       };
 
       const mouseUp = () => {
         prevWidth = width.value;
-        document.removeEventListener('mousemove', mouseMoveLeft);
-        document.removeEventListener('mousemove', mouseMoveRight);
+        isActive.value = false;
       };
 
       const mouseDownLeft = (e) => {
+        // e.stopPropagation();
+        e.preventDefault();
+        isActive.value = true;
         offsetX.value = 0;
         leftX = e.clientX;
-        document.addEventListener('mousemove', mouseMoveLeft);
-        document.addEventListener('mouseup', mouseUp);
+        leftOrRightHandle = 'left';
       };
 
       const mouseDownRight = (e) => {
+        // e.stopPropagation();
+        e.preventDefault();
+        isActive.value = true;
         offsetX.value = 0;
         rightX = e.clientX;
-        document.addEventListener('mousemove', mouseMoveRight);
-        document.addEventListener('mouseup', mouseUp);
+        leftOrRightHandle = 'right';
       };
 
       scaleObject.addEventListener('mouseenter', () => {
@@ -108,6 +120,9 @@ export default {
 
       scaleObject.querySelector('.scale-handle-left').addEventListener('mousedown', mouseDownLeft);
       scaleObject.querySelector('.scale-handle-right').addEventListener('mousedown', mouseDownRight);
+      document.addEventListener('mousemove', mouseMoveLeft);
+      document.addEventListener('mousemove', mouseMoveRight);
+      document.addEventListener('mouseup', mouseUp);
     });
 
     return {
@@ -121,12 +136,13 @@ export default {
       getHeight,
       prevWidth,
       width,
+      isActive,
     };
   },
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 $frameX: .8rem;
 $frameY: 50%;
 .scale{
@@ -134,6 +150,9 @@ $frameY: 50%;
     position: relative;
     width: 100%;
     height: 100%;
+  }
+  &-compression{
+    transition: width .3s ease-out;
   }
   &-area{
     display: flex;
@@ -143,6 +162,8 @@ $frameY: 50%;
   &-object{
     flex: 1;
     position: relative;
+    width: auto;
+    transition: height .3s ease-out;
   }
   &-handle{
     &-right{

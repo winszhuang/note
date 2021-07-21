@@ -4,7 +4,7 @@
       :data-pageid="block.content"
       :id=block.id
       @click="goCurrentPage(targetPage.id)">
-    <div class="p-prefix" :data-pageid="block.content">
+    <div class="prefix" :data-pageid="block.content">
       <font-awesome-icon :icon="['far', 'file']"/>
     </div>
     <div class="p" :data-pageid="block.content">
@@ -40,7 +40,7 @@ export default {
 input{
   display: block;
 }
-.p-prefix{
+.prefix{
   color: #777;
 }
 </style>

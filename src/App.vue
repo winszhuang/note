@@ -8,14 +8,12 @@ import { useRouter, useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import { checkAuthState } from './store/firebaseAuth';
 import { getUserDataByEmailFromFS, updateStoreToFS } from './store/firestore';
-// import { waitSecondAndCallBack } from './components/commonEffect';
 import {
   isDataInLS,
   setDataToLS,
   getDataFromLS,
   deleteDataFromLS,
 } from './store/localStorageEffect';
-// import userInfoEffect from './views/verification/userInfoEffect';
 
 export default {
   name: 'App',

@@ -1,5 +1,6 @@
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import { generateRandomString } from './commonEffect';
 
 const dragDropActionInBlocks = () => {
   const store = useStore();
@@ -45,19 +46,19 @@ const dragDropActionInBlocks = () => {
     }
   };
 
-  const deleteGroupIfEmptyByBlock = (block) => {
-    const group = computed(() => store.getters['groups/getGroupByBlock'](block)).value;
-    if (group.value.length === 0) {
-      store.commit('groups/deleteGroup', group);
-    }
-  };
+  // const deleteGroupIfEmptyByBlock = (block) => {
+  //   const group = computed(() => store.getters['groups/getGroupByBlock'](block)).value;
+  //   if (group.value.length === 0) {
+  //     store.commit('groups/deleteGroup', group);
+  //   }
+  // };
 
-  const deleteIdToGroupAndDeleteGroupIfEmpty = (catchBlock) => {
+  const deleteIdToGroup = (catchBlock) => {
     store.commit('groups/deleteIdToGroup', {
       groupId: catchBlock.group,
       id: catchBlock.id,
     });
-    deleteGroupIfEmptyByBlock(catchBlock);
+    // deleteGroupIfEmptyByBlock(catchBlock);
   };
 
   // 自定義判斷程式邏輯區域
@@ -65,39 +66,44 @@ const dragDropActionInBlocks = () => {
   // .........................
   const catchFalseLastSameNextSame = (nextBlock) => {
     const nextBlockGroup = computed(() => store.getters['groups/getGroupByBlock'](nextBlock)).value;
-    const index = nextBlockGroup.value.indexOf(nextBlock.id);
+    const index = nextBlockGroup.blocks.indexOf(nextBlock.id);
 
-    const shiftIds = nextBlockGroup.value.slice(index);
+    const shiftIds = nextBlockGroup.blocks.slice(index);
     store.dispatch('groups/deleteIdsToGroup', {
       groupId: nextBlockGroup.id,
       ids: shiftIds,
     });
 
-    const groupId = new Date().getTime().toString();
-    store.commit('groups/addGroup', groupId);
+    const group = {
+      id: generateRandomString(),
+      blocks: [],
+    };
+    store.commit('groups/addGroup', group);
     store.commit('groups/addIdsToGroup', {
-      groupId,
+      groupId: group.id,
       ids: shiftIds,
     });
     store.dispatch('blocks/changeGroupIdFromBlocksIds', {
       blocksIds: shiftIds,
-      groupId,
+      groupId: group.id,
     });
   };
 
-  const catchTrueLastSameNextSame = (catchBlock, lastBlock) => {
+  const catchTrueLastSameNextSame = (catchBlock, prevBlock) => {
     console.log('上有group 下沒有  或者上下都有');
-    deleteIdToGroupAndDeleteGroupIfEmpty(catchBlock);
-    const lastBlockGroup = computed(() => store.getters['groups/getGroupByBlock'](lastBlock)).value;
-    const index = lastBlockGroup.value.indexOf(lastBlock.id);
+    deleteIdToGroup(catchBlock);
+    const lastBlockGroup = computed(() => store.getters['groups/getGroupByBlock'](prevBlock)).value;
+    console.log(lastBlockGroup);
+    console.log(prevBlock.id);
+    const index = lastBlockGroup.blocks.indexOf(prevBlock.id);
 
     store.commit('blocks/changeGroupIdFromBlockId', {
       blockId: catchBlock.id,
-      groupId: lastBlock.group,
+      groupId: prevBlock.group,
     });
 
     store.commit('groups/addIdToGroup', {
-      groupId: lastBlock.group,
+      groupId: prevBlock.group,
       id: catchBlock.id,
       index: index + 1,
     });
@@ -105,9 +111,9 @@ const dragDropActionInBlocks = () => {
 
   const catchTrueLastFalseNextTrue = (catchBlock, nextBlock) => {
     console.log('上沒有group 下有');
-    deleteIdToGroupAndDeleteGroupIfEmpty(catchBlock);
+    deleteIdToGroup(catchBlock);
     const nextBlockGroup = computed(() => store.getters['groups/getGroupByBlock'](nextBlock)).value;
-    const index = nextBlockGroup.value.indexOf(nextBlock.id);
+    const index = nextBlockGroup.blocks.indexOf(nextBlock.id);
     store.commit('blocks/changeGroupIdFromBlockId', {
       blockId: catchBlock.id,
       groupId: nextBlock.group,
@@ -123,18 +129,21 @@ const dragDropActionInBlocks = () => {
   const catchTrueLastFalseNextFalse = (catchBlock) => {
     console.log('上下都沒有group');
 
-    deleteIdToGroupAndDeleteGroupIfEmpty(catchBlock);
-    const groupId = new Date().getTime().toString();
-    store.commit('groups/addGroup', groupId);
+    deleteIdToGroup(catchBlock);
+    const group = {
+      id: generateRandomString(),
+      blocks: [],
+    };
+    store.commit('groups/addGroup', group);
 
     store.commit('groups/addIdToGroup', {
-      groupId,
+      groupId: group.id,
       id: catchBlock.id,
     });
 
     store.commit('blocks/changeGroupIdFromBlockId', {
       blockId: catchBlock.id,
-      groupId,
+      groupId: group.id,
     });
   };
   // .........................
@@ -144,7 +153,7 @@ const dragDropActionInBlocks = () => {
   const handleIdDropInGroup = (catchBlock) => {
     const currentBlocks = computed(() => store.getters['blocks/currentBlocks']).value;
     const catchBlockIndex = currentBlocks.indexOf(catchBlock);
-    const lastBlock = currentBlocks[catchBlockIndex - 1] || { group: '' };
+    const prevBlock = currentBlocks[catchBlockIndex - 1] || { group: '' };
     const nextBlock = currentBlocks[catchBlockIndex + 1] || { group: '' };
 
     // 根據對應判斷選擇要執行的方法
@@ -153,6 +162,13 @@ const dragDropActionInBlocks = () => {
     // F表示沒有值或者''  T表示有值  S表示有相同值(last和next相同)
     // 範例 : cF代表catchBlock.group沒有值或者是''
     const actions = new Map([
+      [{
+        catchB_g: false,
+        lastB_g: false,
+        nextB_g: false,
+      }, () => false],
+      // catch、last和next都沒有group
+
       [{
         catchB_g: false,
         lastB_g: true,
@@ -164,14 +180,14 @@ const dragDropActionInBlocks = () => {
         catchB_g: true,
         lastB_g: true,
         nextB_g: true,
-      }, () => catchTrueLastSameNextSame(catchBlock, lastBlock)],
+      }, () => catchTrueLastSameNextSame(catchBlock, prevBlock)],
       // catch有group，last和next有同group
 
       [{
         catchB_g: true,
         lastB_g: true,
         nextB_g: false,
-      }, () => catchTrueLastSameNextSame(catchBlock, lastBlock)],
+      }, () => catchTrueLastSameNextSame(catchBlock, prevBlock)],
       // catch有group，last有group  next沒有group
 
       [{
@@ -187,26 +203,19 @@ const dragDropActionInBlocks = () => {
         nextB_g: false,
       }, () => catchTrueLastFalseNextFalse(catchBlock)],
       // catch有group，last和next都沒有group
-
-      [{
-        catchB_g: false,
-        lastB_g: false,
-        nextB_g: false,
-      }, () => false],
-      // catch、last和next都沒有group
     ]);
 
     const selectAction = [...actions].find(([key]) => key.catchB_g === (catchBlock.group !== '')
-      && key.lastB_g === (lastBlock.group !== '') && key.nextB_g === (nextBlock.group !== ''));
-    console.log(selectAction);
+      && key.lastB_g === (prevBlock.group !== '') && key.nextB_g === (nextBlock.group !== ''));
+    // console.log(selectAction);
     selectAction[1]();
   };
 
   const handleDrop = (e) => {
-    console.log('插進來');
     const currentPage = computed(() => store.getters['pages/currentPage']).value;
     const catchBlockId = e.dataTransfer.getData('text/plain'); // 其他地方丟過來的blockId
     const catchBlock = computed(() => store.getters['blocks/chooseBlock'](catchBlockId)).value;
+    console.log(catchBlock);
     const targetDOM = e.target; // 當前block的DOM元素
 
     handleLeave(e); // 刪除所有拖動過程會產生的邊線style
@@ -215,11 +224,16 @@ const dragDropActionInBlocks = () => {
     if (!(targetDOM.hasAttribute('id') || targetDOM.hasAttribute('data-pageid'))) return;
 
     // 先刪除原本的位置的blockID
+    store.commit('pages/deleteIdToBlocksOfPage', {
+      page: currentPage,
+      id: catchBlockId,
+    });
+
     const direction = getVerticalDirByMousePosition(targetDOM, e.clientY); // 取得滑鼠放開時候的Y位置
     const newIndex = currentPage.blocks.indexOf(targetDOM.id); // 新的要插入的位置
-    store.dispatch('pages/moveIdInBlocksOfPage', {
+    store.commit('pages/addIdToBlocksOfPage', {
       page: currentPage,
-      blockId: catchBlockId,
+      id: catchBlockId,
       index: direction === 'up' ? newIndex : newIndex + 1,
     });
 

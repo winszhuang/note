@@ -40,6 +40,7 @@ import {
   faClock as fasClock,
   faQuoteLeft,
   faLock,
+  faAdjust,
 } from '@fortawesome/free-solid-svg-icons';
 
 import 'bootstrap';
@@ -91,6 +92,7 @@ library.add(faLaptopCode);
 library.add(faAngleDoubleLeft);
 library.add(faAngleDoubleRight);
 library.add(faLock);
+library.add(faAdjust);
 
 // 社群圖標
 library.add(faGooglePlusSquare);

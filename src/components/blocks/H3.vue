@@ -17,7 +17,7 @@ export default {
 
 <style lang="scss" scoped>
 .h4{
-  margin: .2rem 0;
+  margin: 0;
   line-height: 2rem;
   font-weight: 700;
 }

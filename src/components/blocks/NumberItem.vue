@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex">
-    <div class="p-prefix">{{ index + 1 }}. </div>
+    <div class="prefix">{{ index + 1 }}. </div>
     <P :block="block" :data-group-id="group.id"/>
   </div>
 </template>

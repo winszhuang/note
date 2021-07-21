@@ -1,45 +1,54 @@
 <template>
-  <div @paste="paste($event, block.id)"
-        v-show="!isShow">
-    <BlockEditable
-        :block="block"
-        :no-id="true"
-        :placeholder="'ctrl + v 貼上複製的圖片'"
-        :className="'p'"/>
-  </div>
-  <ScaleController v-show="isShow" :id="block.id + 'img'">
-    <img :id="block.id" />
+  <input type="text"
+        placeholder="ctrl + v 貼上複製的圖片"
+        class="media-input"
+        v-show="!isShow"
+        @paste="paste($event, block.id)"
+        @keydown="deleteInput($event, block)">
+  <ScaleController v-show="isShow"
+      :min-width="200"
+      :id="block.id + 'img'">
+    <transition>
+      <img :id="block.id" :src="block.content"/>
+    </transition>
   </ScaleController>
 </template>
 
 <script>
-import { onMounted, ref } from 'vue';
-import BlockEditable from '../input/BlockEditable.vue';
+import { onMounted } from 'vue';
 import ScaleController from '../ScaleController.vue';
 import { showEffect } from '../commonEffect';
 import commonDomEffect from '../commonDomEffect';
+import commonUpdateEffect from '../../views/commonUpdataEffect';
 
 export default {
   name: 'Img',
   props: ['block'],
-  components: { ScaleController, BlockEditable },
-  setup() {
-    const { pasteImage } = commonDomEffect();
+  components: { ScaleController },
+  setup(props) {
+    const {
+      editBlockData,
+      deleteInput,
+    } = commonUpdateEffect();
+    const { getDataURLByClipBoardData } = commonDomEffect();
     const { isShow, handleShow } = showEffect();
 
     onMounted(() => {
-      handleShow(false);
+      handleShow(props.block.content !== '');
     });
 
-    const paste = (e, id) => {
-      pasteImage(e, id);
-      handleShow(true);
+    const paste = async (e, id) => {
+      try {
+        const dataURL = await getDataURLByClipBoardData(e);
+        editBlockData(id, dataURL, 'content');
+        handleShow(true);
+      } catch (error) {
+        console.log(error);
+      }
     };
 
-    const url = ref('');
-
     return {
-      url,
+      deleteInput,
       paste,
       isShow,
       handleShow,
@@ -49,7 +58,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../../style/component/_input.scss';
 img{
   width: 100%;
 }
+
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex">
     <input type="checkbox"
-            class="p-prefix checkbox"
+            class="prefix checkbox"
             value="false"
             checked
             @input="editBlockData(block.id, $event.target.value, 'check')">

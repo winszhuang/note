@@ -3,8 +3,8 @@
       type="button"
       :class="{'customlist-group-item-action': page.id === currentPageId }"
       @click="goCurrentPage(page.id)"
-      @mouseover="hoverHandle(page.id)"
-      @mouseout="hoverHandle('')">
+      @mouseenter="hoverHandle(true)"
+      @mouseleave="hoverHandle(false)">
 
     <div :style="{ 'padding-left': `${number}rem` }"></div> <!--調間距用-->
 
@@ -19,13 +19,13 @@
     <div class="customlist-item-name">{{ page.name }}</div>
 
     <div class="ms-auto icon-button"
-        v-show="page.id === currentPageIdOnMouse"
+        v-show="isHover"
         @click.stop="deletePage(page)">
       <font-awesome-icon :icon="['far', 'minus-square']" style="color: #999999" size="sm"/>
     </div>
 
     <div class="icon-button"
-        v-show="page.id === currentPageIdOnMouse"
+        v-show="isHover"
         @click.stop="addPageInside(page)">
       <font-awesome-icon :icon="['far', 'plus-square']" style="color: #999999"/>
     </div>
@@ -51,7 +51,7 @@
 
 <script>
 import {
-  toRefs, computed, // onMounted
+  toRefs, computed, ref, // onMounted
 } from 'vue';
 import { useStore } from 'vuex';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -78,14 +78,10 @@ export default {
   setup(props) {
     const store = useStore();
     const childrenPages = computed(() => store.getters['pages/childrenPages'](props.page.id));
-    const { currentPageId, currentPageIdOnMouse } = toRefs(store.state.pages);
+    const { currentPageId } = toRefs(store.state.pages);
     const { goCurrentPage } = commonUpdateEffect();
     const { isShow, handleShow, toggleShow } = showEffect();
     const caretIcon = computed(() => (isShow.value ? faCaretRight : faCaretDown));
-
-    const hoverHandle = (id) => {
-      store.commit('pages/changeCurrentPageIdOnMouse', id);
-    };
 
     const addPageInside = (page) => {
       store.dispatch('pages/addPageInside', page);
@@ -96,15 +92,19 @@ export default {
       store.dispatch('pages/deletePageWithIcon', item);
     };
 
+    const isHover = ref(false);
+    const hoverHandle = (isTrueOrFalse) => {
+      isHover.value = isTrueOrFalse;
+    };
+
     return {
       goCurrentPage,
       childrenPages,
       currentPageId,
-      currentPageIdOnMouse,
       deletePage,
       addPageInside,
       hoverHandle,
-      // count,
+      isHover,
       caretIcon,
       isShow,
       toggleShow,
@@ -113,8 +113,9 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../style/base.scss';
+@import '../style/component/_customlist-group.scss';
 .icon-button{
   width: 1.5rem;
   text-align: center;

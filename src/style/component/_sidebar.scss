@@ -7,13 +7,12 @@
   width: 23rem;
   height: 100vh;
   box-shadow: .05rem 0rem .2rem .05rem rgb(160, 160, 160);
-  // -webkit-transition: all 0.5s ease-in-out;
-  // transition: all 0.5s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  -webkit-transition: all 0.5s ease-in-out;
+  transition: all 0.5s ease-in-out;
   &-footer{
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    margin-top: auto;
     overflow-x: hidden;
   }
 }
@@ -29,14 +28,9 @@
   transform: scale(.85);
   transform-origin: left;
   font-weight: 300;
-  // font-weight: 700;
 }
 
 .scollitem{
-  position: absolute;
-  top: 11rem;
-  bottom: 2.5rem;
-  left: 0;
-  right: 0;
+  flex: 1;
   overflow-y: auto;
 }

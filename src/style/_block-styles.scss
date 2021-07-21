@@ -1,0 +1,40 @@
+$colors: (
+  default: #584d58,
+  orange: #f1ad5f,
+  red: #e74141,
+  blue: #5591e0,
+  yellow: #ecbc1f,
+  green: #28c850,
+  purple: #8632ca,
+  pink: #db2571,
+  gray: #777777,
+);
+
+$bg-colors: (
+  default: #dddddd,  // OK
+  orange: #f1d3b7a8,  // OK
+  red: #f3929275,     // OK
+  blue: #9cc4f88f,    // OK
+  yellow: #f0de7a81,  // OK
+  green: #cde7c0,     // OK
+  purple: #e7afe78f, // OK
+  pink: #f58bae81,
+  gray: #cccccc,
+);
+
+@each $name, $value in $colors {
+  .style-text-color__#{$name} {
+    color: $value;
+  }
+
+  .style-border__#{$name} {
+    border: .2rem solid $value;
+  }
+};
+
+@each $name, $value in $bg-colors {
+  .style-bg-color__#{$name} {
+    background-color: $value;
+    border-radius: 1px;
+  }
+};

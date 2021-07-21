@@ -1,12 +1,7 @@
 @import '../../node_modules/bootstrap/scss/functions';
 @import './variables';
-@import './color.scss';
 @import '../../node_modules/bootstrap/scss/mixins';
 
 @import '../../node_modules/bootstrap/scss/bootstrap.scss';
 
-// custom component
-@import './base.scss';
-@import './component/sidebar';
-@import './component/customlist-group';
-
+@import '../style/base.scss';

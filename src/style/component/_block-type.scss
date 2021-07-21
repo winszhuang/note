@@ -1,0 +1,60 @@
+$margin-default: .2rem 0;
+
+.block {
+  &-h1 {
+    margin-top: 1rem;
+    margin-bottom: .7rem;
+  }
+
+  &-h2 {
+    margin: .5rem 0;
+  }
+
+  &-h3 {
+    margin: .3rem 0;
+  }
+
+  &-video {
+    margin: 1rem 0;
+  }
+
+  &-img {
+    margin: 1rem 0;
+  }
+
+  &-p {
+    margin: $margin-default;
+  }
+
+  &-page {
+    margin: $margin-default;
+  }
+
+  &-number-item {
+    margin: $margin-default;
+  }
+
+  &-bullet-item {
+    margin: $margin-default;
+  }
+
+  &-toggle-list {
+    margin: $margin-default;
+  }
+
+  &-todo-item {
+    margin: $margin-default;
+  }
+
+  &-dividing-line {
+    margin: $margin-default;
+  }
+
+  &-code-editor {
+    margin: .5rem 0;
+  }
+
+  &-quote {
+    margin: .5rem 0;
+  }
+}

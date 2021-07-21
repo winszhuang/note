@@ -17,7 +17,8 @@ export default {
 
 <style lang="scss" scoped>
 .h3{
-  margin: .5rem 0;
-  line-height: 3rem;
+  line-height: 2.5rem;
+  padding-left: 3px;
+  margin: 0;
 }
 </style>

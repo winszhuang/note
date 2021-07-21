@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex">
-    <div class="p-prefix toggle-button" @click="toggleShowAndUpdateHiddenBlocks" type="button">
+    <div class="prefix toggle-button" @click="toggleShowAndUpdateHiddenBlocks" type="button">
       <font-awesome-icon :icon="['fas', iconName]" :key="iconName" size="1x"/>
     </div>
     <P :block="block"/>

@@ -1,7 +1,7 @@
 <template>
     <ContentEditable
         :placeholder="placeholder"
-        :className="className"
+        :className="block.className + ' ' + className"
         :id="noId ? '' : block.id"
         :value="block.content"
         @input="inputToBlockContent"

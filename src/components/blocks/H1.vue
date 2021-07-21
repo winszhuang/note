@@ -2,7 +2,7 @@
   <BlockEditable
         :block="block"
         :placeholder="'請輸入標題'"
-        :className="'h2'"/>
+        :className="'h1'"/>
 </template>
 
 <script>
@@ -16,8 +16,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.h2{
-  margin: .7rem 0;
-  line-height: 3.5rem;
+.h1{
+  margin: 0;
+  padding-left: 3px;
+  line-height: 3.2rem;
 }
 </style>

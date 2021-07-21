@@ -1,5 +1,5 @@
 <template>
-  <div class="dragicon"
+  <div class="block-tool"
       draggable="true"
       @dragstart="handleDrag($event)">
     <font-awesome-icon :icon="['fas', 'expand-arrows-alt']" size="xs"/>
@@ -21,17 +21,6 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.dragicon{
-  display: flex;
-  align-items: center;
-  // height: 100%;
-  // line-height: 100%;
-  width: 1rem;
-  color: #c0c0c0;
-  transition: color .3s ease-out;
-  &:hover{
-    color: #747474;
-  }
-}
+<style lang="scss" scoped>
+@import '../style/component/_block.scss';
 </style>

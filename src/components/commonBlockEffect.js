@@ -1,5 +1,6 @@
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import { generateRandomString } from './commonEffect';
 
 const commonBlockEffect = () => {
   const store = useStore();
@@ -17,7 +18,17 @@ const commonBlockEffect = () => {
     return level.value;
   };
 
-  return { getLevelOfBlock };
+  const generateBlock = ({ type = 'p', content = '', group = '' }) => ({
+    id: generateRandomString(),
+    type,
+    content,
+    group,
+    blocks: [],
+    parentId: '',
+    className: 'style-text-color__default',
+  });
+
+  return { getLevelOfBlock, generateBlock };
 };
 
 export default commonBlockEffect;

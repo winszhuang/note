@@ -1,5 +1,8 @@
 import { ref } from 'vue';
 
+const generateRandomString = () => Math.random().toString(36).substr(2, 14)
+  + Date.now().toString(36).substr(4, 14);
+
 const commonArrEffect = () => {
   const arrayList = () => {
     const arr = {
@@ -40,14 +43,14 @@ const commonStringEffect = () => {
 };
 
 const commonCollisionEffect = () => {
-  const boxCollisionDetection = (a, b) => {
+  const isBoxACollisionB = (a, b) => {
     if (a.right > b.left && a.left < b.right && a.top < b.bottom && a.bottom > b.top) {
       return true;
     }
     return false;
   };
 
-  return { boxCollisionDetection };
+  return { isBoxACollisionB };
 };
 
 const showEffect = () => {
@@ -117,4 +120,5 @@ export {
   showEffect,
   transTimeStampToLocalTime,
   waitSecondAndCallBack,
+  generateRandomString,
 };

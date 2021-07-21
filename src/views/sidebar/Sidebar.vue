@@ -26,7 +26,15 @@
             <font-awesome-icon
                 :icon="['fas', 'search']" />
           </div>
-          <div class="customlist-item-6 block-name ">搜尋區塊</div>
+          <div class="customlist-item-6 block-name ">關鍵字搜尋</div>
+        </div>
+        <div class="customlist-group-item"
+              type="button">
+          <div class="customlist-item-1 ms-4" style="margin-left: 1rem;">
+            <font-awesome-icon
+                :icon="['fas', 'adjust']" />
+          </div>
+          <div class="customlist-item-6 block-name ">編輯區塊樣式</div>
         </div>
       </div>
       <div class="scollitem">
@@ -52,7 +60,7 @@
                 type="button"
                 v-for="item in blocktype"
                 :key="item.type"
-                @click="addBlock(item.type)">
+                @click="checkBlockTypeThenAdd(item.type)">
             <div class="customlist-item-1 ms-4">
               <font-awesome-icon
                   :icon="[transStyleToFAPrefix(item.style),
@@ -80,12 +88,14 @@ import UserField from './UserField.vue';
 import CustomList from '../../components/CustomList.vue';
 import Modal from '../../components/Modal.vue';
 import Search from '../Search.vue';
-import { showEffect } from '../../components/commonEffect';
 import Splitter from '../../components/Splitter.vue';
+import commonBlockEffect from '../../components/commonBlockEffect';
+import { showEffect, generateRandomString } from '../../components/commonEffect';
 
 const DEFAULT_SIDEBAR_WIDTH = 300;
 
 const useSidebarWidthEffect = (minWidth, maxWidth) => {
+  const store = useStore();
   const sidebarWidth = ref(0);
   const prevSidebarWidth = ref(0);
 
@@ -108,6 +118,10 @@ const useSidebarWidthEffect = (minWidth, maxWidth) => {
     sidebarWidth.value = DEFAULT_SIDEBAR_WIDTH;
     prevSidebarWidth.value = DEFAULT_SIDEBAR_WIDTH;
   });
+
+  watch(sidebarWidth, (curr) => {
+    store.commit('setCurrentSidebarWidth', curr);
+  }, { immediate: true });
 
   return {
     setSidebarWidth,
@@ -157,6 +171,72 @@ const useSidebarStateEffect = () => {
   };
 };
 
+const addBlockEffect = () => {
+  const store = useStore();
+  const { blocktype } = toRefs(store.state);
+  const { currentPageId } = toRefs(store.state.pages);
+  const { generateBlock } = commonBlockEffect();
+
+  const addBlockFlow = (type) => {
+    const block = generateBlock({ type });
+    store.dispatch('blocks/addBlockAndSetFocusBlockId', { block });
+  };
+
+  const addPageTypeBlockFlow = (type) => {
+    const block = generateBlock({ type, content: currentPageId.value });
+    store.dispatch('blocks/addBlock', { block });
+
+    store.commit('pages/addPage', {
+      id: generateRandomString(),
+      name: 'untitle',
+      blocks: [],
+      parentId: currentPageId.value,
+      createdTime: new Date().getTime().toString(),
+      editTime: new Date().getTime().toString(),
+      tags: [],
+      cover: '',
+    });
+  };
+
+  const addGroupTypeBlockFlow = (type) => {
+    const group = { id: generateRandomString(), blocks: [] };
+    const block = generateBlock({ type, group: group.id });
+
+    store.commit('groups/addGroup', group);
+    store.dispatch('blocks/addBlockAndSetFocusBlockId', { block });
+
+    store.commit('groups/addIdToGroup', {
+      id: block.id,
+      groupId: group.id,
+    });
+  };
+
+  const checkBlockTypeThenAdd = (type = 'p') => {
+    if (currentPageId.value === '') {
+      console.log('請先選擇頁面');
+      return;
+    }
+
+    if (!blocktype.value.find((item) => item.type === type)) {
+      console.log('沒有此type類型');
+      return;
+    }
+
+    const actions = {
+      page: addPageTypeBlockFlow,
+      numberItem: addGroupTypeBlockFlow,
+      bulletItem: addGroupTypeBlockFlow,
+    };
+
+    const execute = actions[type] ? actions[type] : addBlockFlow;
+    execute(type);
+  };
+
+  return {
+    checkBlockTypeThenAdd,
+  };
+};
+
 export default {
   name: 'Sidebar',
   components: {
@@ -170,7 +250,6 @@ export default {
     const store = useStore();
     const rootPages = computed(() => store.getters['pages/childrenPages'](''));
     const { blocktype } = toRefs(store.state);
-    const { currentPageId, currentPageIdOnMouse } = toRefs(store.state.pages);
     const {
       setSidebarWidth,
       setPrevSidebarWidth,
@@ -183,45 +262,19 @@ export default {
       isSidebarFloating,
     } = useSidebarStateEffect();
 
+    const { checkBlockTypeThenAdd } = addBlockEffect();
+
     const transStyleToFAPrefix = (style) => `fa${style.charAt(0)}`;
 
     const addPage = () => {
-      store.commit('pages/addPage', {});
-    };
-
-    const addBlock = (type) => {
-      if (currentPageId.value === '') {
-        console.log('請先選擇頁面');
-        return;
-      }
-
-      if (type === 'page') {
-        store.dispatch('pages/addPageInside');
-        return;
-      }
-
-      if (type === 'numberItem' || type === 'bulletItem') {
-        const groupId = (new Date().getTime() - 2).toString();
-        store.commit('groups/addGroup', groupId);
-        store.dispatch('blocks/addBlockInGroup', {
-          type,
-          groupId,
-        });
-        return;
-      }
-
-      store.dispatch('blocks/addBlock', {
-        type,
-      });
+      store.commit('pages/addPage');
     };
 
     return {
       rootPages,
       blocktype,
       addPage,
-      currentPageId,
-      currentPageIdOnMouse,
-      addBlock,
+      checkBlockTypeThenAdd,
       transStyleToFAPrefix,
       isShow,
       handleShow,
@@ -235,8 +288,9 @@ export default {
 };
 </script>
 
-<style lang="scss" >
+<style lang="scss" scoped>
 @import '../../style/component/_sidebar.scss';
+@import '../../style/component/_customlist-group.scss';
 .sidebar{
   transition: width .4s ease-in-out .1s;
 }
@@ -248,12 +302,12 @@ export default {
 
 .splitter{
   position: absolute;
-  right: 0rem;
+  right: -0.4rem;
   top: 73px;
   bottom: 35px;
   width: .7rem;
   // background: rgb(235, 78, 78);
-  z-index: 20;
+  z-index: 10;
   &:hover{
     cursor: col-resize;
   }

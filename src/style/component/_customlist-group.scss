@@ -15,7 +15,6 @@
   padding: 0 1rem;
   // color: #969293;
   color: #8a8687;
-  text-decoration: if($link-decoration == none, null, none);
   &:hover,
   &:focus{
     background: #5c525e;

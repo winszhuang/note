@@ -14,6 +14,14 @@ a {
   text-decoration: none;
 }
 
+.prefix {
+  width: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
 .scale-07{
   transform: scale(.7);
   transform-origin: center;
@@ -43,6 +51,7 @@ a {
 
 input,
 div[contenteditable] {
+  box-sizing: border-box;
   width: 100%;
   // color: #494949;
   // color: #645b66;
@@ -71,7 +80,7 @@ div[contenteditable] {
 
 /* width */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 /* Track */
@@ -82,7 +91,7 @@ div[contenteditable] {
 /* Handle */
 ::-webkit-scrollbar-thumb {
   background: #555; 
-  border-radius: 4px;
+  border-radius: 5px;
 }
 
 /* Handle on hover */
@@ -103,52 +112,6 @@ div[contenteditable] {
 .v-enter-to,
 .v-leave-from{
   opacity: 1;
-}
-
-$drag-width: 1.5rem;
-.block{
-  position: relative;
-  &-content{
-    width: 100%;
-  }
-  &-drag{
-    position: absolute;
-    left: -$drag-width;
-    width: $drag-width;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    
-  }
-  &-border-top{
-    border-top: .1rem dashed rgb(173, 173, 173);
-  }
-  &-border-bottom{
-    border-bottom: .1rem dashed rgb(173, 173, 173);
-  }
-  &-selected{
-    opacity: .9;
-    filter: grayscale(100%);
-    background:rgba($color: rgb(131, 214, 235), $alpha: 0.2);
-    border-radius: .2rem;
-  }
-}
-
-$p-height: 1.8rem;
-$p-margin: .2rem 0;
-.p {
-  color: #646464 !important;
-  line-height: $p-height;
-  overflow: auto;
-  margin: $p-margin;
-  padding-left: .1rem;
-  &-prefix{
-    width: 1rem;
-    line-height: $p-height;
-    height: $p-height;
-    margin: .2rem .5rem .2rem .2rem;
-    padding-left: .2rem;
-  }
 }
 
 .pageblock{

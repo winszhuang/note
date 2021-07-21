@@ -15,36 +15,42 @@ export default createStore({
         icon: 'heading',
         style: 'solid',
         name: '大標題',
+        className: 'block-h1',
       },
       {
         type: 'h2',
         icon: 'heading',
         style: 'solid',
         name: '中標題',
+        className: 'block-h2',
       },
       {
         type: 'h3',
         icon: 'heading',
         style: 'solid',
         name: '小標題',
+        className: 'block-h3',
       },
       {
         type: 'video',
         icon: 'video',
         style: 'solid',
         name: '影片',
+        className: 'block-video',
       },
       {
         type: 'img',
         icon: 'images',
         style: 'regular',
         name: '圖片',
+        className: 'block-img',
       },
       {
         type: 'p',
         icon: 'font',
         style: 'solid',
         name: '文字片段',
+        className: 'block-p',
       },
       {
         type: 'page',
@@ -52,18 +58,21 @@ export default createStore({
         style: 'regular',
         size: '1x',
         name: '內嵌頁面',
+        className: 'block-page',
       },
       {
         type: 'numberItem',
         icon: 'list-ol',
         style: 'solid',
         name: '順序列表',
+        className: 'block-number-item',
       },
       {
         type: 'bulletItem',
         icon: 'list-ul',
         style: 'solid',
         name: '無序列表',
+        className: 'block-bullet-item',
       },
       {
         type: 'toggleList',
@@ -71,30 +80,35 @@ export default createStore({
         style: 'solid',
         size: '1x',
         name: '切換列表',
+        className: 'block-toggle-list',
       },
       {
         type: 'todoItem',
         icon: 'check-square',
         style: 'regular',
         name: '核取框',
+        className: 'block-todo-item',
       },
       {
         type: 'dividingLine',
         icon: 'window-minimize',
         style: 'regular',
         name: '分割線',
+        className: 'block-dividing-line',
       },
       {
         type: 'codeEditor',
         icon: 'laptop-code',
         style: 'solid',
         name: '程式碼',
+        className: 'block-code-editor',
       },
       {
         type: 'quote',
         icon: 'quote-left',
         style: 'solid',
         name: '引言',
+        className: 'block-quote',
       },
     ],
     colors: [
@@ -109,6 +123,7 @@ export default createStore({
     sidebarState: {
       isCollapse: '',
       isFloating: '',
+      currentWidth: '',
     },
     windowWidth: '',
   },
@@ -129,13 +144,22 @@ export default createStore({
     setSidebarFloating(state, isTrueOrFalse) {
       state.sidebarState.isFloating = isTrueOrFalse;
     },
+
+    setCurrentSidebarWidth(state, width) {
+      state.sidebarState.currentWidth = width;
+    },
+  },
+  getters: {
+    getClassNameOfBlockType(state) {
+      return (type) => state.blocktype.find((item) => item.type === type).className;
+    },
   },
   actions: {
     resetStoreData({ commit }) {
       commit('pages/resetPages', null, { root: true });
       commit('blocks/resetBlocks', null, { root: true });
       commit('groups/resetGroups', null, { root: true });
-      commit('userInfo/resetUserInfo', null, { root: true });
+      // commit('userInfo/resetUserInfo', null, { root: true });
     },
 
     async floatSidebar({ commit, state }) {

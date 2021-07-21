@@ -1,0 +1,10 @@
+.media-input{
+  width: 100%;
+  color: #584d58;
+  background: transparent;
+  border: none;
+  outline: none;
+  &:empty:not(:focus)::before{
+    content: '';
+  }
+}

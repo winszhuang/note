@@ -1,0 +1,46 @@
+$drag-width: 1.5rem;
+$block-border: .2rem dashed rgb(141, 184, 219);
+.block{
+  // margin: .3rem 0;
+  position: relative;
+  display: flex;  
+
+  &-content{
+    width: 100%;
+  }
+  &-tools{
+    position: absolute;
+    right: calc(100%);
+    height: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  &-border-top{
+    border-top: $block-border;
+  }
+  &-border-bottom{
+    border-bottom: $block-border;
+  }
+}
+
+.block-selected{
+  opacity: .9;
+  filter: grayscale(70%);
+  background-color :rgba(209, 209, 209, 0.5) !important;
+  transition: background-color .3s ease-in-out ;
+  border-radius: .2rem;
+}
+
+.block-tool{
+  display: flex;
+  align-items: center;
+  width: 1.3rem;
+  color: #c0c0c0;
+  transition: color .3s ease-out;
+  &:hover{
+    color: #747474;
+  }
+  svg {
+    transform: scale(1.05);
+  }
+}

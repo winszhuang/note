@@ -3,7 +3,9 @@
     <div :class="{ userfield: true, 'p-0': isSidebarCollapse }" type="button"
         @click="linkToUserInfo">
         <!-- :style="{ padding: isSidebarCollapse ? '0' :  }" -->
-      <div class="userfield-icon" v-html="headshot"></div>
+      <div class="userfield-icon">
+        <div :style="{ 'background-image': `url(${headshotURL});` }">C</div>
+      </div>
       <div class="userfield-info">
         <div class="userfield-info-name">{{ userInfo?.name || '遊客' }}</div>
         <div class="userfield-info-email">{{ userInfo?.email || 'xxx.gmail.com' }}</div>
@@ -52,6 +54,14 @@ export default {
       router.push('/userinfo');
     };
 
+    const headshotURL = computed(() => {
+      if (userInfo.value.headshot) {
+        console.log(userInfo.value.headshot);
+        return `${userInfo.value.headshot}`;
+      }
+      return 'https://image.flaticon.com/icons/png/512/3135/3135715.png';
+    });
+
     const headshot = computed(() => {
       if (userInfo.value.headshot) {
         return `<img src="${userInfo.value.headshot}">`;
@@ -73,6 +83,7 @@ export default {
     return {
       userInfo,
       headshot,
+      headshotURL,
       floatSidebar,
       lockSidebar,
       isSidebarCollapse,
@@ -84,7 +95,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../style/color.scss';
 .topfield{
   width: inherit;

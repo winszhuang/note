@@ -1,4 +1,5 @@
 import { findInStoreById } from './commonStoreEffect';
+import { generateRandomString } from '../../components/commonEffect';
 
 export default {
   namespaced: true,
@@ -10,32 +11,31 @@ export default {
       state.groups = [];
     },
 
-    addGroup(state, groupId) {
-      const group = {
-        id: groupId || new Date().getTime().toString(),
-        value: [],
-      };
+    addGroup(state, group = {
+      id: generateRandomString(),
+      blocks: [],
+    }) {
       state.groups.push(group);
     },
 
-    addIdToGroup(state, { groupId, id, index }) {
+    addIdToGroup(state, { id, groupId, index }) {
       const group = findInStoreById(state.groups, groupId);
       if (index !== undefined) {
-        group.value.splice(index, 0, id);
+        group.blocks.splice(index, 0, id);
       } else {
-        group.value.push(id);
+        group.blocks.push(id);
       }
     },
 
     addIdsToGroup(state, { groupId, ids }) {
       const group = findInStoreById(state.groups, groupId);
-      group.value = [...group.value, ...ids];
+      group.blocks = [...group.blocks, ...ids];
     },
 
     deleteIdToGroup(state, { groupId, id }) {
       const group = findInStoreById(state.groups, groupId);
-      const index = group.value.indexOf(id);
-      group.value.splice(index, 1);
+      const index = group.blocks.indexOf(id);
+      group.blocks.splice(index, 1);
     },
 
     deleteGroup(state, group) {
@@ -44,12 +44,16 @@ export default {
     },
   },
   getters: {
+    getGroupById(state) {
+      return (id) => findInStoreById(state.groups, id);
+    },
+
     getGroupByBlock(state) {
       return (block) => findInStoreById(state.groups, block.group);
     },
 
     getIndexFromGroupByBlock(state) {
-      return (block) => findInStoreById(state.groups, block.group).value.indexOf(block.id);
+      return (block) => findInStoreById(state.groups, block.group).blocks.indexOf(block.id);
     },
   },
   actions: {

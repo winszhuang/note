@@ -137,7 +137,7 @@ export default {
 .pageinfo{
   font-size: 13px;
   border-bottom: .05rem solid #dbdbdb;
-  margin-top: 2rem;
+  margin-top: 1.5rem;
   margin-bottom: 1rem;
   padding-bottom: .5rem;
   &-item{

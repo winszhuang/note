@@ -1,4 +1,5 @@
 import { findInStoreById, arrayDeleteByValue } from './commonStoreEffect';
+import { generateRandomString } from '../../components/commonEffect';
 
 export default {
   namespaced: true,
@@ -12,61 +13,67 @@ export default {
     resetPages(state) {
       state.pages = [];
       state.currentPageId = '';
-      state.currentPageIdOnMouse = '';
     },
 
-    addPage(state, { id, parentPageId }) {
-      const newDate = new Date().getTime().toString();
-      const newId = id || newDate;
-      const page = {
-        id: newId,
+    addPage(state,
+      page = {
+        id: generateRandomString(),
         name: 'untitle',
         blocks: [],
-        parentId: parentPageId || '',
-        createdTime: newDate,
-        editTime: newDate,
+        parentId: '',
+        createdTime: new Date().getTime().toString(),
+        editTime: new Date().getTime().toString(),
         tags: [],
         cover: '',
-      };
+      }) {
       state.pages.push(page);
     },
 
-    deletePage(state, item) {
-      state.pages = arrayDeleteByValue(state.pages, item);
+    deletePage(state, page) {
+      state.pages = arrayDeleteByValue(state.pages, page);
     },
 
-    editPageData(state, { property, value, pageId = state.currentPageId }) {
-      const page = findInStoreById(state.pages, pageId);
-      if (page) {
-        page[property] = value;
+    editPageData(state, {
+      page = findInStoreById(state.pages, state.currentPageId),
+      key,
+      value,
+    }) {
+      if (!page) {
+        console.log('請先選擇頁面');
+        return;
       }
+      // eslint-disable-next-line no-param-reassign
+      page[key] = value;
     },
 
-    addIdToBlocksOfPage(state, { page, blockId, index }) {
-      const thispage = page || findInStoreById(state.pages, state.currentPageId);
-      if (index !== undefined) {
-        thispage.blocks.splice(index, 0, blockId);
-      } else {
-        console.log('9999999999999999');
-        thispage.blocks.push(blockId);
+    addIdToBlocksOfPage(state, {
+      page = findInStoreById(state.pages, state.currentPageId),
+      id,
+      index,
+    }) {
+      if (index === undefined) {
+        page.blocks.push(id);
+        return;
       }
+      page.blocks.splice(index, 0, id);
     },
 
-    deleteIdToBlocksOfPage(state, { page, blockId }) {
-      const thispage = page || findInStoreById(state.pages, state.currentPageId);
-      const index = thispage.blocks.indexOf(blockId);
-      thispage.blocks.splice(index, 1);
+    deleteIdToBlocksOfPage(state, {
+      page = findInStoreById(state.pages, state.currentPageId),
+      id,
+    }) {
+      const index = page.blocks.indexOf(id);
+      page.blocks.splice(index, 1);
     },
 
     addTag(state, name) {
-      const thisPage = findInStoreById(state.pages, state.currentPageId);
-      const tagIndex = thisPage.tags.length;
-      console.log(tagIndex);
+      const page = findInStoreById(state.pages, state.currentPageId);
+      const tagIndex = page.tags.length;
       const tag = {
         name,
         color: state.colors[tagIndex],
       };
-      thisPage.tags.push(tag);
+      page.tags.push(tag);
     },
 
     deleteTag(state, tag) {
@@ -79,11 +86,6 @@ export default {
     setCurrentPageId(state, id) {
       if (id === state.currentPageId) return;
       state.currentPageId = id;
-    },
-
-    // 處理currentPageIdOnMouse
-    changeCurrentPageIdOnMouse(state, id) {
-      state.currentPageIdOnMouse = id;
     },
   },
   getters: {
@@ -121,29 +123,29 @@ export default {
     },
   },
   actions: {
-    addPageInside({ getters, commit, dispatch }, page) {
-      const parentPage = page || getters.currentPage;
+    // addPageInside({ getters, commit, dispatch }, page) {
+    //   const parentPage = page || getters.currentPage;
 
-      const id = new Date().getTime().toString(); // 新的id
-      commit('addPage', {
-        id,
-        parentPageId: parentPage.id,
-      });
-      dispatch('blocks/addBlock', {
-        type: 'page',
-        page: parentPage,
-        value: id,
-      }, { root: true });
-    },
+    //   const id = new Date().getTime().toString(); // 新的id
+    //   commit('addPage', {
+    //     id,
+    //     parentPageId: parentPage.id,
+    //   });
+    //   dispatch('blocks/addBlock', {
+    //     type: 'page',
+    //     page: parentPage,
+    //     value: id,
+    //   }, { root: true });
+    // },
 
-    moveIdInBlocksOfPage({ commit }, { page, blockId, index }) {
+    moveIdInBlocksOfPage({ commit }, { page, id, index }) {
       commit('deleteIdToBlocksOfPage', {
         page,
-        blockId,
+        id,
       });
       commit('addIdToBlocksOfPage', {
         page,
-        blockId,
+        id,
         index,
       });
     },

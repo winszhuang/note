@@ -1,15 +1,25 @@
 <template>
   <div class="block"
+      :class="getClassNameOfBlockType(block.type)"
       @mouseenter="handleShow(true)"
       @mouseleave="handleShow(false)"
-      :style="{ 'margin-left': `${getLevelOfBlock(block)*1.65}rem` }">
-    <div class="block-drag" >
+      :style="{ 'margin-left': `${getLevelOfBlock(block)*1.65}rem`}">
+    <div class="block-tools">
+      <transition name="drag">
+        <div class="block-tool"
+            v-show="isShow"
+            type="button"
+            @click="$emit('showBlockStyleEditor', true)">
+          <font-awesome-icon :icon="['fas', 'adjust']" size="xs"/>
+        </div>
+      </transition>
       <transition name="drag">
         <DragItem :block="block"
                   v-show="isShow"/>
       </transition>
     </div>
     <div class="block-content"
+        :class="{ 'block-selected': isSelected }"
         @drop="handleDrop($event)"
         @dragenter="cancelDefault($event, true)"
         @dragleave="handleLeave($event)"
@@ -23,6 +33,8 @@
 </template>
 
 <script>
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 import { commonStringEffect, showEffect } from './commonEffect';
 import commonBlockEffect from './commonBlockEffect';
 import dragDropActionInBlocks from './dragDropActionInBlocks';
@@ -30,9 +42,11 @@ import DragItem from './DragItem.vue';
 
 export default {
   name: 'Block',
-  props: ['block'],
+  props: ['block', 'isSelected'],
   components: { DragItem },
   setup() {
+    const store = useStore();
+    // const blocktype = computed(() => store.state.blocktype);
     const { isShow, handleShow } = showEffect();
     const { getLevelOfBlock } = commonBlockEffect();
     const { getFirstToUpper } = commonStringEffect();
@@ -43,6 +57,9 @@ export default {
       handleLeave,
     } = dragDropActionInBlocks();
 
+    // eslint-disable-next-line max-len
+    const getClassNameOfBlockType = (type) => computed(() => store.getters.getClassNameOfBlockType(type)).value;
+
     return {
       isShow,
       handleShow,
@@ -52,12 +69,16 @@ export default {
       handleBeforeDrop,
       handleLeave,
       getLevelOfBlock,
+      getClassNameOfBlockType,
     };
   },
 };
 </script>
 
 <style lang="scss" scoped>
+@import '../style/component/_block.scss';
+@import '../style/_block-styles.scss';
+@import '../style/component/_block-type.scss';
 .drag-enter-active,
 .drag-leave-active{
   transition: opacity 0.3s ease;

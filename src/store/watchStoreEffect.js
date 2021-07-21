@@ -1,3 +1,4 @@
+import { computed } from 'vue';
 import { useStore } from 'vuex';
 import { setDataToLS } from './localStorageEffect';
 
@@ -24,10 +25,9 @@ const watchStoreEffect = () => {
 
   const storeObserver = () => {
     const updateEditTimeOfPageBySubscribe = (mutation, state) => {
-      console.log(mutation.type);
+      // console.log(mutation.type);
       if (!state.pages.currentPageId) return;
       if (mutation.type === 'blocks/setFocusBlockById') return;
-      if (mutation.type === 'pages/changeCurrentPageIdOnMouse') return;
       if (mutation.type === 'pages/editPageData' && mutation.payload?.property === 'editTime') return;
 
       const mutationsThatDidntRequireRecordingtime = [
@@ -35,12 +35,11 @@ const watchStoreEffect = () => {
         'pages/resetPages',
         'pages/deletePage',
         'pages/setCurrentPageId',
-        'pages/changeCurrentPageIdOnMouse',
         'pages/addIdToPageHistory',
         'blocks/deleteBlock',
         'blocks/resetBlocks',
         'blocks/setFocusBlockById',
-        'blocks/changeBlocksByAreaSelect',
+        'blocks/setSelectedBlocksIds',
         'blocks/addIdsToHiddenBlocksIds',
         'blocks/deleteIdToBlocksOfBlock',
         'blocks/deleteIdToBlocksOfPage',
@@ -54,12 +53,12 @@ const watchStoreEffect = () => {
 
       for (let i = 0; i < mutationsThatDidntRequireRecordingtime.length; i += 1) {
         if (mutation.type === mutationsThatDidntRequireRecordingtime[i]) {
-          console.log('不需要紀錄時間');
+          // console.log('不需要紀錄時間');
           return;
         }
       }
       // pages/deleteIdToBlocksOfPage需要紀錄
-      console.log(mutation.type);
+      // console.log(mutation.type);
       // console.log('需要紀錄時間');
       store.commit('pages/editPageData', {
         property: 'editTime',
@@ -99,12 +98,22 @@ const watchStoreEffect = () => {
         store.commit('userInfo/deleteIdFromPageHistory', mutation.payload);
       }
     };
+    // const listenBlockDeleteAnd = (mutation) => {
+    //   if (mutation.type !== 'blocks/deleteBlock') return;
+    //   const block = mutation.payload;
+    //   const blockId = mutation.payload.id;
+    //   console.log(block, blockId);
+    // };
 
-    const listenBlockDeleteAnd = (mutation) => {
-      if (mutation.type !== 'blocks/deleteBlock') return;
-      const block = mutation.payload;
-      const blockId = mutation.payload.id;
-      console.log(block, blockId);
+    const checkGroupEmptyAndDelete = (mutation) => {
+      if (mutation.type !== 'groups/deleteIdToGroup') return;
+      const { groupId } = mutation.payload;
+      const group = computed(() => store.getters['groups/getGroupById'](groupId));
+      if (group.value.blocks.length === 0) {
+        setTimeout(() => {
+          store.commit('groups/deleteGroup', group.value);
+        }, 1000);
+      }
     };
 
     store.subscribe((mutation, state) => {
@@ -116,7 +125,8 @@ const watchStoreEffect = () => {
         }
       });
       updatePageHistory(mutation);
-      listenBlockDeleteAnd(mutation);
+      // listenBlockDeleteAnd(mutation);
+      checkGroupEmptyAndDelete(mutation);
     });
   };
 

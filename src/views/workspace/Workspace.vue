@@ -1,11 +1,14 @@
 <template>
-  <main class="mainspace" @mousemove="toggleFloatSidebar($event)">
-    <div class="workspace" v-if="currentPage">
+  <BlockStyleEditor @hiddenStyleEditor="hiddenStyleEditor"
+      :is-show="isShowBlockStyleEditor"/>
+  <main class="mainspace"
+      @mousemove="toggleFloatSidebar($event)">
+    <div class="workspace" v-if="currentPage" @mousedown="clickActions($event)">
       <!-- {{ pageHistory }} -->
       <div class="header">
         <Breadcrumb :page="currentPage"/>
         <div class="update" type="button" @click="updateToFS">
-          <div class="update-icon" v-if="!isUpdating">
+          <div class="update-icon" v-if="!isFSUpdating">
             <font-awesome-icon :icon="['fas', 'database']"/>
           </div>
           <div class="update-icon" v-else>
@@ -14,21 +17,8 @@
           <div class="update-text">更新到數據庫</div>
         </div>
       </div>
-      <!-- <div class="decoration"></div> -->
-      <!-- <div class="cover"
-          style="background-image: url(https://images.unsplash.com/photo-1496681859237-6039cd585c4e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80);"
-          @mouseover="hoverHandle(true)"
-          @mouseout="hoverHandle(false)"
-      >
-        <div class="cover-edit" v-show="isShowEditCoverButton">
-          <button type="button"
-                class="btn btn-transparent"
-                @click="editCoverCardHandle(true)"
-          >編輯圖片</button>
-        </div>
-      </div> -->
       <div class="content">
-        <AreaSelect :ids="currentBlocksIds" :work-area="'.content'"/>
+        <AreaSelect :work-area="'.content'"/>
         <StyleTool/>
         <div class="title">
           <PageEditable
@@ -38,9 +28,10 @@
           <!-- <div class="prefix-line"></div> -->
         </div>
         <PageInfo :page="currentPage"/>
-        <div class="blockcontent" v-if="currentBlocks" @mousedown="clickActionInContent($event)">
+        <div class="blockcontent" v-if="currentBlocks">
           <template v-for="(block) in currentBlocks" :key="block.id">
-            <Block :block="block"
+            <Block :block="block" :is-selected="isBlockSelected(block.id)"
+                  @showBlockStyleEditor="clickBlockStyleEditorIconAction(block)"
                   v-show="!hiddenBlocksIds.includes(block.id)"/>
           </template>
         </div>
@@ -49,11 +40,11 @@
         <hr>
         <template v-if="groups && groups.length !== 0">
           <div v-for="(item) in groups" :key="item.id">
-            <ul>
-                <li>id ------ {{ item.id }}</li>
-                <li>value ---- {{ item.value }}</li>
-                <hr>
-            </ul>
+            <div>GroupId ------ {{ item.id }}</div>
+            <div>
+              Groupvalue ----
+              <li v-for="(item) in item.blocks" :key="item">{{ item }}</li>
+            </div>
           </div>
         </template>
         <hr>
@@ -61,9 +52,6 @@
           <div>hiddenBlocksIds:
             {{ hiddenBlocksIds }}
           </div>
-        </div>
-        <div v-if="currentBlocksByAreaSelect">
-          {{ currentBlocksByAreaSelect }}
         </div>
         <hr>
         <div v-if="currentPage">
@@ -93,6 +81,7 @@
             <ul>
               <li style="width: 400px; overflow: hidden; text-overflow: ellipsis;">
                 content ------ {{ block.content }}</li>
+              <li>className ------ {{ block.className }}</li>
               <li>type ------ {{ block.type }}</li>
               <li>id ------ {{ block.id }}</li>
               <li>parentId ------ {{ block.parentId }}</li>
@@ -106,44 +95,7 @@
 
       </div>
     </div>
-    <template v-else>
-      <div class="base">
-        <div class="base-container">
-          <div class="base-title">
-            <div class="base-title-first">N</div>
-            <div class="base-title-second">ote</div>
-          </div>
-          <div class="base-small">區塊構成的世界...</div>
-          <div class="base-intro">
-            <div class="base-intro-quote">Note是一個筆記軟體</div>
-            <br>
-            <br>
-            <div class="base-intro-text">
-              <p>使用不同的區塊工具</p>
-              <p>來記錄文字、影片、圖像等載體...</p>
-              <p></p>
-              <p></p>
-              <!-- <p>使用區塊工具</p>
-              <p>來記錄文字、影片</p>
-              <p>圖像等載體...</p> -->
-              <br>
-              <!-- <br> -->
-              <p>也能夠創建頁面</p>
-              <p>來為多個不同區塊分類</p>
-              <br>
-              <br>
-              <!-- <p>更多說明參考</p> -->
-
-            </div>
-            <!-- <p>左方側邊欄可以創建頁面、區塊</p>
-            <p>在頁面中，可以創建無數的區塊</p>
-            <p>甚至是内嵌頁</p>
-            <p>而不同種類的區塊有不同的功能</p> -->
-          </div>
-        </div>
-      </div>
-    </template>
-
+    <FrontPage v-else/>
   </main>
 </template>
 
@@ -160,6 +112,8 @@ import AreaSelect from '../../components/AreaSelect.vue';
 import PageEditable from '../../components/input/PageEditable.vue';
 import StyleTool from '../../components/StyleTool.vue';
 import PageInfo from './PageInfo.vue';
+import BlockStyleEditor from '../../components/BlockStyleEditor.vue';
+import FrontPage from './FrontPage.vue';
 import { updateStoreToFS } from '../../store/firestore';
 import watchStoreEffect from '../../store/watchStoreEffect';
 
@@ -172,6 +126,8 @@ export default {
     PageEditable,
     StyleTool,
     PageInfo,
+    BlockStyleEditor,
+    FrontPage,
   },
   setup() {
     const store = useStore();
@@ -192,19 +148,27 @@ export default {
     const currentPage = computed(() => store.getters['pages/currentPage']);
     const currentBlocks = computed(() => store.getters['blocks/currentBlocks']);
     const currentFocusBlock = computed(() => store.getters['blocks/currentFocusBlock']);
-    // eslint-disable-next-line max-len
-    const currentBlocksByAreaSelect = computed(() => store.getters['blocks/currentBlocksByAreaSelect']);
     const currentBlocksIds = computed(() => store.getters['blocks/currentBlocksIds']);
     const isSidebarFloating = computed(() => store.state.sidebarState.isFloating);
+    const selectedBlocksIds = computed(() => store.state.blocks.selectedBlocksIds);
+    const isBlockSelected = (id) => computed(() => store.getters['blocks/isBlockSelected'](id)).value;
 
-    const unCollapseSidebar = () => {
-      store.dispatch('lockSidebar');
-    };
-
-    const { editPageData } = commonUpdateEffect();
+    const { editPageData, deleteBlockAndDependByPressBackspace } = commonUpdateEffect();
     const {
       currentFocusBlockId, hiddenBlocksIds, // pages, blocks,
     } = toRefs(store.state.blocks);
+
+    const deleteSelectedBlocks = (e) => {
+      if (selectedBlocksIds.value.length === 0) return;
+      if (e.keyCode !== 8) return;
+      e.preventDefault();
+      selectedBlocksIds.value.forEach((blockId) => {
+        const block = computed(() => store.getters['blocks/chooseBlock'](blockId));
+        deleteBlockAndDependByPressBackspace(block.value);
+      });
+    };
+
+    window.addEventListener('keydown', deleteSelectedBlocks);
 
     const isShowEditCoverButton = ref(false);
     const hoverHandle = (choose) => {
@@ -216,43 +180,73 @@ export default {
       isShowEditCoverCard.value = choose;
     };
 
-    const isUpdating = ref(false);
-    const isUpdatingHandle = (choose) => {
-      isUpdating.value = choose;
+    const isFSUpdating = ref(false);
+    const isFSUpdatingHandle = (choose) => {
+      isFSUpdating.value = choose;
+    };
+
+    const isShowBlockStyleEditor = ref(false);
+    const clickBlockStyleEditorIconAction = (block) => {
+      isShowBlockStyleEditor.value = true;
+      console.log(selectedBlocksIds.value);
+      if (selectedBlocksIds.value.length === 0) {
+        store.commit('blocks/addIdToSelectedBlocksIds', block.id);
+        return;
+      }
+      if (!selectedBlocksIds.value.find((id) => id === block.id)) {
+        store.commit('blocks/setSelectedBlocksIds', []);
+        store.commit('blocks/addIdToSelectedBlocksIds', block.id);
+      }
+    };
+
+    const hiddenStyleEditor = () => {
+      isShowBlockStyleEditor.value = false;
     };
 
     const updateToFS = async () => {
-      isUpdatingHandle(true);
+      isFSUpdatingHandle(true);
       try {
         await updateStoreToFS();
-        isUpdatingHandle(false);
+        isFSUpdatingHandle(false);
       } catch (error) {
         console.log(error);
-        isUpdatingHandle(false);
+        isFSUpdatingHandle(false);
       }
     };
 
     const { isMouseUnderTheElement } = commonDomEffect();
     const clickActionInContent = (e) => {
-      const lastBlock = currentBlocks.value[currentBlocks.value.length - 1];
-      if (!lastBlock) {
+      const finalBlock = currentBlocks.value[currentBlocks.value.length - 1];
+      if (!finalBlock) {
         e.preventDefault();
-        store.dispatch('blocks/pushBlock', {
-          type: 'p',
-        });
+        store.dispatch('blocks/addBlockAndSetFocusBlockId', {});
         return;
       }
-      const lastBlockDom = document.getElementById(lastBlock.id);
-      if (isMouseUnderTheElement(lastBlockDom, e)) {
+      const finalBlockDom = document.getElementById(finalBlock.id);
+      if (isMouseUnderTheElement(finalBlockDom, e)) {
         e.preventDefault();
-        if (lastBlock.content === '') {
-          lastBlockDom.focus();
+        if (finalBlock.content === '') {
+          finalBlockDom.focus();
           return;
         }
-        store.dispatch('blocks/pushBlock', {
-          type: 'p',
-        });
+        store.dispatch('blocks/addBlockAndSetFocusBlockId', {});
       }
+    };
+
+    const clickActions = (e) => {
+      const el = e.target;
+      if (!el.closest('.workspace')) return;
+      if (el.closest('.blockcontent')) {
+        // console.log('888888888888888');
+        clickActionInContent(e);
+        return;
+      }
+      store.commit('blocks/setFocusBlockById', '');
+      store.commit('blocks/setSelectedBlocksIds', []);
+      hiddenStyleEditor();
+      // if (el.classList.contains('content') || el.classList.contains('workspace')) {
+      //   console.log('點到外面了');
+      // }
     };
 
     const toggleFloatSidebar = (e) => {
@@ -340,7 +334,8 @@ export default {
     // );
 
     return {
-      clickActionInContent,
+      deleteSelectedBlocks,
+      clickActions,
       currentPage,
       editPageData,
       currentBlocks,
@@ -351,13 +346,16 @@ export default {
       isShowEditCoverButton,
       isShowEditCoverCard,
       editCoverCardHandle,
-      currentBlocksByAreaSelect,
+      selectedBlocksIds,
       groups,
       hiddenBlocksIds,
       updateToFS,
-      isUpdating,
-      unCollapseSidebar,
+      isFSUpdating,
       toggleFloatSidebar,
+      isShowBlockStyleEditor,
+      clickBlockStyleEditorIconAction,
+      hiddenStyleEditor,
+      isBlockSelected,
     };
   },
 };
@@ -366,13 +364,16 @@ export default {
 <style lang="scss" scoped>
 @import '../../style/color.scss';
 
+[v-cloak] {
+  display: none;
+}
+
 @mixin mainspace {
-  height: 100vh;
-  // background: #F1F0EA;
+  // height: 100%;
   background: #faf9f2;
+  // background: #faf9f2;
   position: relative;
   z-index: 1;
-  overflow-y: auto;
   &::-webkit-scrollbar {
     width: 8px;
   }
@@ -397,12 +398,19 @@ export default {
 .mainspace{
   width: 100%;
   position: relative;
+  z-index: 1;
+  height: 100vh;
+  overflow-y: auto;
+  // padding: 2rem 2rem;
+  // background-color: rgb(243, 226, 203);
 }
 
 .workspace{
   @include mainspace;
   display: flex;
   flex-direction: column;
+  border-radius: .2rem;
+  box-shadow: 0 0 5px 0 rgb(209, 193, 171);
 }
 
 p{
@@ -424,71 +432,13 @@ p{
   }
 }
 
-.base{
-  @include mainspace;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  &-title{
-    width: 100%;
-    color: #504952;
-    height: 12rem;
-    // margin-top: 12rem;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    &-first{
-      // background: #504952;
-      // background: #645b66;
-      background: #584d58;
-      color: #F1F0EA;
-      // color: #645b66;
-      font-size: 8rem;
-      font-weight: bold;
-      line-height: 9rem;
-      box-shadow: .2rem .2rem .3rem .1rem #a1a1a1;
-      border-radius: .5rem;
-      margin: 0 .1rem 0 1.5rem;
-      padding: 0 .7rem;
-    }
-    &-second{
-      box-shadow: .1rem .1rem .3rem .1rem #858585;
-      font-size: 2rem;
-      font-weight: 900;
-      padding: 0 .5rem;
-      border-radius: .5rem;
-      color: #645b66;
-    }
-  }
-  &-small{
-    margin: .7rem;
-    padding-left: .7rem;
-    text-align: center;
-    color: #999999;
-    transform: scale(.85);
-  }
-  &-intro{
-    text-align: center;
-    color: #5f5661;
-    margin-top: 4rem;
-    &-quote{
-      font-size: 1.3rem;
-      font-weight: bold;
-      color: #676269;
-    }
-    &-text{
-      color: #807883;
-    }
-  }
-}
-
 .header{
-  background: #faf9f2;
+  // background: #faf9f2;
   position: sticky;
   top: 0;
   display: flex;
   padding: 1.5rem .5rem 1.5rem 2rem;
-  margin-bottom: 6rem;
+  margin-bottom: 5rem;
   z-index: 7;
 }
 
@@ -538,6 +488,7 @@ p{
 .blockcontent{
   width: 100%;
   flex-grow: 1;
+  min-height: 350px;
   &-input{
     width: inherit;
     min-height: 50px;
@@ -546,7 +497,7 @@ p{
 .title{
   position: relative;
   &-input{
-    font-family: 'Noto Sans TC', sans-serif;
+    font-family: 'Noto Sans TC', sans-se rif;
     font-weight: 700;
     font-size: 3rem;
   }

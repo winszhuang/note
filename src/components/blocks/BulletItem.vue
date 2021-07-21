@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex">
-    <div class="p-prefix">
+    <div class="prefix">
       <div class="bullet">⦁</div>
     </div>
     <P :block="block"/>

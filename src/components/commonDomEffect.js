@@ -25,9 +25,8 @@ const commonDomEffect = () => {
     return element;
   };
 
-  const pasteImage = (ev, id) => {
+  const getDataURLByClipBoardData = async (ev) => new Promise((resolve, reject) => {
     const { items } = ev.clipboardData || ev.originalEvent.clipboardData;
-    console.log(JSON.stringify(items)); // will give you the mime types
     // find pasted image among pasted items
     let blob = null;
     for (let i = 0; i < items.length; i += 1) {
@@ -35,17 +34,18 @@ const commonDomEffect = () => {
         blob = items[i].getAsFile();
       }
     }
-    // load image if there is a pasted image
-    // console.log(ev.target.previousElementSibling);
+
     if (blob !== null) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        document.getElementById(id).src = e.target.result;
-        // console.log(e.target.result); // data url!
+        resolve(e.target.result);
+      };
+      reader.onerror = (err) => {
+        reject(err);
       };
       reader.readAsDataURL(blob);
     }
-  };
+  });
 
   const getMouseOffsetByClickElAndMove = () => {
     let isTrigger = false;
@@ -160,7 +160,7 @@ const commonDomEffect = () => {
   return {
     getElementsByIdsInArr,
     getElementBySelector,
-    pasteImage,
+    getDataURLByClipBoardData,
     dragDropEffect,
     getMouseOffsetByClickElAndMove,
     isMouseInsideElement,

@@ -1,28 +1,32 @@
 import { findInStoreById } from './commonStoreEffect';
+import { generateRandomString } from '../../components/commonEffect';
 
 export default {
   namespaced: true,
   state: {
     blocks: [],
     currentFocusBlockId: '',
-    currentBlocksByAreaSelect: [],
+    selectedBlocksIds: [],
     hiddenBlocksIds: [],
+    blockStyleEditor: {
+      isShow: false,
+    },
   },
   mutations: {
     // 處理blocks
     resetBlocks(state) {
       state.blocks = [];
       state.currentFocusBlockId = '';
-      state.currentBlocksByAreaSelect = [];
+      state.selectedBlocksIds = [];
       state.hiddenBlocksIds = [];
     },
 
-    addBlock(state, item) {
-      state.blocks.push(item);
+    addBlock(state, block) {
+      state.blocks.push(block);
     },
 
-    deleteBlock(state, item) {
-      const index = state.blocks.indexOf(item);
+    deleteBlock(state, block) {
+      const index = state.blocks.indexOf(block);
       state.blocks.splice(index, 1);
     },
 
@@ -45,7 +49,6 @@ export default {
 
     // 處理currentFocusBlockId
     editBlockData(state, { id = state.currentFocusBlockId, value, key = 'content' }) {
-      if (state.currentPageId === '') return;
       findInStoreById(state.blocks, id)[key] = value;
     },
 
@@ -53,9 +56,24 @@ export default {
       state.currentFocusBlockId = id;
     },
 
-    // 處理currentBlocksByAreaSelect
-    changeBlocksByAreaSelect(state, { arr }) {
-      state.currentBlocksByAreaSelect = arr;
+    // selectedBlocksIds
+    setSelectedBlocksIds(state, arr = []) {
+      state.selectedBlocksIds = arr;
+    },
+
+    addIdToSelectedBlocksIds(state, id) {
+      if (state.selectedBlocksIds.includes(id)) return false;
+      state.selectedBlocksIds.push(id);
+      return true;
+    },
+
+    deleteIdFromSelectedBlocksIds(state, id) {
+      if (state.selectedBlocksIds.includes(id)) {
+        const index = state.selectedBlocksIds.indexOf(id);
+        state.selectedBlocksIds.splice(index, 1);
+        return true;
+      }
+      return false;
     },
 
     // 處理hiddenBlocksIds
@@ -78,6 +96,11 @@ export default {
 
     resetHiddenBlocksIds(state) {
       state.hiddenBlocksIds = [];
+    },
+
+    // 處理blockStyleEditor
+    setStyleEditorShow(state, isTrueOrFalse) {
+      state.blockStyleEditor = isTrueOrFalse;
     },
   },
   getters: {
@@ -111,6 +134,39 @@ export default {
       return (id) => state.hiddenBlocksIds.includes(id);
     },
 
+    getIndexFromCurrentBlocksByBlock(state, getters) {
+      return (block) => getters.currentBlocks.indexOf(block);
+    },
+
+    getLastBlockByid(state, getters) {
+      return (id) => {
+        const index = getters.currentBlocksIds.indexOf(id);
+        if (index === 0) return null;
+        return getters.currentBlocks[index - 1];
+      };
+    },
+
+    getNextBlockByid(state, getters) {
+      return (id) => {
+        const index = getters.currentBlocksIds.indexOf(id);
+        if (index === getters.currentBlocksIds.length - 1) return null;
+        return getters.currentBlocks[index + 1];
+      };
+    },
+
+    selectedBlocks(state, getters) {
+      const blocks = [];
+      state.selectedBlocksIds.forEach((blockId) => {
+        const block = findInStoreById(getters.currentBlocks, blockId);
+        blocks.push(block);
+      });
+      return blocks;
+    },
+
+    isBlockSelected(state) {
+      return (id) => state.selectedBlocksIds.includes(id);
+    },
+
     allBlocksIds(state) {
       const allIds = [];
       state.blocks.forEach((block) => {
@@ -120,138 +176,168 @@ export default {
     },
   },
   actions: {
-    addBlock({
-      state, commit, rootState,
-    }, {
+    addBlock({ commit, rootState }, {
       page = findInStoreById(rootState.pages.pages, rootState.pages.currentPageId),
-      type = 'p',
-      id = (new Date().getTime() + 3).toString(),
-      value = '',
-      blocks = [],
-      parentId = '',
-      group = '',
+      block = {
+        id: generateRandomString(),
+        type: 'p',
+        content: '',
+        blocks: [],
+        group: '',
+        parentId: '',
+        className: 'style-text-color__default',
+      },
+      index,
     }) {
-      const newBlock = {
-        id,
-        type,
-        content: value,
-        blocks,
-        parentId,
-        group,
-      };
-      commit('addBlock', newBlock);
+      commit('addBlock', block);
 
-      // 此段處理block的id被加入某page中的blocks陣列裡的某位置
-      const isSelect = state.currentFocusBlockId !== '';
-      if (isSelect) {
-        const index = page.blocks.indexOf(state.currentFocusBlockId);
-        commit('pages/addIdToBlocksOfPage', {
-          page,
-          blockId: id,
-          index: index + 1,
-        }, { root: true });
-      } else {
-        commit('pages/addIdToBlocksOfPage', {
-          page,
-          blockId: id,
-        }, { root: true });
-      }
-
-      // const lastBlock = findInStoreById(rootState.blocks.blocks, state.currentFocusBlockId);
-      // if (lastBlock.content === '') {
-      //   dispatch('deleteBlock', { block: lastBlock });
-      // }
-
-      commit('setFocusBlockById', id);
-    },
-
-    pushBlock({ commit }, {
-      type = 'p',
-      id = (new Date().getTime() + 3).toString(),
-      value = '',
-      blocks = [],
-      parentId = '',
-      group = '',
-    }) {
-      const newBlock = {
-        id,
-        type,
-        content: value,
-        blocks,
-        parentId,
-        group,
-      };
-      commit('addBlock', newBlock);
-
-      // 此段處理block的id被加入某page中的blocks陣列裡的某位置
       commit('pages/addIdToBlocksOfPage', {
-        blockId: id,
+        page,
+        id: block.id,
+        index: index || undefined,
       }, { root: true });
-
-      commit('setFocusBlockById', id);
     },
+
+    addBlockAndSetFocusBlockId({ commit, dispatch, rootState }, {
+      page = findInStoreById(rootState.pages.pages, rootState.pages.currentPageId),
+      block = {
+        id: generateRandomString(),
+        type: 'p',
+        content: '',
+        blocks: [],
+        group: '',
+        parentId: '',
+        className: 'style-text-color__default',
+      },
+    }) {
+      dispatch('addBlock', { block, page });
+      commit('blocks/setFocusBlockById', block.id, { root: true });
+    },
+
+    // pushBlockAndSetFocusBlockId({ commit, dispatch, rootState }, {
+    //   page = findInStoreById(rootState.pages.pages, rootState.pages.currentPageId),
+    //   block = {
+    //     id: generateRandomString(),
+    //     type: 'p',
+    //     content: '',
+    //     blocks: [],
+    //     group: '',
+    //     parentId: '',
+    //   },
+    // }) {
+    //   dispatch('addBlockAndSetFocusBlockId', { block, page, index:  });
+    // },
+
+    // pushBlock({ commit }, {
+    //   type = 'p',
+    //   id = (new Date().getTime() + 3).toString(),
+    //   value = '',
+    //   blocks = [],
+    //   parentId = '',
+    //   group = '',
+    // }) {
+    //   const newBlock = {
+    //     id,
+    //     type,
+    //     content: value,
+    //     blocks,
+    //     parentId,
+    //     group,
+    //   };
+    //   commit('addBlock', newBlock);
+
+    //   // 此段處理block的id被加入某page中的blocks陣列裡的某位置
+    //   commit('pages/addIdToBlocksOfPage', {
+    //     blockId: id,
+    //   }, { root: true });
+
+    //   commit('setFocusBlockById', id);
+    // },
 
     // 增加子block
-    addBlockInside({ commit, dispatch }, block) {
-      const parentBlock = block;
+    // addBlockInside({ commit, dispatch }, block) {
+    //   const parentBlock = block;
 
-      const id = new Date().getTime().toString(); // 創一個新的blockId
+    //   const id = new Date().getTime().toString(); // 創一個新的blockId
+
+    //   dispatch('addBlock', {
+    //     type: 'p',
+    //     id,
+    //     parentId: parentBlock.id,
+    //   });
+
+    //   commit('addIdToBlocksOfBlock', {
+    //     block: parentBlock,
+    //     blockId: id,
+    //   });
+    // },
+
+    // addGroupTypeBlock({ commit, dispatch }, { block, group }) {
+    //   const newBlock = { ...block };
+    //   if (newBlock.group !== group.id) {
+    //     newBlock.group = group.id;
+    //   }
+
+    //   dispatch('addBlock', {
+    //     block: newBlock,
+    //   });
+
+    //   commit('groups/addIdToGroup', {
+    //     id: newBlock.id,
+    //     group,
+    //   }, { root: true });
+    // },
+
+    addPageTypeBlock({ commit, dispatch, rootState }, {
+      block,
+      page = rootState.pages.currentPageId,
+    }) {
+      const newBlock = { ...block };
+      if (newBlock.content !== page.id) {
+        newBlock.content = page.id;
+      }
 
       dispatch('addBlock', {
-        type: 'p',
-        id,
-        parentId: parentBlock.id,
+        block: newBlock,
       });
 
-      commit('addIdToBlocksOfBlock', {
-        block: parentBlock,
-        blockId: id,
-      });
-    },
-
-    addBlockInGroup({ commit, dispatch }, { type, groupId }) {
-      const blockId = (new Date().getTime() + 3).toString();
-      const newGroupId = groupId || (new Date().getTime() + 5).toString();
-
-      dispatch('addBlock', {
-        type,
-        id: blockId,
-        group: newGroupId,
-      });
-
-      commit('groups/addIdToGroup', {
-        groupId: newGroupId,
-        id: blockId,
-      }, { root: true });
+      const newPage = {
+        id: generateRandomString(),
+        name: 'untitle',
+        blocks: [],
+        parentId: page.id,
+        createdTime: new Date().getTime().toString(),
+        editTime: new Date().getTime().toString(),
+        tags: [],
+        cover: '',
+      };
+      commit('pages/addPage', newPage, { root: true });
     },
 
     deleteBlock({ state, rootState, commit }, {
       containPage = findInStoreById(rootState.pages.pages, rootState.pages.currentPageId),
       block = findInStoreById(state.blocks, state.currentFocusBlockId),
     }) {
-      // 如果刪除的block是包在某父集block裡面的情況，就刪除父集block屬性blocks中的對應ID
-      if (block.parentId !== '') {
-        const parentBlock = findInStoreById(state.blocks, block.parentId);
-        commit('deleteIdToBlocksOfBlock', {
-          block: parentBlock,
-          blockId: block.id,
-        });
-      }
-
-      if (block.group !== '') { // 如果此block有包含在某個group，就把group中此id刪除
-        commit('groups/deleteIdToGroup', {
-          groupId: block.group,
-          id: block.id,
-        }, { root: true });
-      }
-
       // 刪除當前page的blocks裡面對應的id
       commit('pages/deleteIdToBlocksOfPage', {
         page: containPage,
-        blockId: block.id,
+        id: block.id,
       }, { root: true });
 
       commit('deleteBlock', block); // 徹底刪除此block
+    },
+
+    deleteSelectedBlocks({ state, dispatch }) {
+      state.selectedBlocksIds.forEach((blockId) => {
+        const block = findInStoreById(state.blocks, blockId);
+        dispatch('deleteBlock', { block });
+      });
+    },
+
+    editSelectedBlocksData({ state, commit }, { key, value }) {
+      state.selectedBlocksIds.forEach((blockId) => {
+        commit('editBlockData', { key, value, id: blockId });
+      });
     },
 
     goBlockPosition({ commit }, { page, block }) {
