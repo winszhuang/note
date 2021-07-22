@@ -1,5 +1,5 @@
 <template>
-  <div class="scale-controller my-4">
+  <div class="scale-controller">
     <div class="scale-area">
       <div class="scale-compression"
             :style="{ width: width > 0 ? `${width}px` : 0 }"></div>

@@ -1,9 +1,10 @@
 $drag-width: 1.5rem;
-$block-border: .2rem dashed rgb(141, 184, 219);
+$block-border: .2rem dashed rgb(134, 193, 241);
 .block{
   // margin: .3rem 0;
   position: relative;
-  display: flex;  
+  display: flex; 
+  box-sizing: border-box; 
 
   &-content{
     width: 100%;

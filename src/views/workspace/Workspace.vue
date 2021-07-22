@@ -29,10 +29,15 @@
         </div>
         <PageInfo :page="currentPage"/>
         <div class="blockcontent" v-if="currentBlocks">
+          <!-- <div class="fixblock" id="fixblock"></div> -->
           <template v-for="(block) in currentBlocks" :key="block.id">
             <Block :block="block" :is-selected="isBlockSelected(block.id)"
+                  :is-under-mouse-in-drag="currentIdUnderTheMouse === block.id"
+                  v-show="!hiddenBlocksIds.includes(block.id)"
                   @showBlockStyleEditor="clickBlockStyleEditorIconAction(block)"
-                  v-show="!hiddenBlocksIds.includes(block.id)"/>
+                  @drop="handleDrop"
+                  @dragenter="cancelDefault"
+                  @dragover="handleBeforeDrop"/>
           </template>
         </div>
 
@@ -116,6 +121,7 @@ import BlockStyleEditor from '../../components/BlockStyleEditor.vue';
 import FrontPage from './FrontPage.vue';
 import { updateStoreToFS } from '../../store/firestore';
 import watchStoreEffect from '../../store/watchStoreEffect';
+import updateIDsEffectByDragDrop from '../../components/updateIDsEffectByDragDrop';
 
 export default {
   name: 'Workspace',
@@ -157,6 +163,18 @@ export default {
     const {
       currentFocusBlockId, hiddenBlocksIds, // pages, blocks,
     } = toRefs(store.state.blocks);
+
+    const {
+      ids,
+      currentIdUnderTheMouse,
+      cancelDefault,
+      handleDrop,
+      handleBeforeDrop,
+    } = updateIDsEffectByDragDrop(currentBlocksIds, (e) => e.target.closest('.block').dataset.blockId);
+
+    watch(() => ids.value, (curr) => {
+      store.commit('pages/editPageData', { key: 'blocks', value: [...curr] });
+    }, { deep: true });
 
     const deleteSelectedBlocks = (e) => {
       if (selectedBlocksIds.value.length === 0) return;
@@ -292,47 +310,6 @@ export default {
       );
     });
 
-    // watch(
-    //   hiddenBlocksIds,
-    //   (curr) => {
-    //     console.log(curr);
-    //   }
-    // )
-
-    // watch(
-
-    // )
-    // watch( // 監聽state中的pages資料被更新就馬上更新到FS
-    //   () => pages.value,
-    //   (currData) => {
-    //     store.dispatch('updateToFs', {
-    //       collectionName: 'pages',
-    //       data: currData,
-    //     });
-    //   },
-    //   { deep: true },
-    // );
-
-    // watch( // 監聽state中的blocks資料被更新就馬上更新到FS
-    //   () => blocks.value,
-    //   (currData, prevData) => {
-    //     // console.log(currData);
-    //     // 如果數據量比原本的多或者不變，就是新增或者編輯
-    //     if (currData.length >= prevData.length) {
-    //       store.dispatch('updateToFs', {
-    //         collectionName: 'blocks',
-    //         data: currData,
-    //       });
-    //     // 如果數據量比原本的少，就是刪除
-    //     } else {
-    //       store.dispatch('deleteToFs', {
-    //         collectionName: 'blocks',
-    //       });
-    //     }
-    //   },
-    //   { deep: true },
-    // );
-
     return {
       deleteSelectedBlocks,
       clickActions,
@@ -356,6 +333,10 @@ export default {
       clickBlockStyleEditorIconAction,
       hiddenStyleEditor,
       isBlockSelected,
+      cancelDefault,
+      handleDrop,
+      handleBeforeDrop,
+      currentIdUnderTheMouse,
     };
   },
 };

@@ -1,9 +1,12 @@
 <template>
   <div class="block"
       :class="getClassNameOfBlockType(block.type)"
+      :data-block-id="block.id"
       @mouseenter="handleShow(true)"
       @mouseleave="handleShow(false)"
-      :style="{ 'margin-left': `${getLevelOfBlock(block)*1.65}rem`}">
+      :style="{ 'margin-left': `${getLevelOfBlock(block)*1.65}rem`,
+                'border-bottom': isUnderMouseInDrag
+                  ? '.3rem solid rgb(134, 193, 241)' : 'none' }">
     <div class="block-tools">
       <transition name="drag">
         <div class="block-tool"
@@ -20,10 +23,9 @@
     </div>
     <div class="block-content"
         :class="{ 'block-selected': isSelected }"
-        @drop="handleDrop($event)"
-        @dragenter="cancelDefault($event, true)"
-        @dragleave="handleLeave($event)"
-        @dragover="handleBeforeDrop($event)">
+        @drop="$emit('drop', $event)"
+        @dragenter="$emit('dragenter', $event)"
+        @dragover="$emit('dragover', $event)">
       <component
           :is="getFirstToUpper(block.type)"
           :block="block">
@@ -37,25 +39,17 @@ import { computed } from 'vue';
 import { useStore } from 'vuex';
 import { commonStringEffect, showEffect } from './commonEffect';
 import commonBlockEffect from './commonBlockEffect';
-import dragDropActionInBlocks from './dragDropActionInBlocks';
 import DragItem from './DragItem.vue';
 
 export default {
   name: 'Block',
-  props: ['block', 'isSelected'],
+  props: ['block', 'isSelected', 'isUnderMouseInDrag'],
   components: { DragItem },
   setup() {
     const store = useStore();
-    // const blocktype = computed(() => store.state.blocktype);
     const { isShow, handleShow } = showEffect();
     const { getLevelOfBlock } = commonBlockEffect();
     const { getFirstToUpper } = commonStringEffect();
-    const {
-      handleDrop,
-      cancelDefault,
-      handleBeforeDrop,
-      handleLeave,
-    } = dragDropActionInBlocks();
 
     // eslint-disable-next-line max-len
     const getClassNameOfBlockType = (type) => computed(() => store.getters.getClassNameOfBlockType(type)).value;
@@ -64,12 +58,10 @@ export default {
       isShow,
       handleShow,
       getFirstToUpper,
-      handleDrop,
-      cancelDefault,
-      handleBeforeDrop,
-      handleLeave,
+      // handleLeave,
       getLevelOfBlock,
       getClassNameOfBlockType,
+      // setBlockBottom,
     };
   },
 };

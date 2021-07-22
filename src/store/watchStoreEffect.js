@@ -104,6 +104,9 @@ const watchStoreEffect = () => {
     //   const blockId = mutation.payload.id;
     //   console.log(block, blockId);
     // };
+    // const checkNextAndPrevIdAction = (mutation) => {
+
+    // }
 
     const checkGroupEmptyAndDelete = (mutation) => {
       if (mutation.type !== 'groups/deleteIdToGroup') return;
