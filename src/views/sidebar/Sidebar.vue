@@ -72,7 +72,7 @@
         </div>
       </div>
       <div class="sidebar-footer">
-        <div class="addpage bt" type="button" @click="addPage">
+        <div class="addpage" type="button" @click="addPage">
           <div class="addpage-text">+ 新頁面</div>
         </div>
       </div>
@@ -175,19 +175,44 @@ const addBlockEffect = () => {
   const store = useStore();
   const { blocktype } = toRefs(store.state);
   const { currentPageId } = toRefs(store.state.pages);
-  const { generateBlock } = commonBlockEffect();
+  const { Block } = commonBlockEffect();
 
-  const addBlockFlow = (type) => {
-    const block = generateBlock({ type });
-    store.dispatch('blocks/addBlockAndSetFocusBlockId', { block });
+  const addBlockFlow = (block) => {
+    const currentFocusBlock = computed(() => store.getters['blocks/currentFocusBlock']);
+    if (currentFocusBlock.value) {
+      const focusBlockIndex = computed(() => store.getters['blocks/getIndexByBlockId'](currentFocusBlock.value.id));
+      // console.log(focusBlockIndex.value);
+      store.dispatch('blocks/addBlockAndSetFocusBlockId', { block, index: focusBlockIndex.value + 1 });
+    } else {
+      store.dispatch('blocks/addBlockAndSetFocusBlockId', { block, index: undefined });
+    }
+  };
+
+  const addTextTypeBlockFlow = (type) => {
+    const block = new Block(type).addContent({ text: '', html: '' });
+    addBlockFlow(block);
+  };
+
+  const addMediaTypeBlockFlow = (type) => {
+    const block = new Block(type).addContent({ url: '', compressionWidth: '' });
+    addBlockFlow(block);
+  };
+
+  const addCheckBoxTypeBlockFlow = (type) => {
+    const block = new Block(type).addContent({ text: '', html: '', isChecked: false });
+    addBlockFlow(block);
+  };
+
+  const addToggleTypeBlockFlow = (type) => {
+    const block = new Block(type).addContent({ text: '', html: '', isHidden: false });
+    addBlockFlow(block);
   };
 
   const addPageTypeBlockFlow = (type) => {
-    const block = generateBlock({ type, content: currentPageId.value });
-    store.dispatch('blocks/addBlock', { block });
+    const innerPageId = generateRandomString();
 
     store.commit('pages/addPage', {
-      id: generateRandomString(),
+      id: innerPageId,
       name: 'untitle',
       blocks: [],
       parentId: currentPageId.value,
@@ -196,19 +221,9 @@ const addBlockEffect = () => {
       tags: [],
       cover: '',
     });
-  };
 
-  const addGroupTypeBlockFlow = (type) => {
-    const group = { id: generateRandomString(), blocks: [] };
-    const block = generateBlock({ type, group: group.id });
-
-    store.commit('groups/addGroup', group);
-    store.dispatch('blocks/addBlockAndSetFocusBlockId', { block });
-
-    store.commit('groups/addIdToGroup', {
-      id: block.id,
-      groupId: group.id,
-    });
+    const block = new Block(type).addContent(innerPageId);
+    store.dispatch('blocks/addBlock', { block });
   };
 
   const checkBlockTypeThenAdd = (type = 'p') => {
@@ -224,12 +239,26 @@ const addBlockEffect = () => {
 
     const actions = {
       page: addPageTypeBlockFlow,
-      numberItem: addGroupTypeBlockFlow,
-      bulletItem: addGroupTypeBlockFlow,
+      h1: addTextTypeBlockFlow,
+      h2: addTextTypeBlockFlow,
+      h3: addTextTypeBlockFlow,
+      p: addTextTypeBlockFlow,
+      quote: addTextTypeBlockFlow,
+      numberItem: addTextTypeBlockFlow,
+      bulletItem: addTextTypeBlockFlow,
+      codeEditor: addTextTypeBlockFlow,
+
+      img: addMediaTypeBlockFlow,
+      video: addMediaTypeBlockFlow,
+
+      todoItem: addCheckBoxTypeBlockFlow,
+
+      toggleList: addToggleTypeBlockFlow,
+
+      dividingLine: () => addBlockFlow(new Block(type)),
     };
 
-    const execute = actions[type] ? actions[type] : addBlockFlow;
-    execute(type);
+    actions[type](type);
   };
 
   return {
@@ -291,10 +320,6 @@ export default {
 <style lang="scss" scoped>
 @import '../../style/component/_sidebar.scss';
 @import '../../style/component/_customlist-group.scss';
-.sidebar{
-  transition: width .4s ease-in-out .1s;
-}
-
 .search-container{
   width: 30%;
   height: 50%;
@@ -313,27 +338,10 @@ export default {
   }
 }
 
-.addpage{
-  line-height: 2.5rem;
-  // height: 2.5rem;
-  color: #909090;
-  &-text{
-    padding-left: 35%;
-  }
-  &-small{
-    color: #636363;
-  }
-  &:hover{
-    background: #5c525e;
-    color: #c9c0c2;
-  }
-}
-.caret-right{
-  margin-right: .3rem;
-}
-// .block-icon{
-//   width: 1.3rem;
+// .caret-right{
+//   margin-right: .3rem;
 // }
+
 .block-name{
   padding-top: .05rem;
 }

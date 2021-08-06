@@ -1,10 +1,9 @@
 <template>
   <div class="d-flex">
     <input type="checkbox"
-            class="prefix checkbox"
-            value="false"
-            checked
-            @input="editBlockData(block.id, $event.target.value, 'check')">
+            class="prefix m-auto"
+            :checked="block.content.isChecked"
+            @input="setTodoItemData($event, block)">
     <P :block="block" />
   </div>
 </template>
@@ -20,14 +19,20 @@ export default {
   setup() {
     const { editBlockData } = commonUpdateEffect();
 
-    return { editBlockData };
+    const setTodoItemData = (e, block) => {
+      console.log(e);
+      // console.log(e.target.checked);
+      editBlockData(block.id, {
+        text: block.content.text,
+        html: block.content.html,
+        isChecked: e.target.checked,
+      }, 'content');
+    };
+
+    return { setTodoItemData };
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.checkbox{
-  display: block;
-  text-align: center;
-}
 </style>

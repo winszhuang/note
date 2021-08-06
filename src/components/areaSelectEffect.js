@@ -1,8 +1,8 @@
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 // import { useStore } from 'vuex';
 
 const useAreaSelectEffect = (AllIds, isBoxACollisionB) => {
-  let isActive = false;
+  const isAreaSelectActive = ref(false);
 
   const currentSelectedIds = reactive([]);
 
@@ -28,7 +28,7 @@ const useAreaSelectEffect = (AllIds, isBoxACollisionB) => {
   };
 
   const mouseDown = (e) => {
-    if (isActive === true) return;
+    if (isAreaSelectActive.value === true) return;
     if (!e.target.closest('.workspace')) return;
     if (e.target.closest('.block') || e.target.hasAttribute('contenteditable')) {
       if (e.target.closest('.block-tools')) return;
@@ -36,17 +36,18 @@ const useAreaSelectEffect = (AllIds, isBoxACollisionB) => {
       return;
     }
 
-    e.preventDefault();
-    // console.log('9999999999999999999999999999999999999');
+    // e.preventDefault();
 
-    isActive = true;
+    isAreaSelectActive.value = true;
     position.x1 = e.clientX;
     position.y1 = e.clientY;
     currentSelectedIds.length = 0;
   };
 
   const mouseMove = (e) => {
-    if (isActive === false) return;
+    if (isAreaSelectActive.value === false) return;
+    e.preventDefault();
+    e.stopPropagation();
 
     position.x2 = e.clientX;
     position.y2 = e.clientY;
@@ -67,8 +68,9 @@ const useAreaSelectEffect = (AllIds, isBoxACollisionB) => {
       bottom: top + height,
     };
 
+    if (!AllIds.value) return; // 處理這行
     AllIds.value.forEach((id) => {
-      const blockEl = document.getElementById(id);
+      const blockEl = document.querySelector(`[data-block-id="${id}"]`);
       const blockBounding = blockEl.getBoundingClientRect();
       if (isBoxACollisionB(selectorBox, blockBounding)) {
         // console.log(`框到id是${id}了`);
@@ -88,7 +90,7 @@ const useAreaSelectEffect = (AllIds, isBoxACollisionB) => {
   };
 
   const mouseUp = () => {
-    isActive = false;
+    isAreaSelectActive.value = false;
     setSelector(0, 0, 0, 0);
   };
 
@@ -98,6 +100,7 @@ const useAreaSelectEffect = (AllIds, isBoxACollisionB) => {
     mouseMove,
     selector,
     currentSelectedIds,
+    isAreaSelectActive,
   };
 };
 

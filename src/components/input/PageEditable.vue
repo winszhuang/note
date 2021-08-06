@@ -26,7 +26,7 @@ export default {
     const { editPageData, checkKeydownInPageData, setFocusBlock } = commonUpdateEffect();
 
     const inputToPageContent = (e) => {
-      editPageData('name', e.target.innerHTML);
+      editPageData('name', e.target.innerText);
     };
 
     const keydownAction = (e) => {

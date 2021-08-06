@@ -1,5 +1,4 @@
 <template>
-  <!--只能一行，否則會有留白text-->
   <!-- eslint-disable-next-line max-len -->
   <pre class='language-javascript' id="code-editor"><code class='language-javascript' v-text="codeText"></code>
     <div class="code-input"
@@ -21,10 +20,12 @@
 import Prism from 'prismjs';
 import '../../style/prism.css';
 import { nextTick, onMounted, ref } from 'vue';
+// import ContentEditable from '../input/ContentEditable.vue';
 
 export default {
   name: 'CodeEditor',
   props: ['block'],
+  // components: { ContentEditable },
   setup() {
     // const adjustCodeInputHeight = () => {
 
@@ -112,6 +113,8 @@ export default {
   width: 100%;
   position: relative;
   padding: 1rem 2rem;
+  // box-shadow: 1px 1px 5px 0 rgb(192, 192, 192);
+  border-radius: 4px;
   & > .code-input{
     position: absolute;
     // padding: 1rem 0 1rem 2rem;

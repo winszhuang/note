@@ -1,5 +1,5 @@
 import { findInStoreById, arrayDeleteByValue } from './commonStoreEffect';
-import { generateRandomString } from '../../components/commonEffect';
+import { generateRandomString, getRandomLightColor } from '../../components/commonEffect';
 
 export default {
   namespaced: true,
@@ -68,10 +68,9 @@ export default {
 
     addTag(state, name) {
       const page = findInStoreById(state.pages, state.currentPageId);
-      const tagIndex = page.tags.length;
       const tag = {
         name,
-        color: state.colors[tagIndex],
+        color: getRandomLightColor(),
       };
       page.tags.push(tag);
     },

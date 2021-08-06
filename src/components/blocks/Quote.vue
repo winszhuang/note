@@ -2,7 +2,7 @@
   <div class="quote">
     <BlockEditable
             :block="block"
-            :placeholder="'輸入引言。Shift + Enter可以在引言中換行'"
+            :placeholder="'請輸入引言'"
             :className="'h5'"/>
   </div>
 </template>
@@ -20,11 +20,13 @@ export default {
 <style lang="scss" scoped>
 .quote{
   border-left: .4rem solid #8d8a8d;
+  padding-top: .3rem;
+  padding-bottom: .3rem;
   padding-left: .7rem;;
-  margin: 1.3rem 0;
+  margin: 0;
 }
 .h5{
-  margin: .2rem 0;
+  margin: 0;
   line-height: 2rem;
   font-weight: 400;
   color: #383638;

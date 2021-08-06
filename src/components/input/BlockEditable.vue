@@ -1,28 +1,39 @@
 <template>
     <ContentEditable
         :placeholder="placeholder"
-        :className="block.className + ' ' + className"
+        :className="className"
         :id="noId ? '' : block.id"
-        :value="block.content"
+        :value="block.content.text"
         @input="inputToBlockContent"
         @keydown="keydownAction"
         @focus="focusToBlock"
-        @blur="unFocusToBlock"/>
+        @paste="pasteBlocksAction"/>
 </template>
 
 <script>
-import commonUpdateEffect from '../../views/commonUpdataEffect';
+// import { computed } from 'vue';
+// import { useStore } from 'vuex';
 import ContentEditable from './ContentEditable.vue';
+import commonUpdateEffect from '../../views/commonUpdataEffect';
 
 export default {
   components: { ContentEditable },
   name: 'BlockEditable',
   props: ['block', 'placeholder', 'className', 'noId'],
   setup(props) {
-    const { editBlockData, setFocusBlock, checkKeydownInBlockContent } = commonUpdateEffect();
+    const {
+      editBlockData,
+      setFocusBlock,
+      pasteBlocksAction,
+      checkKeydownInBlockContent,
+    } = commonUpdateEffect();
 
     const inputToBlockContent = (e) => {
-      editBlockData(props.block.id, e.target.innerHTML);
+      // console.log(e.target.innerText);
+      editBlockData(props.block.id, {
+        text: e.target.innerText,
+        html: e.target.innerHTML,
+      }, 'content');
     };
 
     const keydownAction = (e) => {
@@ -33,15 +44,12 @@ export default {
       setFocusBlock(props.block.id);
     };
 
-    const unFocusToBlock = () => {
-      setFocusBlock('');
-    };
-
     return {
       inputToBlockContent,
       keydownAction,
       focusToBlock,
-      unFocusToBlock,
+      pasteBlocksAction,
+      // unFocusToBlock,
     };
   },
 };

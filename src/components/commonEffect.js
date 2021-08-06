@@ -3,6 +3,16 @@ import { ref } from 'vue';
 const generateRandomString = () => Math.random().toString(36).substr(2, 14)
   + Date.now().toString(36).substr(4, 14);
 
+// https://stackoverflow.com/questions/23601792/get-only-light-colors-randomly-using-javascript/23603772
+const getRandomLightColor = () => {
+  const letters = 'BCDEF'.split('');
+  let color = '#';
+  for (let i = 0; i < 6; i += 1) {
+    color += letters[Math.floor(Math.random() * letters.length)];
+  }
+  return color;
+};
+
 const commonArrEffect = () => {
   const arrayList = () => {
     const arr = {
@@ -34,6 +44,14 @@ const commonArrEffect = () => {
   return {
     arrayList,
   };
+};
+
+const insertIds = (oldIds, addIds, spliceFunctionArr) => {
+  const ids = [...oldIds];
+
+  Array.prototype.splice.apply(ids, spliceFunctionArr(ids));
+
+  return ids;
 };
 
 const commonStringEffect = () => {
@@ -86,33 +104,6 @@ const waitSecondAndCallBack = async (second, callback) => new Promise((resolve) 
   }, second * 1000);
 });
 
-// const sizeChangeEffect = (minSize, maxSize) => {
-//   const size = ref(0);
-//   const prevSize = ref(0);
-
-//   const getSizeInRange = (offset) => {
-//     size.value = prevSize.value + offset;
-//     if (size.value > maxSize) size.value = maxSize;
-//     if (size.value < minSize) size.value = minSize;
-//     return size.value;
-//   };
-
-//   const setSize = (value) => {
-//     size.value = value;
-//   };
-
-//   const get
-
-//   const setPrevSize = (value) => {
-//     prevSize.value = value;
-//   }
-
-//   const setSizeToPrevSize = () => {
-//     prevSize.value = size.value;
-//   };
-
-// }
-
 export {
   commonArrEffect,
   commonStringEffect,
@@ -121,4 +112,6 @@ export {
   transTimeStampToLocalTime,
   waitSecondAndCallBack,
   generateRandomString,
+  getRandomLightColor,
+  insertIds,
 };

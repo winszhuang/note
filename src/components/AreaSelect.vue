@@ -1,9 +1,9 @@
 <template>
-  <div class="test">
+  <!-- <div class="test">
     {{ currentSelectedIds }}
     <br>
     {{ selectedBlocksIds }}
-  </div>
+  </div> -->
   <div id="area-select"
     :style="{
       left: `${selector.left}px`,
@@ -34,11 +34,17 @@ export default {
       mouseMove,
       selector,
       currentSelectedIds,
+      isAreaSelectActive,
     } = useAreaSelectEffect(currentBlocksIds, isBoxACollisionB);
 
     watch(() => currentSelectedIds, (curr) => {
       store.commit('blocks/setSelectedBlocksIds', [...curr]);
     }, { deep: true });
+
+    watch(isAreaSelectActive, (curr) => {
+      // console.log(curr);
+      store.commit('setIframeActive', !curr);
+    });
 
     document.addEventListener('mousedown', mouseDown);
     document.addEventListener('mouseup', mouseUp);

@@ -1,9 +1,9 @@
 $colors: (
-  default: #584d58,
-  orange: #f1ad5f,
-  red: #e74141,
-  blue: #5591e0,
-  yellow: #ecbc1f,
+  default: #685d68,
+  orange: #f18238,
+  red: #df4a4a,
+  blue: #4c90e9,
+  yellow: #fbb05a,
   green: #28c850,
   purple: #8632ca,
   pink: #db2571,
@@ -24,7 +24,7 @@ $bg-colors: (
 
 @each $name, $value in $colors {
   .style-text-color__#{$name} {
-    color: $value;
+    color: $value !important;
   }
 
   .style-border__#{$name} {

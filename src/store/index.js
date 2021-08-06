@@ -2,7 +2,6 @@
 import { createStore } from 'vuex';
 import pages from './modules/pages';
 import blocks from './modules/blocks';
-import groups from './modules/groups';
 import userInfo from './modules/userInfo';
 import { waitSecondAndCallBack } from '../components/commonEffect';
 
@@ -126,6 +125,8 @@ export default createStore({
       currentWidth: '',
     },
     windowWidth: '',
+    dragStartIds: '',
+    isIframeActive: false,
   },
   mutations: {
     // 把FS的資料全部取到state中
@@ -148,6 +149,14 @@ export default createStore({
     setCurrentSidebarWidth(state, width) {
       state.sidebarState.currentWidth = width;
     },
+
+    setDragStartIds(state, ids) {
+      state.dragStartIds = ids;
+    },
+
+    setIframeActive(state, isTrueOrFalse) {
+      state.isIframeActive = isTrueOrFalse;
+    },
   },
   getters: {
     getClassNameOfBlockType(state) {
@@ -158,7 +167,7 @@ export default createStore({
     resetStoreData({ commit }) {
       commit('pages/resetPages', null, { root: true });
       commit('blocks/resetBlocks', null, { root: true });
-      commit('groups/resetGroups', null, { root: true });
+      // commit('groups/resetGroups', null, { root: true });
       // commit('userInfo/resetUserInfo', null, { root: true });
     },
 
@@ -183,7 +192,6 @@ export default createStore({
   modules: {
     pages,
     blocks,
-    groups,
     userInfo,
   },
 });

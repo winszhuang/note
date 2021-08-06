@@ -113,6 +113,14 @@ export default {
       color: '',
     });
 
+    const setBlockColor = (color) => {
+      blockDress.color = color;
+    };
+
+    const setBlockStyle = (style) => {
+      blockDress.style = style;
+    };
+
     const setBlockDressByClassName = (className) => {
       if (className === '') {
         blockDress.style = '';
@@ -128,14 +136,13 @@ export default {
     // 剛進入BlockStyleEditor的處理程序
     watch(() => props.isShow, (curr, prev) => {
       if (prev === true || curr === false) return;
+
       if (selectedBlocks.value.length === 1) {
         const block = selectedBlocks.value[0];
         setBlockDressByClassName(block.className);
         return;
-        // if (block.className === '') {
-        //   setClassNameToBlock(block, 'style-text-color__default');
-        // }
       }
+
       const classNameOfFirstBlock = selectedBlocks.value[0].className;
       console.log(classNameOfFirstBlock);
       if (selectedBlocks.value.every((block) => block.className === classNameOfFirstBlock)) {
@@ -149,19 +156,22 @@ export default {
 
     watch(() => blockDress, (curr) => {
       if (blockDress.style === '' && blockDress.color === '') return;
+
+      if (blockDress.color !== '' && blockDress.style === '') {
+        setBlockStyle(styles[0].className);
+        return;
+      }
+
+      if (blockDress.style !== '' && blockDress.color === '') {
+        setBlockColor(colors[0].name);
+        return;
+      }
+
       selectedBlocks.value.forEach((block) => {
         console.log(`${curr.style}__${curr.color}`);
         setClassNameToBlock(block, `${curr.style}__${curr.color}`);
       });
     }, { deep: true });
-
-    const setBlockColor = (color) => {
-      blockDress.color = color;
-    };
-
-    const setBlockStyle = (style) => {
-      blockDress.style = style;
-    };
 
     const checkAction = () => {
       emit('hiddenStyleEditor');

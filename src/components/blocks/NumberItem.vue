@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex">
     <div class="prefix">{{ index + 1 }}. </div>
-    <P :block="block" :data-group-id="group.id"/>
+    <P :block="block"/>
   </div>
 </template>
 
@@ -18,10 +18,20 @@ export default {
   },
   setup(props) {
     const store = useStore();
-    const group = computed(() => store.getters['groups/getGroupByBlock'](props.block));
-    const index = computed(() => store.getters['groups/getIndexFromGroupByBlock'](props.block));
 
-    return { group, index };
+    const getPrevBlockById = (id) => computed(() => store.getters['blocks/getPrevBlockByid'](id));
+
+    const index = computed(() => {
+      let number = 0;
+      let currentBlock = { ...props.block };
+      while (getPrevBlockById(currentBlock.id)?.value?.type === currentBlock.type) {
+        number += 1;
+        currentBlock = getPrevBlockById(currentBlock.id).value;
+      }
+      return number;
+    });
+
+    return { index };
   },
 };
 </script>

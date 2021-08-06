@@ -7,16 +7,35 @@
 </template>
 
 <script>
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+
+const useDragBlockStartEffect = (block) => {
+  const store = useStore();
+  const selectedBlocksIds = computed(() => store.state.blocks.selectedBlocksIds);
+
+  const handleDrag = (e) => {
+    if (selectedBlocksIds.value.includes(block.id)) {
+      store.commit('setDragStartIds', [...selectedBlocksIds.value]);
+      return;
+      // e.dataTransfer.setData('text/plain', ids);
+    }
+    const el = document.querySelector(`[data-block-id="${block.id}"]`);
+    e.dataTransfer.setDragImage(el, -10, 10);
+    store.commit('setDragStartIds', [block.id]);
+    // e.dataTransfer.setData('text/plain', block.id);
+  };
+
+  return {
+    handleDrag,
+  };
+};
 
 export default {
   name: 'DragItem',
   props: ['block'],
   setup(props) {
-    const handleDrag = (e) => {
-      const el = document.getElementById(props.block.id).closest('.block-content');
-      e.dataTransfer.setDragImage(el, 0, 0);
-      e.dataTransfer.setData('text/plain', props.block.id);
-    };
+    const { handleDrag } = useDragBlockStartEffect(props.block);
 
     return { handleDrag };
   },

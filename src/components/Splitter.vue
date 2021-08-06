@@ -4,7 +4,6 @@
 
 <script>
 import { onMounted } from 'vue';
-// import { ref } from 'vue';
 import commonDomEffect from './commonDomEffect';
 
 export default {

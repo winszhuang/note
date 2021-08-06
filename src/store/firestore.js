@@ -58,7 +58,7 @@ export const setUserDataToFS = async (data) => new Promise((resolve, reject) => 
 export const updateStoreToFS = async () => {
   const pages = computed(() => store.state.pages.pages);
   const blocks = computed(() => store.state.blocks.blocks);
-  const groups = computed(() => store.state.groups.groups);
+  // const groups = computed(() => store.state.groups.groups);
   const userInfo = computed(() => store.state.userInfo.userInfo);
 
   console.log(userInfo.value);
@@ -67,7 +67,7 @@ export const updateStoreToFS = async () => {
     userInfo: userInfo.value,
     pages: pages.value,
     blocks: blocks.value,
-    groups: groups.value,
+    // groups: groups.value,
   };
   await setUserDataToFS(info);
 };

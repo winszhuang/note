@@ -3,7 +3,7 @@
       type="button"
       :data-pageid="block.content"
       :id=block.id
-      @click="goCurrentPage(targetPage.id)">
+      @click="goCurrentPage(block.content)">
     <div class="prefix" :data-pageid="block.content">
       <font-awesome-icon :icon="['far', 'file']"/>
     </div>

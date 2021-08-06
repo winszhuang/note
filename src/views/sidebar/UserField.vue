@@ -96,7 +96,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../../style/color.scss';
+@import '../../style/component/sidebar/_sidebar-utils.scss';
 .topfield{
   width: inherit;
   position: relative;
@@ -114,7 +114,7 @@ export default {
     height: 2.5rem;
     line-height: 2.5rem;
     text-align: center;
-    background: #1B998B;
+    background: #c87a30;
     color: #ebebeb;
     margin-right: .5rem;
     font-size: 1.3rem;
@@ -135,7 +135,7 @@ export default {
       font-weight: bold;
       line-height: 1.3rem;
       margin-top: .2rem;
-      color: #C4C1BF;
+      color: #afafaf;
     }
     &-email{
       transform: scale(.8);
@@ -146,13 +146,13 @@ export default {
     }
   }
   &:hover{
-    background: #5c525e;
-    color: #c9c0c2;
+    background: $item-hover-bc;
+    color: $color;
   }
 }
 
 .left-collapse{
-  color: #b8b8b8;
+  color: $color;
   position: absolute;
   right: 0;
   top: 0;
@@ -162,7 +162,7 @@ export default {
   justify-content: center;
   align-items: center;
   &:hover{
-    background: #5c525e;
+    background: $item-active-bc;
   }
 }
 </style>

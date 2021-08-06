@@ -1,9 +1,11 @@
 <template>
-  <div class="scale-controller">
+  <div class="scale-controller" ref="scontroller">
     <div class="scale-area">
       <div class="scale-compression"
             :style="{ width: width > 0 ? `${width}px` : 0 }"></div>
-      <div class="scale-object" :style="{ height: `${getHeight}` }" :id="id">
+      <div class="scale-object"
+            :id="id"
+            :style="{ height: `${getHeight}` }">
         <slot :isActive="isActive"></slot>
         <transition>
           <div class="scale-handle-left" v-show="isShow">
@@ -25,41 +27,67 @@
 </template>
 
 <script>
-import { computed, onMounted, ref } from 'vue';
+import {
+  computed,
+  // nextTick,
+  onMounted,
+  ref,
+} from 'vue';
 import { showEffect } from './commonEffect';
+// import { useStore } from 'vuex';
+// import commonUpdateEffect from '../views/commonUpdataEffect';
 
 export default {
   name: 'ScaleController',
-  props: ['aspectRatio', 'id', 'min-width'],
-  setup(props) {
+  props: [
+    'aspectRatio',
+    'min-width',
+    'max-width',
+    'once-compression-width',
+    'id',
+  ],
+  emits: ['getCompressionWidth'],
+  setup(props, { emit }) {
+    // const store = useStore();
+    // const
     let prevWidth = 0;
     const offsetX = ref('');
     const width = ref(0);
     const isActive = ref('false');
     const { isShow, handleShow } = showEffect();
+    // const scaleobject = ref(null);
 
     const getHeight = computed(() => {
       if (!props.aspectRatio) return 'auto';
+
+      const container = document.getElementsByClassName('blockcontent')[0];
+      if (!container) return 'auto';
+
+      const containerBounding = container.getBoundingClientRect();
       const aspectRatio = props.aspectRatio[0] / props.aspectRatio[1];
-      const container = document.getElementsByClassName('blockcontent')[0].getBoundingClientRect();
-      return `${(container.width - width.value * 2) / aspectRatio}px`;
+      const height = `${(containerBounding.width - width.value * 2) / aspectRatio}px`;
+      console.log(height);
+      return height;
     });
 
+    const emitCompressionWidth = () => {
+      // console.log(width.value);
+      emit('getCompressionWidth', width.value);
+    };
+
     onMounted(() => {
+      const scaleobject = document.getElementById(props.id);
+      // console.log(scaleobject);
+      console.log(props.onceCompressionWidth);
+      prevWidth = props.onceCompressionWidth;
+      width.value = props.onceCompressionWidth;
       isActive.value = false;
-      // const scaleHandleLeft = document.getElementsByClassName('scale-handle-left')[0];
-      // const scaleHandleRight = document.getElementsByClassName('scale-handle-right')[0];
-      // const {
-      //   mouseDown,
-      //   mouseMove,
-      //   mouseUp,
-      // } = getMouseOffsetByClickElAndMove();
 
       let rightX = 0;
       let leftX = 0;
       let leftOrRightHandle = '';
 
-      const scaleObject = document.getElementById(props.id);
+      // const scaleobject = document.getElementById(props.id);
 
       const mouseMoveLeft = (e) => {
         if (isActive.value === false) return;
@@ -72,6 +100,7 @@ export default {
         if (width.value < 0) {
           width.value = 0;
         }
+        emitCompressionWidth();
       };
 
       const mouseMoveRight = (e) => {
@@ -85,6 +114,7 @@ export default {
         if (width.value < 0) {
           width.value = 0;
         }
+        emitCompressionWidth();
       };
 
       const mouseUp = () => {
@@ -110,29 +140,24 @@ export default {
         leftOrRightHandle = 'right';
       };
 
-      scaleObject.addEventListener('mouseenter', () => {
+      scaleobject.addEventListener('mouseenter', () => {
         handleShow(true);
       });
 
-      scaleObject.addEventListener('mouseleave', () => {
+      scaleobject.addEventListener('mouseleave', () => {
         handleShow(false);
       });
 
-      scaleObject.querySelector('.scale-handle-left').addEventListener('mousedown', mouseDownLeft);
-      scaleObject.querySelector('.scale-handle-right').addEventListener('mousedown', mouseDownRight);
+      scaleobject.querySelector('.scale-handle-left').addEventListener('mousedown', mouseDownLeft);
+      scaleobject.querySelector('.scale-handle-right').addEventListener('mousedown', mouseDownRight);
       document.addEventListener('mousemove', mouseMoveLeft);
       document.addEventListener('mousemove', mouseMoveRight);
       document.addEventListener('mouseup', mouseUp);
     });
 
     return {
-      // mouseDownInElement,
-      // mouseMove,
-      // mouseUp,
       offsetX,
-      // setOffsetX,
       isShow,
-      // multiEvent,
       getHeight,
       prevWidth,
       width,

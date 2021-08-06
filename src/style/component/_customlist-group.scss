@@ -1,10 +1,11 @@
+@import './sidebar/sidebar-utils';
+
 .customlist-group {
   display: flex;
   flex-direction: column;
   margin-bottom: 1rem;
   overflow: auto;
 }
-
 
 // 單個list (裡面可塞多個東西)
 .customlist-group-item {
@@ -14,22 +15,27 @@
   display: flex;
   padding: 0 1rem;
   // color: #969293;
-  color: #8a8687;
+  color: $color;;
   &:hover,
   &:focus{
-    background: #5c525e;
-    color: #c9c0c2;
+    background-color: $item-hover-bc;
+    color: $color;
+    // background: #5c525e;
+    // color: #c9c0c2;
   }
 
   &:active{
-    background: #716574;
+    background-color: $item-active-bc;
+    color: $color;
+    // background: #dad9d3;
   }
 
-}
+  &-action {
+    background-color: $item-action-bc;
+    color: $color;
+    font-weight: 700;
+  }
 
-.customlist-group-item-action {
-  background: #5c525e;
-  color: #c9c0c2 !important;
 }
 
 // 單個list裡面的文字'
@@ -51,27 +57,3 @@
   overflow: hidden;
 }
 
-// &.disabled,
-  // &:disabled {
-  //   color: $list-group-disabled-color;
-  //   pointer-events: none;
-  //   background-color: $list-group-disabled-bg;
-  // }
-
-  // Include both here for `<a>`s and `<button>`s
-  // &.active {
-  //   z-index: 2; // Place active items above their siblings for proper border styling
-  //   color: $list-group-active-color;
-  //   background-color: rgb(243, 73, 73);
-  //   // background-color: $list-group-active-bg;
-  //   // border-color: $list-group-active-border-color;
-  // }
-
-  // & + & {
-  //   border-top-width: 0;
-
-  //   &.active {
-  //     margin-top: -$list-group-border-width;
-  //     // border-top-width: $list-group-border-width;
-  //   }
-  // }

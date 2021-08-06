@@ -36,6 +36,8 @@ const commonDomEffect = () => {
     }
 
     if (blob !== null) {
+      console.log(blob);
+      console.log(blob.size);
       const reader = new FileReader();
       reader.onload = (e) => {
         resolve(e.target.result);
@@ -45,6 +47,24 @@ const commonDomEffect = () => {
       };
       reader.readAsDataURL(blob);
     }
+  });
+
+  const getBlobByClipBoardData = async (ev) => new Promise((resolve, reject) => {
+    const { items } = ev.clipboardData || ev.originalEvent.clipboardData;
+    // find pasted image among pasted items
+    let blob = null;
+    for (let i = 0; i < items.length; i += 1) {
+      if (items[i].type.indexOf('image') === 0) {
+        blob = items[i].getAsFile();
+      }
+    }
+
+    if (blob !== null) {
+      console.log(blob);
+      console.log(blob.size);
+      resolve(blob);
+    }
+    reject();
   });
 
   const getMouseOffsetByClickElAndMove = () => {
@@ -161,6 +181,7 @@ const commonDomEffect = () => {
     getElementsByIdsInArr,
     getElementBySelector,
     getDataURLByClipBoardData,
+    getBlobByClipBoardData,
     dragDropEffect,
     getMouseOffsetByClickElAndMove,
     isMouseInsideElement,

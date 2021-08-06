@@ -7,6 +7,7 @@ export default {
     blocks: [],
     currentFocusBlockId: '',
     selectedBlocksIds: [],
+    clipboardBlocks: [],
     hiddenBlocksIds: [],
     blockStyleEditor: {
       isShow: false,
@@ -43,9 +44,9 @@ export default {
       block.blocks.splice(index, 1);
     },
 
-    changeGroupIdFromBlockId(state, { blockId, groupId }) {
-      findInStoreById(state.blocks, blockId).group = groupId;
-    },
+    // changeGroupIdFromBlockId(state, { blockId, groupId }) {
+    //   findInStoreById(state.blocks, blockId).group = groupId;
+    // },
 
     // 處理currentFocusBlockId
     editBlockData(state, { id = state.currentFocusBlockId, value, key = 'content' }) {
@@ -102,6 +103,10 @@ export default {
     setStyleEditorShow(state, isTrueOrFalse) {
       state.blockStyleEditor = isTrueOrFalse;
     },
+
+    setClipboardBlocks(state, blocks) {
+      state.clipboardBlocks = [...blocks];
+    },
   },
   getters: {
     // 回傳當前page裡面包含的所有blocks
@@ -127,18 +132,18 @@ export default {
     },
 
     searchBlocks(state) {
-      return (str) => (str !== '' ? state.blocks.filter((block) => block.content.includes(str)) : null);
+      return (str) => (str !== '' ? state.blocks.filter((block) => block.content?.text?.includes(str)) : null);
     },
 
     isIdInHiddenBlocksIds(state) {
       return (id) => state.hiddenBlocksIds.includes(id);
     },
 
-    getIndexFromCurrentBlocksByBlock(state, getters) {
-      return (block) => getters.currentBlocks.indexOf(block);
+    getIndexByBlockId(state, getters) {
+      return (id) => getters.currentBlocksIds.indexOf(id);
     },
 
-    getLastBlockByid(state, getters) {
+    getPrevBlockByid(state, getters) {
       return (id) => {
         const index = getters.currentBlocksIds.indexOf(id);
         if (index === 0) return null;
@@ -174,6 +179,10 @@ export default {
       });
       return allIds;
     },
+
+    getClipboardBlocksIds(state) {
+      return state.clipboardBlocks.map((block) => block.id);
+    },
   },
   actions: {
     addBlock({ commit, rootState }, {
@@ -183,7 +192,6 @@ export default {
         type: 'p',
         content: '',
         blocks: [],
-        group: '',
         parentId: '',
         className: 'style-text-color__default',
       },
@@ -203,14 +211,18 @@ export default {
       block = {
         id: generateRandomString(),
         type: 'p',
-        content: '',
+        content: {
+          text: '',
+          html: '',
+        },
         blocks: [],
-        group: '',
+        // group: '',
         parentId: '',
         className: 'style-text-color__default',
       },
+      index,
     }) {
-      dispatch('addBlock', { block, page });
+      dispatch('addBlock', { block, page, index });
       commit('blocks/setFocusBlockById', block.id, { root: true });
     },
 
@@ -345,13 +357,13 @@ export default {
       commit('setFocusBlockById', block.id);
     },
 
-    changeGroupIdFromBlocksIds({ commit }, { blocksIds, groupId }) {
-      blocksIds.forEach((blockId) => {
-        commit('changeGroupIdFromBlockId', {
-          blockId,
-          groupId,
-        });
-      });
-    },
+    // changeGroupIdFromBlocksIds({ commit }, { blocksIds, groupId }) {
+    //   blocksIds.forEach((blockId) => {
+    //     commit('changeGroupIdFromBlockId', {
+    //       blockId,
+    //       groupId,
+    //     });
+    //   });
+    // },
   },
 };

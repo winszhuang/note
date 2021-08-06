@@ -4,6 +4,7 @@
 html {
   font-family: 'Noto Sans TC', sans-serif;
   font-size: 14px;
+  // color: #4d464d;
 }
 
 body {
@@ -55,7 +56,10 @@ div[contenteditable] {
   width: 100%;
   // color: #494949;
   // color: #645b66;
-  color: #584d58;
+  // color: #6d626d;
+  // color: #685d68;
+  // color: #5f575f;
+  // color: #4d464d;
   background: transparent;
   border: none;
   outline: none;
@@ -85,18 +89,18 @@ div[contenteditable] {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #3a343b; 
+  background: #e2e1db; 
 }
  
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #555; 
+  background: #cfcfcd; 
   border-radius: 5px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #888; 
+  background: #b8b8b5; 
 }
 
 .v-enter-active,

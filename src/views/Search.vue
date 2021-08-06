@@ -41,7 +41,7 @@
               </div>
             </div>
             <!-- {{ getBlockContentWithKeyword(block) }} -->
-            <div class="search-content" v-html="getContentWithKeyword(block.content)"></div>
+            <div class="search-content" v-html="getContentWithKeyword(block.content?.text)"></div>
             <!-- {{ block.content }} -->
           </div>
         </div>
@@ -139,7 +139,8 @@ export default {
 
 $search-border-bottom: .05rem solid rgb(212, 212, 212);
 .search{
-  height: 100%;
+  height: 55vh;
+  width: 35vw;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
   background: #faf9f2;
   border-radius: .3rem;

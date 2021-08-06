@@ -1,4 +1,4 @@
-import { computed } from 'vue';
+// import { computed } from 'vue';
 import { useStore } from 'vuex';
 import { setDataToLS } from './localStorageEffect';
 
@@ -14,12 +14,6 @@ const watchStoreEffect = () => {
   const updateBlocksToLSByWatching = () => {
     store.watch((state) => state.blocks.blocks, (curr) => {
       setDataToLS('blocks', curr);
-    }, { deep: true });
-  };
-
-  const updateGroupsToLSByWatching = () => {
-    store.watch((state) => state.groups.groups, (curr) => {
-      setDataToLS('groups', curr);
     }, { deep: true });
   };
 
@@ -45,7 +39,6 @@ const watchStoreEffect = () => {
         'blocks/deleteIdToBlocksOfPage',
         'blocks/deleteIdsToHiddenBlocksIds',
         'blocks/resetHiddenBlocksIds',
-        'groups/resetGroups',
         'userInfo/resetUserInfo',
         'userInfo/setUserInfo',
         'userInfo/deleteIdFromPageHistory',
@@ -108,16 +101,16 @@ const watchStoreEffect = () => {
 
     // }
 
-    const checkGroupEmptyAndDelete = (mutation) => {
-      if (mutation.type !== 'groups/deleteIdToGroup') return;
-      const { groupId } = mutation.payload;
-      const group = computed(() => store.getters['groups/getGroupById'](groupId));
-      if (group.value.blocks.length === 0) {
-        setTimeout(() => {
-          store.commit('groups/deleteGroup', group.value);
-        }, 1000);
-      }
-    };
+    // const checkGroupEmptyAndDelete = (mutation) => {
+    //   if (mutation.type !== 'groups/deleteIdToGroup') return;
+    //   const { groupId } = mutation.payload;
+    //   const group = computed(() => store.getters['groups/getGroupById'](groupId));
+    //   if (group.value.blocks.length === 0) {
+    //     setTimeout(() => {
+    //       store.commit('groups/deleteGroup', group.value);
+    //     }, 1000);
+    //   }
+    // };
 
     store.subscribe((mutation, state) => {
       updateEditTimeOfPageBySubscribe(mutation, state);
@@ -129,14 +122,14 @@ const watchStoreEffect = () => {
       });
       updatePageHistory(mutation);
       // listenBlockDeleteAnd(mutation);
-      checkGroupEmptyAndDelete(mutation);
+      // checkGroupEmptyAndDelete(mutation);
     });
   };
 
   return {
     updatePagesToLSByWatching,
     updateBlocksToLSByWatching,
-    updateGroupsToLSByWatching,
+    // updateGroupsToLSByWatching,
     storeObserver,
   };
 };

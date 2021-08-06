@@ -50,7 +50,7 @@ export default {
           userData.value = {
             pages: getDataFromLS('pages'),
             blocks: getDataFromLS('blocks'),
-            groups: getDataFromLS('groups'),
+            // groups: getDataFromLS('groups'),
             userInfo: getDataFromLS('userInfo'),
           };
         } else {
@@ -93,7 +93,7 @@ export default {
           store.dispatch('resetStoreData');
           deleteDataFromLS('pages');
           deleteDataFromLS('blocks');
-          deleteDataFromLS('groups');
+          // deleteDataFromLS('groups');
           deleteDataFromLS('userInfo');
         }
         router.push('/signin');

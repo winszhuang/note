@@ -8,8 +8,6 @@
 </template>
 
 <script>
-import { computed } from 'vue';
-import { useStore } from 'vuex';
 import P from './P.vue';
 
 export default {
@@ -17,12 +15,6 @@ export default {
   props: ['block'],
   component: {
     P,
-  },
-  setup(props) {
-    const store = useStore();
-    const index = computed(() => store.getters['groups/getIndexFromGroupByBlock'](props.block));
-
-    return { index };
   },
 };
 </script>

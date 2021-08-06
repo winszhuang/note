@@ -29,7 +29,7 @@
           @keydown="handleKeyDownIntagInput($event)">
         <template v-if="page.tags.length !== 0">
           <div class="tag" type="button"
-              :style="{ background: `#${tag.color}` }"
+              :style="{ 'background-color': `${tag.color}` }"
               v-for="(tag) in page.tags"
               :key="page.id + tag"
               @click="deleteTag($event, tag)">
@@ -136,9 +136,9 @@ export default {
 <style lang="scss" scoped>
 .pageinfo{
   font-size: 13px;
-  border-bottom: .05rem solid #dbdbdb;
+  border-bottom: 1px solid #dbdbdb;
   margin-top: 1.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   padding-bottom: .5rem;
   &-item{
     display: flex;

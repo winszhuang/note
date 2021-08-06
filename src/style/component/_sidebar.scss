@@ -1,25 +1,46 @@
+@import './sidebar/sidebar-utils';
+
 .sidebar{
   position: relative;
-  background-color: #433c44;
+  // background-color: #ecebe7;
+  background-color: $sidebar-bc;
+  // background-color: #433c44;
   z-index: 2;
   overflow: hidden;
   flex: none;
   width: 23rem;
   height: 100vh;
-  box-shadow: .05rem 0rem .2rem .05rem rgb(160, 160, 160);
+  // box-shadow: .05rem 0rem .2rem .05rem rgb(160, 160, 160);
+  box-shadow: 0 0 4px 0 $shadow-color;
   display: flex;
   flex-direction: column;
   -webkit-transition: all 0.5s ease-in-out;
   transition: all 0.5s ease-in-out;
+  // transition: width .4s ease-in-out .1s;
   &-footer{
     margin-top: auto;
     overflow-x: hidden;
+    box-shadow: 0 0 2px 0 $shadow-color;
+    .addpage{
+      line-height: 3rem;
+      // height: 2.5rem;
+      color: $color;
+      &-text{
+        padding-left: 35%;
+      }
+      &-small{
+        color: #636363;
+      }
+      &:hover{
+        background: $item-hover-bc;
+      }
+    }
   }
 }
 
 .sidebar-float{
   position: absolute !important;
-  background-color: rgba($color: #433c44, $alpha: 0.96);
+  background-color: rgba($color: $sidebar-bc, $alpha: 0.96);
 }
 
 .field-title{
@@ -33,4 +54,6 @@
 .scollitem{
   flex: 1;
   overflow-y: auto;
+  // border-top: 1px solid rgb(187, 187, 187);
+  // box-shadow: 0 4px 2px 0 gray;
 }

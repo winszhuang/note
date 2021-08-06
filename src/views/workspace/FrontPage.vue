@@ -3,7 +3,7 @@
   <div class="base-container">
     <div class="base-title">
       <div class="base-title-first">N</div>
-      <div class="base-title-second">ote</div>
+      <!-- <div class="base-title-second">ote</div> -->
     </div>
     <div class="base-small">區塊構成的世界...</div>
     <div class="base-intro">
@@ -12,7 +12,7 @@
       <br>
       <div class="base-intro-text">
         <p>使用不同的區塊工具</p>
-        <p>來記錄文字、影片、圖像等載體...</p>
+        <p>來記錄<span>文字</span>、影片、圖像等載體...</p>
         <p></p>
         <p></p>
         <!-- <p>使用區塊工具</p>
@@ -51,9 +51,9 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #faf9f2;
   &-title{
     width: 100%;
+    color: #685d68;
     color: #504952;
     height: 12rem;
     // margin-top: 12rem;
@@ -63,15 +63,17 @@ export default {
     &-first{
       // background: #504952;
       // background: #645b66;
-      background: #584d58;
+      // background: #584d58;
+      // background: #685d68;
+      background: #575157;
       color: #F1F0EA;
       // color: #645b66;
       font-size: 8rem;
       font-weight: bold;
       line-height: 9rem;
-      box-shadow: .2rem .2rem .3rem .1rem #a1a1a1;
+      box-shadow: 2px 1px 6px 0 #afafaf;
       border-radius: .5rem;
-      margin: 0 .1rem 0 1.5rem;
+      // margin: 0 .1rem 0 1.5rem;
       padding: 0 .7rem;
     }
     &-second{
@@ -93,14 +95,18 @@ export default {
   &-intro{
     text-align: center;
     color: #5f5661;
-    margin-top: 4rem;
+    margin-top: 3rem;
     &-quote{
+      margin-left: .5rem;
       font-size: 1.3rem;
       font-weight: bold;
-      color: #676269;
+      color: #69646b;
     }
     &-text{
       color: #807883;
+      p {
+        margin-bottom: .5rem;
+      }
     }
   }
 }

@@ -5,7 +5,7 @@
       @mouseenter="handleShow(true)"
       @mouseleave="handleShow(false)"
       :style="{ 'margin-left': `${getLevelOfBlock(block)*1.65}rem`,
-                'border-bottom': isUnderMouseInDrag
+                'border-bottom': isUnderMouseOnDrag
                   ? '.3rem solid rgb(134, 193, 241)' : 'none' }">
     <div class="block-tools">
       <transition name="drag">
@@ -21,15 +21,17 @@
                   v-show="isShow"/>
       </transition>
     </div>
-    <div class="block-content"
-        :class="{ 'block-selected': isSelected }"
-        @drop="$emit('drop', $event)"
-        @dragenter="$emit('dragenter', $event)"
-        @dragover="$emit('dragover', $event)">
-      <component
-          :is="getFirstToUpper(block.type)"
-          :block="block">
-      </component>
+    <div style="width: 100%;" :class="block.className">
+      <div class="block-content"
+          :class="{ 'block-selected': isSelected }"
+          @drop="$emit('drop', $event)"
+          @dragenter="$emit('dragenter', $event)"
+          @dragover="$emit('dragover', $event)">
+        <component
+            :is="getFirstToUpper(block.type)"
+            :block="block">
+        </component>
+      </div>
     </div>
   </div>
 </template>
@@ -43,7 +45,7 @@ import DragItem from './DragItem.vue';
 
 export default {
   name: 'Block',
-  props: ['block', 'isSelected', 'isUnderMouseInDrag'],
+  props: ['block', 'isSelected', 'isUnderMouseOnDrag'],
   components: { DragItem },
   setup() {
     const store = useStore();
