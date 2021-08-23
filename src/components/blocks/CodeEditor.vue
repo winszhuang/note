@@ -1,85 +1,117 @@
 <template>
-  <!-- eslint-disable-next-line max-len -->
-  <pre class='language-javascript' id="code-editor"><code class='language-javascript' v-text="codeText"></code>
-    <div class="code-input"
-        :id="block.id"
-        contenteditable="plaintext-only"
-        spellcheck="false"
-        @input="editCodeText($event)"
-        @keydown="handleCodeEditInKeyDown($event)"></div>
-  </pre>
-  <!-- <div class="code-input"
-        :id="block.id"
-        contenteditable="plaintext-only"
-        spellcheck="false"
-        @input="editCodeText($event)"
-        @keydown="handleCodeEditInKeyDown($event)"></div> -->
+  <div class="code-container" :style="{ height: `${editorHeight}px` }">
+    <pre class='language-javascript'
+        id="code-editor"
+        :scrollLeft="scrollLeft"
+        :style="{ height: `${editorHeight}px`,  }"
+        ><code class='language-javascript' v-text="codeText"></code>
+    </pre>
+    <ContentEditable
+      :placeholder="placeholderInfo"
+      :id="block.id"
+      :className="'editor'"
+      :value="block.content.text"
+      @input="editCodeText"
+      @keydown="tabAction"
+      @paste="pasteAction"
+      @focus="() => setFocusBlock(block.id)"
+      @scroll="setScrollLeft"/>
+  </div>
 </template>
 
 <script>
 import Prism from 'prismjs';
 import '../../style/prism.css';
-import { nextTick, onMounted, ref } from 'vue';
-// import ContentEditable from '../input/ContentEditable.vue';
+import {
+  // computed,
+  nextTick,
+  onMounted,
+  ref,
+  watch,
+} from 'vue';
+import ContentEditable from '../input/ContentEditable.vue';
+import codeEditorEffect from '../codeEditorEffect';
+import commonUpdateEffect from '../../views/commonUpdataEffect';
 
 export default {
   name: 'CodeEditor',
   props: ['block'],
-  // components: { ContentEditable },
-  setup() {
-    // const adjustCodeInputHeight = () => {
+  components: { ContentEditable },
+  setup(props) {
+    const placeholderInfo = '輸入或貼上code...\ntab鍵往前縮排、shift + tab往後縮排\n搭配反白文字範圍可以多行縮排';
 
-    // }
-    onMounted(() => {
-      Prism.highlightAll();
-      const codeInput = document.querySelector('.code-input');
-      const codeTag = codeInput.previousElementSibling;
-      console.log(codeTag.clientHeight);
-      if (codeTag.clientHeight < 40) {
-        codeInput.style.height = '60px';
-      } else {
-        codeInput.style.height = `${codeTag.clientHeight}px`;
-      }
-      // console.log(editor.clientHeight);
-    });
+    const {
+      editBlockData,
+      setFocusBlock,
+    } = commonUpdateEffect();
+
+    const {
+      handleIndent,
+      handlePaste,
+      generateTextAndWrapNodes,
+    } = codeEditorEffect();
+
+    const scrollLeft = ref('');
+    const setScrollLeft = (e) => {
+      scrollLeft.value = e.target.scrollLeft;
+    };
+
+    const editorHeight = ref(0);
+    const setEditorHeight = (height) => {
+      editorHeight.value = height;
+    };
 
     const codeText = ref('');
+    const setCodeText = (text) => {
+      codeText.value = text;
+    };
+
+    const updateCodeTextAndEditorHeight = (container) => {
+      nextTick(() => {
+        setCodeText(container.innerText);
+        setEditorHeight(container.getBoundingClientRect().height);
+      });
+    };
+
+    const tabAction = (e) => {
+      if (e.key !== 'Tab') return;
+      handleIndent(e);
+      updateCodeTextAndEditorHeight(e.currentTarget);
+    };
+
+    const pasteAction = (e) => {
+      handlePaste(e);
+      updateCodeTextAndEditorHeight(e.currentTarget);
+    };
+
+    const changeToMultiNode = (container) => {
+      if (container.childNodes.length > 1) return;
+      const fragment = generateTextAndWrapNodes(container.innerText);
+      container.replaceChildren();
+      container.appendChild(fragment);
+    };
+
+    onMounted(() => {
+      const editor = document.getElementById(props.block.id);
+      changeToMultiNode(editor);
+
+      updateCodeTextAndEditorHeight(editor);
+    });
 
     const editCodeText = (e) => {
-      // console.log(e.target.textContent);
-      // console.log(e.target.innerText);
-      // console.log(e.target.innerText);
-      codeText.value = e.target.innerText;
-      nextTick(() => {
-        Prism.highlightAll();
-      });
-      console.log(e.target.innerText);
+      const container = e.target;
+      updateCodeTextAndEditorHeight(container);
     };
 
-    const handleCodeEditInKeyDown = (e) => {
-      // const el = document.getElementsByClassName('code-input')[0];
-      // 處理tab
-      if (e.keyCode === 9) {
-        e.preventDefault();
-        // const currentText = e.target.innerText;
-        // const selection = window.getSelection();
-        // console.log(selection);
-        // console.log(selection.focusNode, selection.focusOffset);
-        // if (selection.isCollapsed) { // 沒有選到的情況
-        //   const divideIndex = selection.focusOffset;
-        //   console.log(divideIndex);
-        //   const last = currentText.substring(0, selection.anchorOffset);
-        //   const next = currentText.substring(divideIndex, currentText.length);
-        //   const newNode = document.createTextNode(`${last}  ${next}`);
-        //   console.log(newNode);
-        //   e.target.innerHTML = '';
-        //   e.target.appendChild(newNode);
-        //   selection.collapse(newNode, divideIndex + 2);
-        //   // console.log(e.target.innerText);
-        //   editCodeText(e);
-        // }
-      }
-    };
+    watch(codeText, (curr) => {
+      nextTick(() => {
+        Prism.highlightAll();
+        editBlockData(props.block.id, {
+          text: curr,
+          html: curr,
+        }, 'content');
+      });
+    });
 
     const languages = [
       'Javascript',
@@ -99,44 +131,73 @@ export default {
     ];
 
     return {
+      placeholderInfo,
+      scrollLeft,
+      setScrollLeft,
+      editorHeight,
+      tabAction,
+      pasteAction,
+      handlePaste,
       languages,
       codeText,
       editCodeText,
-      handleCodeEditInKeyDown,
+      setFocusBlock,
+      // handleCodeEditInKeyDown,
     };
   },
 };
 </script>
 
 <style lang="scss" scoped>
-#code-editor{
-  width: 100%;
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;300;400;500;700;900&display=swap');
+
+$code-font: 'Courier New', Courier, monospace;
+// pre和code標籤都要放同樣的字體
+.language-javascript {
+  margin: 0;
+  font-family:$code-font;
+}
+
+.code-container {
   position: relative;
-  padding: 1rem 2rem;
-  // box-shadow: 1px 1px 5px 0 rgb(192, 192, 192);
-  border-radius: 4px;
-  & > .code-input{
-    position: absolute;
-    // padding: 1rem 0 1rem 2rem;
-    box-sizing: border-box;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 1rem 2rem;
-    height: auto;
-    color: transparent;
-    text-shadow: none;
-    bottom: 0;
-    caret-color: rgb(43, 43, 43);
-    &::selection{
-      // background: #777;
-      color: #777
-    }
+}
+
+.editor {
+  z-index: 1;
+  font-family:$code-font;
+
+  color: rgba($color: #000000, $alpha: 0.3);
+  color: transparent;
+  background-color: transparent;
+  caret-color: black;
+
+  overflow: auto;
+  // top: 200px !important;
+}
+
+#code-editor {
+  z-index: 0;
+  overflow: hidden !important;
+  code {
+    overflow: auto;
   }
 }
 
-// .code-input{
+.editor, #code-editor {
+  padding: 1rem;
+  width: 100%;
 
-//   // opacity: 0.1;
-// }
+  white-space: pre;
+
+  font-size: 1rem;
+  line-height: 1.5rem;
+  // letter-spacing: .1rem;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  min-height: 100px;
+}
+
 </style>

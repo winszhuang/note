@@ -18,7 +18,7 @@
       </div>
       <div class="content">
         <AreaSelect :work-area="'.content'"/>
-        <StyleTool/>
+        <!-- <StyleTool/> -->
         <div class="title">
           <PageEditable
               :page="currentPage"
@@ -123,7 +123,7 @@ import Breadcrumb from './Breadcrumb.vue';
 import Block from '../../components/Block.vue';
 import AreaSelect from '../../components/AreaSelect.vue';
 import PageEditable from '../../components/input/PageEditable.vue';
-import StyleTool from '../../components/StyleTool.vue';
+// import StyleTool from '../../components/StyleTool.vue';
 import PageInfo from './PageInfo.vue';
 import BlockStyleEditor from '../../components/BlockStyleEditor.vue';
 import FrontPage from './FrontPage.vue';
@@ -138,7 +138,7 @@ export default {
     Breadcrumb,
     AreaSelect,
     PageEditable,
-    StyleTool,
+    // StyleTool,
     PageInfo,
     BlockStyleEditor,
     FrontPage,
@@ -206,8 +206,8 @@ export default {
     const handleCopyAndPasteBlocks = (e) => {
       // if (e.clipboardData)
       if (e.ctrlKey && e.key === 'v') {
-        console.log(e);
-        console.log('77777777777777');
+        // console.log(e);
+        // console.log('77777777777777');
         pasteBlocksAction(e);
         // document.activeElement.blur();
       }

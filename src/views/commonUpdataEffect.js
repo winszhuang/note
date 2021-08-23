@@ -57,8 +57,9 @@ const commonUpdateEffect = () => {
   };
 
   const deleteBlockAndDependByPressBackspace = (block) => {
-    // console.log(block.id);
+    console.log(block.id);
 
+    // if (!block) return;
     const deleteBlocksDepend = () => {
       if (!block.blocks) return;
       if (block.blocks.length === 0) return;
@@ -81,8 +82,16 @@ const commonUpdateEffect = () => {
       });
     };
 
+    const deletePageDepend = () => {
+      if (block.type !== 'page') return;
+      const page = computed(() => store.getters['pages/choosePage'](block.content));
+      console.log(page.value);
+      store.dispatch('pages/deletePage', page.value);
+    };
+
     deleteBlocksDepend();
     deleteParentDepend();
+    deletePageDepend();
 
     const lastBlock = computed(() => store.getters['blocks/getPrevBlockByid'](block.id));
     store.commit('blocks/setFocusBlockById', lastBlock.value?.id);
@@ -170,7 +179,7 @@ const commonUpdateEffect = () => {
   };
 
   const goCurrentPage = (id) => {
-    console.log(id);
+    // console.log(id);
     store.commit('pages/setCurrentPageId', id);
   };
 
@@ -239,6 +248,7 @@ const commonUpdateEffect = () => {
     selectedBlocksIds.value.forEach((blockId) => {
       const block = computed(() => store.getters['blocks/chooseBlock'](blockId));
       deleteBlockAndDependByPressBackspace(block.value);
+      console.log(selectedBlocksIds.value);
     });
   };
 

@@ -153,12 +153,12 @@ const useSidebarStateEffect = () => {
     if (curr < 992) {
       if (breakpoint.value === 'sm') return;
       breakpoint.value = 'sm';
-      console.log(isSidebarCollapse.value, isSidebarFloating.value);
+      // console.log(isSidebarCollapse.value, isSidebarFloating.value);
       store.dispatch('floatSidebar');
     } else {
       if (breakpoint.value === 'lg') return;
       breakpoint.value = 'lg';
-      console.log(isSidebarCollapse.value, isSidebarFloating.value);
+      // console.log(isSidebarCollapse.value, isSidebarFloating.value);
       store.dispatch('lockSidebar');
     }
   });

@@ -190,39 +190,3 @@ const commonDomEffect = () => {
 };
 
 export default commonDomEffect;
-
-// class DomObject {
-//   constructor(dom, data) {
-//     this.dom = dom;
-//     this.data = data;
-//   }
-
-//   get dom() {
-//     return this.dom;
-//   }
-
-//   set dom(dom) {
-//     this.dom = dom;
-//   }
-
-//   get data() {
-//     return this.data;
-//   }
-
-//   set data(data) {
-//     this.data = data;
-//   }
-// }
-
-// const addClass = (el, className) => {
-//   el.classList.add(className);
-// };
-
-// const removeClass = (el, className) => {
-//   el.classList.remove(className);
-// };
-
-// const editStyle = (el, property, value, extra) => {
-//   // eslint-disable-next-line no-param-reassign
-//   el.style[property] = value || extra;
-// };

@@ -122,21 +122,6 @@ export default {
     },
   },
   actions: {
-    // addPageInside({ getters, commit, dispatch }, page) {
-    //   const parentPage = page || getters.currentPage;
-
-    //   const id = new Date().getTime().toString(); // 新的id
-    //   commit('addPage', {
-    //     id,
-    //     parentPageId: parentPage.id,
-    //   });
-    //   dispatch('blocks/addBlock', {
-    //     type: 'page',
-    //     page: parentPage,
-    //     value: id,
-    //   }, { root: true });
-    // },
-
     moveIdInBlocksOfPage({ commit }, { page, id, index }) {
       commit('deleteIdToBlocksOfPage', {
         page,
@@ -150,30 +135,34 @@ export default {
     },
 
     // 刪除某頁面 item是點擊刪除按鈕同行的page
-    deletePageWithIcon({
+    deletePage({
       state, rootState, commit, dispatch,
-    }, item) {
-      if (item.parentId !== '') {
-        console.log('山上面');
-        dispatch('blocks/deleteBlock', {
-          containPage: findInStoreById(state.pages, item.parentId),
-          block: rootState.blocks.blocks.find((block) => block.content === item.id),
-        }, { root: true });
+    }, page) {
+      if (page.parentId !== '') {
+        const blockThatHasPageId = rootState.blocks.blocks
+          .find((block) => block.content === page.id);
+        if (blockThatHasPageId) {
+          dispatch('blocks/deleteBlock', {
+            containPage: findInStoreById(state.pages, page.parentId),
+            block: blockThatHasPageId,
+          }, { root: true });
+        }
       }
 
-      const blockList = [...item.blocks];
+      const blockList = [...page.blocks];
       blockList.forEach((blockId) => {
         const blockInPage = rootState.blocks.blocks.find((block) => block.id === blockId);
         dispatch('blocks/deleteBlock', {
-          containPage: item,
+          containPage: page,
           block: blockInPage,
         }, { root: true });
       });
-      commit('deletePage', item);
 
-      const childrenPages = state.pages.filter((page) => page.parentId === item.id);
+      commit('deletePage', page);
+
+      const childrenPages = state.pages.filter((aPage) => aPage.parentId === page.id);
       if (childrenPages && childrenPages.length !== 0) {
-        childrenPages.forEach((page) => dispatch('deletePageWithIcon', page));
+        childrenPages.forEach((aPage) => dispatch('deletePage', aPage));
       }
     },
   },

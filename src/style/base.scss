@@ -78,7 +78,8 @@ div[contenteditable] {
     content: '';
   }
   &::selection{
-    background-color: #bddaeb;
+    background-color:rgba($color: #4ab8f8, $alpha: 0.3)
+    // background-color: #bddaeb;
   }
 }
 

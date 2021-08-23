@@ -51,6 +51,9 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  &-container {
+    margin-left: -1rem;
+  }
   &-title{
     width: 100%;
     color: #685d68;

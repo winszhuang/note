@@ -59,7 +59,7 @@ import {
   faCaretRight, faCaretDown,
 } from '@fortawesome/free-solid-svg-icons';
 import commonUpdateEffect from '../views/commonUpdataEffect';
-import { showEffect } from './commonEffect';
+import { showEffect, generateRandomString } from './commonEffect';
 
 export default {
   name: 'CustomList',
@@ -84,12 +84,37 @@ export default {
     const caretIcon = computed(() => (isShow.value ? faCaretRight : faCaretDown));
 
     const addPageInside = (page) => {
-      store.dispatch('pages/addPageInside', page);
+      const newPage = {
+        id: generateRandomString(),
+        name: 'untitle',
+        blocks: [],
+        parentId: page.id,
+        createdTime: new Date().getTime().toString(),
+        editTime: new Date().getTime().toString(),
+        tags: [],
+        cover: '',
+      };
+
+      store.commit('pages/addPage', newPage);
+
+      const newBlock = {
+        type: 'page',
+        id: generateRandomString(),
+        parentId: '',
+        content: newPage.id,
+        className: 'style-text-color__default',
+      };
+
+      store.dispatch('blocks/addBlock', {
+        page,
+        block: newBlock,
+      });
+
       handleShow(true);
     };
 
-    const deletePage = (item) => {
-      store.dispatch('pages/deletePageWithIcon', item);
+    const deletePage = (page) => {
+      store.dispatch('pages/deletePage', page);
     };
 
     const isHover = ref(false);
