@@ -18,9 +18,6 @@ export default {
     Workspace,
     ResetButton,
   },
-  setup() {
-
-  },
 };
 </script>
 

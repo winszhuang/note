@@ -49,6 +49,8 @@ const useAreaSelectEffect = (AllIds, isBoxACollisionB) => {
     e.preventDefault();
     e.stopPropagation();
 
+    document.activeElement.blur();
+
     position.x2 = e.clientX;
     position.y2 = e.clientY;
 

@@ -4,18 +4,7 @@
   <main class="mainspace"
       @mousemove="toggleFloatSidebar($event)">
     <div class="workspace" v-if="currentPage" @mousedown="clickActions($event)">
-      <div class="header">
-        <Breadcrumb :page="currentPage"/>
-        <div class="update" type="button" @click="updateToFS">
-          <div class="update-icon" v-if="!isFSUpdating">
-            <font-awesome-icon :icon="['fas', 'database']"/>
-          </div>
-          <div class="update-icon" v-else>
-            <font-awesome-icon :icon="['fas', 'sync-alt']"/>
-          </div>
-          <div class="update-text">更新到數據庫</div>
-        </div>
-      </div>
+      <Header :currentPage="currentPage"/>
       <div class="content">
         <AreaSelect :work-area="'.content'"/>
         <!-- <StyleTool/> -->
@@ -45,16 +34,6 @@
 
         <!--測試用-->
         <!-- <hr>
-        <template v-if="groups && groups.length !== 0">
-          <div v-for="(item) in groups" :key="item.id">
-            <div>GroupId ------ {{ item.id }}</div>
-            <div>
-              Groupvalue ----
-              <li v-for="(item) in item.blocks" :key="item">{{ item }}</li>
-            </div>
-          </div>
-        </template> -->
-        <hr>
         <div v-if="hiddenBlocksIds">
           <div>hiddenBlocksIds:
             {{ hiddenBlocksIds }}
@@ -78,7 +57,6 @@
               <li>id ------ {{ currentFocusBlock.id }}</li>
               <li>parentId ------ {{ currentFocusBlock.parentId }}</li>
               <li>blocks ------ {{ currentFocusBlock.blocks }}</li>
-              <!-- <li>group ------ {{ currentFocusBlock.group }}</li> -->
               <li>check ------ {{ currentFocusBlock.check }}</li>
               <hr>
             </ul>
@@ -98,11 +76,10 @@
               <li>id ------ {{ block.id }}</li>
               <li>parentId ------ {{ block.parentId }}</li>
               <li>blocks ------ {{ block.blocks }}</li>
-              <!-- <li>group ------ {{ block.group }}</li> -->
               <hr>
             </ul>
           </div>
-        </div>
+        </div> -->
         <!--測試用-->
 
       </div>
@@ -119,7 +96,7 @@ import { useStore } from 'vuex';
 import commonUpdateEffect from '../commonUpdataEffect';
 import commonDomEffect from '../../components/commonDomEffect';
 // import commonBlockEffect from '../../components/commonBlockEffect';
-import Breadcrumb from './Breadcrumb.vue';
+import Header from './header/Header.vue';
 import Block from '../../components/Block.vue';
 import AreaSelect from '../../components/AreaSelect.vue';
 import PageEditable from '../../components/input/PageEditable.vue';
@@ -127,18 +104,190 @@ import PageEditable from '../../components/input/PageEditable.vue';
 import PageInfo from './PageInfo.vue';
 import BlockStyleEditor from '../../components/BlockStyleEditor.vue';
 import FrontPage from './FrontPage.vue';
-import { updateStoreToFS } from '../../store/firestore';
 import watchStoreEffect from '../../store/watchStoreEffect';
 import updateIDsEffectByDragDrop from '../../components/updateIDsEffectByDragDrop';
+
+const useKeyDownEffectWithBlocks = () => {
+  const store = useStore();
+  const selectedBlocksIds = computed(() => store.state.blocks.selectedBlocksIds);
+  const hasSelectedBlocks = () => (!!selectedBlocksIds.value?.length);
+
+  const {
+    pasteBlocksAction,
+    setClipboardBlocks,
+    setSelectedBlocksInClipboardBlocks,
+    deleteSelectedBlocks,
+    duplicateBlocksFromSelectedBlocks,
+  } = commonUpdateEffect();
+
+  const handleBlocksByPaste = (e) => {
+    if (selectedBlocksIds.value.length) {
+      pasteBlocksAction(e);
+    }
+  };
+
+  const handleBlocksByKeyDown = (e) => {
+    const setClipboardText = (text) => navigator.clipboard.writeText(text);
+
+    if (e.ctrlKey && e.key === 'c') {
+      console.log(hasSelectedBlocks());
+      if (hasSelectedBlocks()) {
+        setClipboardText('');
+        e.preventDefault();
+        setSelectedBlocksInClipboardBlocks();
+        console.log('8888888888888');
+      } else {
+        setClipboardBlocks([]);
+      }
+      document.activeElement.blur();
+    }
+
+    if (hasSelectedBlocks() && (e.key === 'Backspace' || e.key === 'Delete')) {
+      e.preventDefault();
+      deleteSelectedBlocks(e);
+      document.activeElement.blur();
+    }
+
+    if (hasSelectedBlocks() && e.ctrlKey && e.key === 'd') {
+      e.preventDefault();
+      duplicateBlocksFromSelectedBlocks();
+      document.activeElement.blur();
+    }
+  };
+
+  const executeKeydownListeningWithBlocks = () => {
+    window.addEventListener('keydown', handleBlocksByKeyDown);
+    window.addEventListener('paste', handleBlocksByPaste);
+  };
+
+  return { executeKeydownListeningWithBlocks };
+};
+
+const useDragDropBlocksEffect = () => {
+  const store = useStore();
+
+  const dragStartIds = computed(() => store.state.dragStartIds);
+  const currentBlocksIds = computed(() => store.getters['blocks/currentBlocksIds']);
+
+  const {
+    ids,
+    currentIdUnderTheMouse,
+    cancelDefault,
+    handleDrop,
+    handleBeforeDrop,
+  } = updateIDsEffectByDragDrop(currentBlocksIds,
+    (e) => e.target.closest('.block').dataset.blockId,
+    () => dragStartIds.value);
+
+  const dropActions = (e) => {
+    handleDrop(e, () => {
+      store.commit('setDragStartIds', []);
+    });
+  };
+
+  watch(() => ids.value, (curr) => {
+    store.commit('pages/editPageData', { key: 'blocks', value: [...curr] });
+  }, { deep: true });
+
+  watch(currentIdUnderTheMouse, (curr) => {
+    store.commit('setIframeActive', curr === '');
+  });
+
+  return {
+    cancelDefault,
+    handleBeforeDrop,
+    dropActions,
+    dragStartIds,
+    currentIdUnderTheMouse,
+  };
+};
+
+const useClickEffectInWorkspace = (hiddenStyleEditor) => {
+  const store = useStore();
+  const currentBlocks = computed(() => store.getters['blocks/currentBlocks']);
+  const { isMouseUnderTheElement } = commonDomEffect();
+
+  const clickActionInContent = (e) => {
+    const finalBlock = currentBlocks.value[currentBlocks.value.length - 1];
+    if (!finalBlock) {
+      e.preventDefault();
+      store.dispatch('blocks/addBlockAndSetFocusBlockId', {});
+      return;
+    }
+
+    const finalBlockDom = document.querySelector(`[data-block-id="${finalBlock.id}"]`);
+    if (isMouseUnderTheElement(finalBlockDom, e)) {
+      e.preventDefault();
+
+      const finalBlockEditable = finalBlockDom.querySelector('[contenteditable]');
+      if (!finalBlockEditable) {
+        store.dispatch('blocks/addBlockAndSetFocusBlockId', {});
+        return;
+      }
+
+      if (finalBlock.content.text === '') {
+        finalBlockEditable.focus();
+        return;
+      }
+
+      store.dispatch('blocks/addBlockAndSetFocusBlockId', {});
+    }
+  };
+
+  const clickActions = (e) => {
+    const el = e.target;
+    if (!el.closest('.workspace')) return;
+    if (el.closest('.blockcontent')) {
+      clickActionInContent(e);
+      return;
+    }
+    store.commit('blocks/setFocusBlockById', '');
+    store.commit('blocks/setSelectedBlocksIds', []);
+    hiddenStyleEditor();
+  };
+
+  return {
+    clickActions,
+  };
+};
+
+const useBlockStyleEditorEffect = () => {
+  const store = useStore();
+  const selectedBlocksIds = computed(() => store.state.blocks.selectedBlocksIds);
+
+  const isShowBlockStyleEditor = ref(false);
+
+  const clickBlockStyleEditorIconAction = (block) => {
+    isShowBlockStyleEditor.value = true;
+    // console.log(selectedBlocksIds.value);
+    if (selectedBlocksIds.value.length === 0) {
+      store.commit('blocks/addIdToSelectedBlocksIds', block.id);
+      return;
+    }
+    if (!selectedBlocksIds.value.find((id) => id === block.id)) {
+      store.commit('blocks/setSelectedBlocksIds', []);
+      store.commit('blocks/addIdToSelectedBlocksIds', block.id);
+    }
+  };
+
+  const hiddenStyleEditor = () => {
+    isShowBlockStyleEditor.value = false;
+  };
+
+  return {
+    isShowBlockStyleEditor,
+    clickBlockStyleEditorIconAction,
+    hiddenStyleEditor,
+  };
+};
 
 export default {
   name: 'Workspace',
   components: {
+    Header,
     Block,
-    Breadcrumb,
     AreaSelect,
     PageEditable,
-    // StyleTool,
     PageInfo,
     BlockStyleEditor,
     FrontPage,
@@ -156,172 +305,39 @@ export default {
     updateBlocksToLSByWatching();
     storeObserver();
 
-    // const groups = computed(() => store.state.groups.groups);
+    const { executeKeydownListeningWithBlocks } = useKeyDownEffectWithBlocks();
+    executeKeydownListeningWithBlocks();
+
+    const {
+      cancelDefault,
+      handleBeforeDrop,
+      dropActions,
+      dragStartIds,
+      currentIdUnderTheMouse,
+    } = useDragDropBlocksEffect();
+
     const currentPage = computed(() => store.getters['pages/currentPage']);
     const currentBlocks = computed(() => store.getters['blocks/currentBlocks']);
     const currentFocusBlock = computed(() => store.getters['blocks/currentFocusBlock']);
-    const currentBlocksIds = computed(() => store.getters['blocks/currentBlocksIds']);
     const isSidebarFloating = computed(() => store.state.sidebarState.isFloating);
     const selectedBlocksIds = computed(() => store.state.blocks.selectedBlocksIds);
     const clipboardBlocks = computed(() => store.state.blocks.clipboardBlocks);
     const clipboardBlocksIds = computed(() => store.getters['blocks/getClipboardBlocksIds']);
-    const dragStartIds = computed(() => store.state.dragStartIds);
     const isBlockSelected = (id) => computed(() => store.getters['blocks/isBlockSelected'](id)).value;
-
-    const {
-      pasteBlocksAction,
-      setClipboardBlocks,
-      deleteSelectedBlocks,
-      duplicateBlocksFromSelectedBlocks,
-    } = commonUpdateEffect();
 
     const {
       currentFocusBlockId, hiddenBlocksIds, // pages, blocks,
     } = toRefs(store.state.blocks);
 
     const {
-      ids,
-      currentIdUnderTheMouse,
-      cancelDefault,
-      handleDrop,
-      handleBeforeDrop,
-    } = updateIDsEffectByDragDrop(currentBlocksIds,
-      (e) => e.target.closest('.block').dataset.blockId,
-      () => dragStartIds.value);
+      isShowBlockStyleEditor,
+      clickBlockStyleEditorIconAction,
+      hiddenStyleEditor,
+    } = useBlockStyleEditorEffect();
 
-    const dropActions = (e) => {
-      handleDrop(e, () => {
-        store.commit('setDragStartIds', []);
-      });
-    };
-
-    watch(() => ids.value, (curr) => {
-      store.commit('pages/editPageData', { key: 'blocks', value: [...curr] });
-    }, { deep: true });
-
-    watch(currentIdUnderTheMouse, (curr) => {
-      store.commit('setIframeActive', curr === '');
-    });
-
-    const handleCopyAndPasteBlocks = (e) => {
-      // if (e.clipboardData)
-      if (e.ctrlKey && e.key === 'v') {
-        // console.log(e);
-        // console.log('77777777777777');
-        pasteBlocksAction(e);
-        // document.activeElement.blur();
-      }
-
-      if (!selectedBlocksIds.value) return;
-      if (selectedBlocksIds.value.length === 0) return;
-
-      if (e.key === 'Backspace' || e.key === 'Delete') {
-        e.preventDefault();
-        deleteSelectedBlocks(e);
-      }
-
-      if (e.ctrlKey && e.key === 'c') {
-        e.preventDefault();
-        setClipboardBlocks();
-      }
-
-      if (e.ctrlKey && e.key === 'd') {
-        e.preventDefault();
-        duplicateBlocksFromSelectedBlocks();
-      }
-
-      document.activeElement.blur();
-    };
-
-    window.addEventListener('keydown', handleCopyAndPasteBlocks);
-
-    const isShowEditCoverButton = ref(false);
-    const hoverHandle = (choose) => {
-      isShowEditCoverButton.value = choose;
-    };
-
-    const isShowEditCoverCard = ref(false);
-    const editCoverCardHandle = (choose) => {
-      isShowEditCoverCard.value = choose;
-    };
-
-    const isFSUpdating = ref(false);
-    const isFSUpdatingHandle = (choose) => {
-      isFSUpdating.value = choose;
-    };
-
-    const isShowBlockStyleEditor = ref(false);
-    const clickBlockStyleEditorIconAction = (block) => {
-      isShowBlockStyleEditor.value = true;
-      // console.log(selectedBlocksIds.value);
-      if (selectedBlocksIds.value.length === 0) {
-        store.commit('blocks/addIdToSelectedBlocksIds', block.id);
-        return;
-      }
-      if (!selectedBlocksIds.value.find((id) => id === block.id)) {
-        store.commit('blocks/setSelectedBlocksIds', []);
-        store.commit('blocks/addIdToSelectedBlocksIds', block.id);
-      }
-    };
-
-    const hiddenStyleEditor = () => {
-      isShowBlockStyleEditor.value = false;
-    };
-
-    const updateToFS = async () => {
-      isFSUpdatingHandle(true);
-      try {
-        await updateStoreToFS();
-        isFSUpdatingHandle(false);
-      } catch (error) {
-        console.log(error);
-        isFSUpdatingHandle(false);
-      }
-    };
-
-    const { isMouseUnderTheElement } = commonDomEffect();
-    const clickActionInContent = (e) => {
-      const finalBlock = currentBlocks.value[currentBlocks.value.length - 1];
-      if (!finalBlock) {
-        e.preventDefault();
-        store.dispatch('blocks/addBlockAndSetFocusBlockId', {});
-        return;
-      }
-
-      const finalBlockDom = document.querySelector(`[data-block-id="${finalBlock.id}"]`);
-      if (isMouseUnderTheElement(finalBlockDom, e)) {
-        e.preventDefault();
-
-        const finalBlockEditable = finalBlockDom.querySelector('[contenteditable]');
-        if (!finalBlockEditable) {
-          // console.log('不是editable');
-          store.dispatch('blocks/addBlockAndSetFocusBlockId', {});
-          return;
-        }
-
-        if (finalBlock.content.text === '') {
-          // console.log('是editable但沒有字');
-          finalBlockEditable.focus();
-          return;
-        }
-
-        // console.log('是editable且有字');
-        store.dispatch('blocks/addBlockAndSetFocusBlockId', {});
-      }
-    };
-
-    const clickActions = (e) => {
-      // console.log(e.clientX);
-      const el = e.target;
-      if (!el.closest('.workspace')) return;
-      if (el.closest('.blockcontent')) {
-        clickActionInContent(e);
-        return;
-      }
-      store.commit('blocks/setFocusBlockById', '');
-      store.commit('blocks/setSelectedBlocksIds', []);
-      hiddenStyleEditor();
-    };
+    const {
+      clickActions,
+    } = useClickEffectInWorkspace(hiddenStyleEditor);
 
     const toggleFloatSidebar = (e) => {
       if (isSidebarFloating.value === false) return;
@@ -332,20 +348,33 @@ export default {
       }
     };
 
+    const isWindowWidthLarge = () => window.innerWidth > 992;
+
+    const initSidebarState = () => {
+      if (isWindowWidthLarge()) {
+        store.dispatch('lockSidebar');
+      }
+    };
+
     onMounted(() => {
+      window.addEventListener('resize', () => {
+        if (!isWindowWidthLarge() && isSidebarFloating.value === false) {
+          store.dispatch('floatSidebar');
+        }
+      });
+
+      initSidebarState();
+
       watch( // 監聽是否切換到其他元素
         currentFocusBlockId,
         (curr, prev) => {
           nextTick(() => {
-            // console.log(curr);
             if (!curr) return;
 
-            // const getInput = (el) => el.querySelector('input');
             const getContenteditable = (el) => el.querySelector('[contenteditable]');
 
             const getEditableElementById = (id) => {
               const el = document.querySelector(`[data-block-id="${id}"]`);
-              // console.log(el);
               if (!el) return null;
               if (getContenteditable(el)) return getContenteditable(el);
               return null;
@@ -361,7 +390,6 @@ export default {
             const prevFocusDom = getEditableElementById(prev);
 
             if (!currFocusDom) return;
-            // console.log('9999999999999999999999');
             currFocusDom.focus();
             setCursorToEnd(currFocusDom);
 
@@ -372,22 +400,84 @@ export default {
       );
     });
 
+    // onMounted(() => {
+    //   let breakpoint = '';
+
+    //   if (window.innerWidth < 992) {
+    //     breakpoint = 'sm';
+    //     store.commit('setSidebarCollapse', true);
+    //     store.commit('setSidebarFloating', true);
+    //   } else {
+    //     breakpoint = 'lg';
+    //     console.log('1');
+    //     store.commit('setSidebarFloating', false);
+    //     store.commit('setSidebarCollapse', true);
+    //   }
+    //   store.commit('setWindowWidth', window.innerWidth);
+
+    //   window.addEventListener('resize', () => {
+    //     store.commit('setWindowWidth', window.innerWidth);
+    //   });
+
+    //   watch(() => windowWidth.value, (curr) => {
+    //     if (curr === '') return;
+    //     if (curr < 992) {
+    //       if (breakpoint.value === 'sm') return;
+    //       breakpoint.value = 'sm';
+    //       // console.log(isSidebarCollapse.value, isSidebarFloating.value);
+    //       store.dispatch('floatSidebar');
+    //     } else {
+    //       console.log('2');
+    //       if (breakpoint.value === 'lg') return;
+    //       breakpoint.value = 'lg';
+    //       // console.log(isSidebarCollapse.value, isSidebarFloating.value);
+    //       store.dispatch('lockSidebar');
+    //     }
+    //   });
+
+    //   watch( // 監聽是否切換到其他元素
+    //     currentFocusBlockId,
+    //     (curr, prev) => {
+    //       nextTick(() => {
+    //         if (!curr) return;
+
+    //         const getContenteditable = (el) => el.querySelector('[contenteditable]');
+
+    //         const getEditableElementById = (id) => {
+    //           const el = document.querySelector(`[data-block-id="${id}"]`);
+    //           if (!el) return null;
+    //           if (getContenteditable(el)) return getContenteditable(el);
+    //           return null;
+    //         };
+
+    //         const setCursorToEnd = (el) => {
+    //           const range = window.getSelection();
+    //           range.selectAllChildren(el);
+    //           range.collapseToEnd();
+    //         };
+
+    //         const currFocusDom = getEditableElementById(curr);
+    //         const prevFocusDom = getEditableElementById(prev);
+
+    //         if (!currFocusDom) return;
+    //         currFocusDom.focus();
+    //         setCursorToEnd(currFocusDom);
+
+    //         if (!prevFocusDom) return;
+    //         prevFocusDom.placeholder = '';
+    //       });
+    //     },
+    //   );
+    // });
+
     return {
-      handleCopyAndPasteBlocks,
       clickActions,
       currentPage,
       currentBlocks,
-      currentBlocksIds,
       currentFocusBlockId,
       currentFocusBlock,
-      hoverHandle,
-      isShowEditCoverButton,
-      isShowEditCoverCard,
-      editCoverCardHandle,
       selectedBlocksIds,
       hiddenBlocksIds,
-      updateToFS,
-      isFSUpdating,
       toggleFloatSidebar,
       isShowBlockStyleEditor,
       clickBlockStyleEditorIconAction,
@@ -449,8 +539,6 @@ export default {
   overflow-y: auto;
   // background: #fdfdf8;
   background: rgb(250, 248, 247);
-  // padding: 2rem 2rem;
-  // background-color: rgb(243, 226, 203);
 }
 
 .workspace{
@@ -459,60 +547,9 @@ export default {
   flex-direction: column;
   border-radius: .2rem;
   box-shadow: 0 0 5px 0 rgb(209, 193, 171);
-}
-
-p{
-  margin-bottom: 0;
-}
-
-.uncollapse{
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 2rem;
-  height: 4.5rem;
-  z-index: 9;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  &-btn{
-    color: #807683;
-  }
-}
-
-.header{
-  position: sticky;
-  top: 0;
-  display: flex;
-  padding: 1.5rem .5rem 1.5rem 2rem;
-  margin-bottom: 5rem;
-  z-index: 7;
-  // box-shadow: 0 0 1.5px 0 #707070;
-}
-
-.update{
-  top: 0;
-  border-radius: .3rem;
-  color: #646464;
-  padding: 0 .3rem;
-  margin-left: auto;
-  margin-right: 1rem;
-  display: flex;
-  &:hover{
-    background: #dbdbdb;
-  }
-  &-text{
-    margin-left: .5rem;
-  }
-}
-
-.decoration{
-  position: absolute;
-  top: 0;
-  right: 20%;
-  width: 3rem;
-  height: 7rem;
-  background: $web-orange;
+  height: 100%;
+  overflow: auto;
+  position: relative;
 }
 
 .content{
@@ -534,14 +571,17 @@ p{
   // }
 }
 .blockcontent{
+  box-sizing: border-box;
   width: 100%;
   flex-grow: 1;
   min-height: 350px;
+  padding-bottom: 10vh;
   &-input{
     width: inherit;
     min-height: 50px;
   }
 }
+
 .title{
   position: relative;
   &-input{
@@ -559,26 +599,6 @@ p{
     height: .3rem;
     background: $web-orange;
     // background: #F3C87A;
-  }
-}
-.pageinfo{
-  color: #7c7c7c;
-}
-.cover{
-  position: relative;
-  height: 16rem;
-  background-size: cover;
-  background-origin: content-box;
-  width: 100%;
-  // margin: 0 -10.5px 0 -10.5px;
-  &-edit{
-    position: absolute;
-    right: 1rem;
-    bottom: .5rem;
-    button{
-      color: #f3f3f3;
-      background: rgba($color: #000000, $alpha: 0.3);
-    }
   }
 }
 

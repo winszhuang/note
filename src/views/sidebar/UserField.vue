@@ -22,7 +22,7 @@
     </NinjaButton>
     <NinjaButton @clickThen="lockSidebar"
         :class-name="'left-collapse'"
-        v-if="isSidebarFloating && windowWidth > 992">
+        v-if="isSidebarFloating && isWindowWidthLarge()">
       <template #default="{ isShow }">
         <div v-show="isShow">
           <font-awesome-icon :icon="['fas', 'lock']"/>
@@ -48,7 +48,8 @@ export default {
     const userInfo = computed(() => store.state.userInfo.userInfo);
     const isSidebarCollapse = computed(() => store.state.sidebarState.isCollapse);
     const isSidebarFloating = computed(() => store.state.sidebarState.isFloating);
-    const windowWidth = computed(() => store.state.windowWidth);
+
+    const isWindowWidthLarge = () => window.innerWidth > 992;
 
     const linkToUserInfo = () => {
       router.push('/userinfo');
@@ -89,7 +90,7 @@ export default {
       isSidebarCollapse,
       isSidebarFloating,
       linkToUserInfo,
-      windowWidth,
+      isWindowWidthLarge,
     };
   },
 };

@@ -5,9 +5,9 @@
         :id="noId ? '' : block.id"
         :value="block.content.text"
         @input="inputToBlockContent"
-        @keydown="keydownAction"
         @focus="focusToBlock"
-        @paste="pasteBlocksAction"/>
+        @keydown.stop="keydownAction"
+        @paste.stop="pasteBlocksAction"/>
 </template>
 
 <script>

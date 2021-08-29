@@ -5,8 +5,10 @@ import blocks from './modules/blocks';
 import userInfo from './modules/userInfo';
 import { waitSecondAndCallBack } from '../components/commonEffect';
 
+const isWindowWidthLarge = () => window.innerWidth > 992;
+
 export default createStore({
-  strict: true, // 正式上線的時候關掉
+  strict: true,
   state: {
     blocktype: [
       {
@@ -109,6 +111,13 @@ export default createStore({
         name: '引言',
         className: 'block-quote',
       },
+      {
+        type: 'linkPreview',
+        icon: 'eye',
+        style: 'regular',
+        name: '連結預覽',
+        className: 'block-link-preview',
+      },
     ],
     colors: [
       'D7EBBA',
@@ -120,8 +129,8 @@ export default createStore({
       'E6F8B2',
     ],
     sidebarState: {
-      isCollapse: '',
-      isFloating: '',
+      isCollapse: true,
+      isFloating: !isWindowWidthLarge(),
       currentWidth: '',
     },
     windowWidth: '',
@@ -167,8 +176,6 @@ export default createStore({
     resetStoreData({ commit }) {
       commit('pages/resetPages', null, { root: true });
       commit('blocks/resetBlocks', null, { root: true });
-      // commit('groups/resetGroups', null, { root: true });
-      // commit('userInfo/resetUserInfo', null, { root: true });
     },
 
     async floatSidebar({ commit, state }) {

@@ -12,34 +12,28 @@ export default {
       state.userInfo = info;
     },
 
-    // 處理pageHistory
-    addIdToPageHistory(state, id = state.currentPageId) {
-      state.userInfo.pageHistory.push(id);
-      if (state.userInfo.pageHistory.length > 10) {
-        state.userInfo.pageHistory.splice(0, 1);
+    // 處理recentPageIds
+    addIdToRecentPageIds(state, id = state.currentPageId) {
+      if (state.userInfo.recentPageIds.includes(id)) return;
+      state.userInfo.recentPageIds.push(id);
+      if (state.userInfo.recentPageIds.length > 10) {
+        state.userInfo.recentPageIds.splice(0, 1);
       }
     },
 
-    deleteIdFromPageHistory(state, id) {
-      const index = state.userInfo.pageHistory.indexOf(id);
-      state.userInfo.pageHistory.splice(index, 1);
+    deleteIdFromRecentPageIds(state, id) {
+      const index = state.userInfo.recentPageIds.indexOf(id);
+      state.userInfo.recentPageIds.splice(index, 1);
     },
   },
   getters: {
-    selectDistinctPageHistory(state) {
-      return new Set(state.userInfo.pageHistory);
-    },
-
-    getPageNameListInHistory(state, getters, rootState, rootGetters) {
-      const pageNameList = [];
-      getters.selectDistinctPageHistory.forEach((id) => {
-        pageNameList.push(rootGetters['pages/choosePage'](id).name);
+    getPagesInRecentPageIds(state, getters, rootState, rootGetters) {
+      const pageList = [];
+      state.userInfo.recentPageIds.forEach((id) => {
+        pageList.push(rootGetters['pages/choosePage'](id));
       });
-      return pageNameList;
+      return pageList;
     },
-
-  },
-  actions: {
 
   },
 };

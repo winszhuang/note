@@ -46,7 +46,7 @@
           </div>
         </div>
       </template>
-      <template v-else>
+      <!-- <template v-else>
         <div class="recent">
           <div class="recent-subtitle">最近造訪</div>
           <div class="recent-page" v-for="(name, index) in getPageNameListInHistory"
@@ -67,7 +67,7 @@
             </div>
           </div>
         </div>
-      </template>
+      </template> -->
     </div>
   </div>
 </template>

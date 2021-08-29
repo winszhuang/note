@@ -1,18 +1,22 @@
 // import { computed } from 'vue';
+// import SecureLS from 'secure-ls';
 import { useStore } from 'vuex';
 import { setDataToLS } from './localStorageEffect';
 
 const watchStoreEffect = () => {
   const store = useStore();
+  // const ls = new SecureLS();
 
   const updatePagesToLSByWatching = () => {
     store.watch((state) => state.pages.pages, (curr) => {
       setDataToLS('pages', curr);
+      // ls.set('blocktest', curr);
     }, { deep: true });
   };
 
   const updateBlocksToLSByWatching = () => {
     store.watch((state) => state.blocks.blocks, (curr) => {
+      // ls.set('blocktest', curr);
       setDataToLS('blocks', curr);
     }, { deep: true });
   };
@@ -29,7 +33,7 @@ const watchStoreEffect = () => {
         'pages/resetPages',
         'pages/deletePage',
         'pages/setCurrentPageId',
-        'pages/addIdToPageHistory',
+        'pages/addIdToRecentPageIds',
         'blocks/deleteBlock',
         'blocks/resetBlocks',
         'blocks/setFocusBlockById',
@@ -41,18 +45,14 @@ const watchStoreEffect = () => {
         'blocks/resetHiddenBlocksIds',
         'userInfo/resetUserInfo',
         'userInfo/setUserInfo',
-        'userInfo/deleteIdFromPageHistory',
+        'userInfo/deleteIdFromRecentPageIds',
       ];
 
+      // 不需要紀錄時間
       for (let i = 0; i < mutationsThatDidntRequireRecordingtime.length; i += 1) {
-        if (mutation.type === mutationsThatDidntRequireRecordingtime[i]) {
-          // console.log('不需要紀錄時間');
-          return;
-        }
+        if (mutation.type === mutationsThatDidntRequireRecordingtime[i]) return;
       }
-      // pages/deleteIdToBlocksOfPage需要紀錄
-      // console.log(mutation.type);
-      // console.log('需要紀錄時間');
+
       store.commit('pages/editPageData', {
         property: 'editTime',
         value: new Date().getTime().toString(),
@@ -82,35 +82,14 @@ const watchStoreEffect = () => {
       }
     };
 
-    const updatePageHistory = (mutation) => {
+    const updateRecentPageIds = (mutation) => {
       if (mutation.type === 'pages/setCurrentPageId') {
-        store.commit('userInfo/addIdToPageHistory', mutation.payload);
+        store.commit('userInfo/addIdToRecentPageIds', mutation.payload);
       }
       if (mutation.type === 'pages/deletePage') {
-        console.log(mutation.payload);
-        store.commit('userInfo/deleteIdFromPageHistory', mutation.payload);
+        store.commit('userInfo/deleteIdFromRecentPageIds', mutation.payload);
       }
     };
-    // const listenBlockDeleteAnd = (mutation) => {
-    //   if (mutation.type !== 'blocks/deleteBlock') return;
-    //   const block = mutation.payload;
-    //   const blockId = mutation.payload.id;
-    //   console.log(block, blockId);
-    // };
-    // const checkNextAndPrevIdAction = (mutation) => {
-
-    // }
-
-    // const checkGroupEmptyAndDelete = (mutation) => {
-    //   if (mutation.type !== 'groups/deleteIdToGroup') return;
-    //   const { groupId } = mutation.payload;
-    //   const group = computed(() => store.getters['groups/getGroupById'](groupId));
-    //   if (group.value.blocks.length === 0) {
-    //     setTimeout(() => {
-    //       store.commit('groups/deleteGroup', group.value);
-    //     }, 1000);
-    //   }
-    // };
 
     store.subscribe((mutation, state) => {
       updateEditTimeOfPageBySubscribe(mutation, state);
@@ -120,16 +99,13 @@ const watchStoreEffect = () => {
           store.commit('setSidebarCollapse', false);
         }
       });
-      updatePageHistory(mutation);
-      // listenBlockDeleteAnd(mutation);
-      // checkGroupEmptyAndDelete(mutation);
+      updateRecentPageIds(mutation);
     });
   };
 
   return {
     updatePagesToLSByWatching,
     updateBlocksToLSByWatching,
-    // updateGroupsToLSByWatching,
     storeObserver,
   };
 };

@@ -5,7 +5,7 @@
   <li
     :class="{'breadcrumb-item': true, effect: page !== currentPage}"
     :type="page !== currentPage ? 'button' : '' "
-    @click="goCurrentPage(page.id)">
+    @click="goCurrentPage(page.id)"><font-awesome-icon :icon="['far', 'file']"/>&nbsp;
     {{ page.name }}
   </li>
 </template>
@@ -13,7 +13,7 @@
 <script>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
-import commonUpdateEffect from '../commonUpdataEffect';
+import commonUpdateEffect from '../../commonUpdataEffect';
 
 export default {
   name: 'BreadcrumbItem',
@@ -27,7 +27,6 @@ export default {
     },
   },
   setup(props) {
-    // console.log(props.page);
     const store = useStore();
     const parentPage = computed(() => store.getters['pages/parentPage'](props.page));
     const currentPage = computed(() => store.getters['pages/currentPage']);
@@ -45,7 +44,6 @@ export default {
 }
 .effect{
   &:hover{
-    // background: #e0e0e0;
     color: #222222;
     text-decoration: underline;
   }

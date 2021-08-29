@@ -10,6 +10,7 @@ import {
   faCheckSquare,
   faWindowMinimize,
   faMinusSquare,
+  faEye,
 } from '@fortawesome/free-regular-svg-icons';
 import {
   faCaretRight,
@@ -59,6 +60,7 @@ import DividingLine from './components/blocks/DividingLine.vue';
 import ToggleList from './components/blocks/ToggleList.vue';
 import CodeEditor from './components/blocks/CodeEditor.vue';
 import Quote from './components/blocks/Quote.vue';
+import LinkPreview from './components/blocks/LinkPreview.vue';
 import App from './App.vue';
 import router from './router';
 import store from './store';
@@ -93,6 +95,7 @@ library.add(faAngleDoubleLeft);
 library.add(faAngleDoubleRight);
 library.add(faLock);
 library.add(faAdjust);
+library.add(faEye);
 
 // 社群圖標
 library.add(faGooglePlusSquare);
@@ -123,6 +126,7 @@ createApp(App).component('font-awesome-icon', FontAwesomeIcon)
   .component('ToggleList', ToggleList)
   .component('CodeEditor', CodeEditor)
   .component('Quote', Quote)
+  .component('LinkPreview', LinkPreview)
   .use(store)
   .use(router)
   .mount('#app');

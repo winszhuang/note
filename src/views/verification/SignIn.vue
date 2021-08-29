@@ -5,13 +5,13 @@
       <div class="verify-subtitle">請輸入email以及密碼</div>
       <!-- {{ isShowError }} -->
       <div :class="{ 'verify-input': true, 'error-border': errorMessage.email !== '' }">
-        <input type="text" placeholder="user@gmail.com"
+        <input type="text" placeholder="user@gmail.com" autocomplete
             v-model="userInput.email" spellcheck="false">
         <div class="error-message">{{ errorMessage.email }}</div>
       </div>
 
       <div :class="{ 'verify-input': true, 'error-border': errorMessage.password !== '' }">
-        <input type="password" placeholder="password"
+        <input type="password" placeholder="password" autocomplete
             v-model="userInput.password" spellcheck="false">
         <div class="error-message">{{ errorMessage.password }}</div>
       </div>

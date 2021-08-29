@@ -39,7 +39,11 @@ const commonUpdateEffect = () => {
     store.commit('blocks/setFocusBlockById', id);
   };
 
-  const setClipboardBlocks = () => {
+  const setClipboardBlocks = (blocks) => {
+    store.commit('blocks/setClipboardBlocks', blocks);
+  };
+
+  const setSelectedBlocksInClipboardBlocks = () => {
     store.commit('blocks/setClipboardBlocks', getCopyBlocksWithNewId(selectedBlocks.value));
   };
 
@@ -57,9 +61,6 @@ const commonUpdateEffect = () => {
   };
 
   const deleteBlockAndDependByPressBackspace = (block) => {
-    console.log(block.id);
-
-    // if (!block) return;
     const deleteBlocksDepend = () => {
       if (!block.blocks) return;
       if (block.blocks.length === 0) return;
@@ -83,15 +84,17 @@ const commonUpdateEffect = () => {
     };
 
     const deletePageDepend = () => {
-      if (block.type !== 'page') return;
       const page = computed(() => store.getters['pages/choosePage'](block.content));
-      console.log(page.value);
       store.dispatch('pages/deletePage', page.value);
     };
 
+    if (block.type === 'page') {
+      deletePageDepend();
+      return;
+    }
+
     deleteBlocksDepend();
     deleteParentDepend();
-    deletePageDepend();
 
     const lastBlock = computed(() => store.getters['blocks/getPrevBlockByid'](block.id));
     store.commit('blocks/setFocusBlockById', lastBlock.value?.id);
@@ -161,7 +164,7 @@ const commonUpdateEffect = () => {
   const checkKeydownInBlockContent = (block, e) => {
     if (currentFocusBlockId.value !== block.id) return;
 
-    if (currentFocusBlock.value.content.text === '' && e.keyCode === 8) {
+    if (currentFocusBlock.value.content.text === '' && e.key === 'Backspace') {
       e.preventDefault();
       deleteBlockAndDependByPressBackspace(block);
     }
@@ -169,6 +172,10 @@ const commonUpdateEffect = () => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       checkBlockThenAddByPressEnter(block);
+    }
+
+    if (e.key === 'c' && e.ctrlKey) {
+      setClipboardBlocks([]);
     }
 
     if (e.key === 'd' && e.ctrlKey) {
@@ -216,9 +223,20 @@ const commonUpdateEffect = () => {
     store.commit('blocks/setSelectedBlocksIds', newBlocksIds);
   };
 
-  const pasteBlocksAction = (e) => {
-    // console.log(clipboardBlocks.value);
-    // console.log(clipboardBlocks.value.length);
+  const pasteBlocksAction = async (e) => {
+    const getClipboardText = async () => new Promise((resolve) => {
+      navigator.clipboard.readText('text')
+        .then((text) => {
+          resolve(text);
+        });
+    });
+
+    const clipboardText = await getClipboardText();
+    if (clipboardText !== '') {
+      setClipboardBlocks([]);
+      return;
+    }
+
     if (!clipboardBlocks.value) return;
     if (!clipboardBlocks.value.length) return;
 
@@ -229,6 +247,7 @@ const commonUpdateEffect = () => {
       addMultiBlock(newBlocks,
         (addedBlocksIds) => [focusBlockIndex.value + 1, 0, ...addedBlocksIds]);
     } else {
+      console.log('11111111111111111');
       addMultiBlock(newBlocks,
         (addedBlocksIds) => {
           if (selectedBlocksIds.value.length < 1) {
@@ -242,13 +261,14 @@ const commonUpdateEffect = () => {
 
     const newBlocksIds = newBlocks.map((block) => block.id);
     store.commit('blocks/setSelectedBlocksIds', newBlocksIds);
+
+    // document.activeElement.blur();
   };
 
   const deleteSelectedBlocks = () => {
     selectedBlocksIds.value.forEach((blockId) => {
       const block = computed(() => store.getters['blocks/chooseBlock'](blockId));
       deleteBlockAndDependByPressBackspace(block.value);
-      console.log(selectedBlocksIds.value);
     });
   };
 
@@ -262,6 +282,7 @@ const commonUpdateEffect = () => {
     setFocusBlock,
     goCurrentPage,
     setClipboardBlocks,
+    setSelectedBlocksInClipboardBlocks,
     pasteBlocksAction,
     deleteSelectedBlocks,
     duplicateBlock,

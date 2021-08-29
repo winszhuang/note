@@ -24,17 +24,16 @@ export default {
 <style lang="scss" scoped>
 .reset-button{
   position: fixed;
-  right: 5rem;
-  bottom: 2rem;
+  right: 2rem;
+  bottom: 1rem;
   z-index: 30;
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  border: .01px solid rgb(172, 172, 172);
-  line-height: 100px;
-  // background-color: #504952;
+  width: 50px;
+  height: 50px;
+  border-radius: .2rem;
+  border: .01px solid rgb(194, 194, 194);
+  line-height: 50px;
   text-align: center;
-  font-size: 1.3rem;
+  font-size: 1rem;
   color: rgb(102, 102, 102);
   &:hover{
     background: #d8d8d8;

@@ -5,17 +5,17 @@
       <div class="verify-subtitle">請輸入email以及密碼</div>
 
       <div :class="{ 'verify-input': true, 'error-border': errorMessage.name !== '' }">
-        <input type="text" placeholder="使用者暱稱"
+        <input type="text" placeholder="使用者暱稱" autocomplete
             v-model="userInput.name" spellcheck="false">
         <div class="error-message">{{ errorMessage.name }}</div>
       </div>
       <div :class="{ 'verify-input': true, 'error-border': errorMessage.email !== '' }">
-        <input type="email" placeholder="user@gmail.com"
+        <input type="email" placeholder="user@gmail.com" autocomplete
             v-model="userInput.email" spellcheck="false">
         <div class="error-message">{{ errorMessage.email }}</div>
       </div>
       <div :class="{ 'verify-input': true, 'error-border': errorMessage.password !== '' }">
-        <input type="password" placeholder="password"
+        <input type="password" placeholder="password" autocomplete
             v-model="userInput.password" spellcheck="false">
         <div class="error-message">{{ errorMessage.password }}</div>
       </div>
@@ -58,6 +58,7 @@
 import { useRouter } from 'vue-router';
 import userVerifyEffect from './userVerifyEffect';
 import { signUp } from '../../store/firebaseAuth';
+import { setUserDataToFS } from '../../store/firestore';
 // import { auth } from '../../store/firebase';
 
 export default {
@@ -86,11 +87,17 @@ export default {
         errorMessage.password = '請輸入密碼';
       }
       try {
-        // eslint-disable-next-line max-len
-        // eslint-disable-next-line max-len
-        // const result = await auth.createUserWithEmailAndPassword(userInput.email, userInput.password);
-        // console.log(result);
         const result = await signUp(userInput.email, userInput.password);
+        await setUserDataToFS({
+          userInfo: {
+            email: userInput.email,
+            headshot: '',
+            name: userInput.name,
+            recentPageIds: [],
+          },
+          pages: [],
+          blocks: [],
+        });
         console.log(result);
         console.log('註冊成功');
         router.push('/signin');

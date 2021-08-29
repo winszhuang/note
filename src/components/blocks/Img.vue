@@ -81,8 +81,16 @@ export default {
     });
 
     const paste = async (e) => {
-      // e.preventDefault();
-      console.log(e);
+      const isPlainText = e.clipboardData.types[0] === 'text/plain';
+      if (isPlainText) {
+        editBlockData(props.block.id, {
+          url: e.clipboardData.getData('text/plain'),
+          compressionWidth: 0,
+        }, 'content');
+        handleShow(true);
+        return;
+      }
+
       try {
         const blob = await getBlobByClipBoardData(e);
         console.log(blob);
@@ -100,16 +108,9 @@ export default {
       }
     };
 
-    // const pasteAction = (e) => {
-    //   paste(e);
-    // };
-
     return {
       deleteInput,
-      // setFocus,
       paste,
-      // deleteBlock,
-      // pasteAction,
       isShow,
       handleShow,
       setFocusBlock,

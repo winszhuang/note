@@ -2,7 +2,6 @@
   <div class="block-style-editor"
       :style="{ width: `${currentSidebarWidth}px`,
           left: isShow ? '0' : `${-currentSidebarWidth || -600}px`}">
-    <div style="color: white;">{{ blockDress }}</div>
     <div class="style-editor-title">挑選顏色 :</div>
     <div class="style-editor-content d-flex flex-wrap">
       <div type="button"
@@ -144,12 +143,11 @@ export default {
       }
 
       const classNameOfFirstBlock = selectedBlocks.value[0].className;
-      console.log(classNameOfFirstBlock);
+
+      // 所有選到的block的樣式都一樣 || 有不一樣的block樣式
       if (selectedBlocks.value.every((block) => block.className === classNameOfFirstBlock)) {
-        console.log('所有選到的block的樣式都一樣');
         setBlockDressByClassName(classNameOfFirstBlock);
       } else {
-        console.log('有不一樣的block樣式');
         setBlockDressByClassName('');
       }
     });
@@ -168,7 +166,7 @@ export default {
       }
 
       selectedBlocks.value.forEach((block) => {
-        console.log(`${curr.style}__${curr.color}`);
+        // console.log(`${curr.style}__${curr.color}`);
         setClassNameToBlock(block, `${curr.style}__${curr.color}`);
       });
     }, { deep: true });

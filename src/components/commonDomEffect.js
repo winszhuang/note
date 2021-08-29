@@ -51,6 +51,7 @@ const commonDomEffect = () => {
 
   const getBlobByClipBoardData = async (ev) => new Promise((resolve, reject) => {
     const { items } = ev.clipboardData || ev.originalEvent.clipboardData;
+    console.log(items);
     // find pasted image among pasted items
     let blob = null;
     for (let i = 0; i < items.length; i += 1) {

@@ -28,14 +28,6 @@
           </div>
           <div class="customlist-item-6 block-name ">關鍵字搜尋</div>
         </div>
-        <div class="customlist-group-item"
-              type="button">
-          <div class="customlist-item-1 ms-4" style="margin-left: 1rem;">
-            <font-awesome-icon
-                :icon="['fas', 'adjust']" />
-          </div>
-          <div class="customlist-item-6 block-name ">編輯區塊樣式</div>
-        </div>
       </div>
       <div class="scollitem">
         <!-- <div v-if="currentPage">
@@ -131,46 +123,6 @@ const useSidebarWidthEffect = (minWidth, maxWidth) => {
   };
 };
 
-const useSidebarStateEffect = () => {
-  const store = useStore();
-  const breakpoint = { value: '' };
-  const windowWidth = computed(() => store.state.windowWidth);
-  const isSidebarCollapse = computed(() => store.state.sidebarState.isCollapse);
-  const isSidebarFloating = computed(() => store.state.sidebarState.isFloating);
-  const { isShow, handleShow } = showEffect();
-
-  onMounted(() => {
-    handleShow(false);
-    if (window.innerWidth < 992) {
-      breakpoint.value = 'sm';
-    } else {
-      breakpoint.value = 'lg';
-    }
-  });
-
-  watch(() => windowWidth.value, (curr) => {
-    if (curr === '') return;
-    if (curr < 992) {
-      if (breakpoint.value === 'sm') return;
-      breakpoint.value = 'sm';
-      // console.log(isSidebarCollapse.value, isSidebarFloating.value);
-      store.dispatch('floatSidebar');
-    } else {
-      if (breakpoint.value === 'lg') return;
-      breakpoint.value = 'lg';
-      // console.log(isSidebarCollapse.value, isSidebarFloating.value);
-      store.dispatch('lockSidebar');
-    }
-  });
-
-  return {
-    isShow,
-    handleShow,
-    isSidebarCollapse,
-    isSidebarFloating,
-  };
-};
-
 const addBlockEffect = () => {
   const store = useStore();
   const { blocktype } = toRefs(store.state);
@@ -190,6 +142,16 @@ const addBlockEffect = () => {
 
   const addTextTypeBlockFlow = (type) => {
     const block = new Block(type).addContent({ text: '', html: '' });
+    addBlockFlow(block);
+  };
+
+  const addLinkTypeBlockFlow = (type) => {
+    const block = new Block(type).addContent({
+      title: '',
+      description: '',
+      image: '',
+      url: '',
+    });
     addBlockFlow(block);
   };
 
@@ -247,6 +209,7 @@ const addBlockEffect = () => {
       numberItem: addTextTypeBlockFlow,
       bulletItem: addTextTypeBlockFlow,
       codeEditor: addTextTypeBlockFlow,
+      linkPreview: addLinkTypeBlockFlow,
 
       img: addMediaTypeBlockFlow,
       video: addMediaTypeBlockFlow,
@@ -278,26 +241,24 @@ export default {
   setup() {
     const store = useStore();
     const rootPages = computed(() => store.getters['pages/childrenPages'](''));
-    const { blocktype } = toRefs(store.state);
+    const isSidebarCollapse = computed(() => store.state.sidebarState.isCollapse);
+    const isSidebarFloating = computed(() => store.state.sidebarState.isFloating);
+    const blocktype = computed(() => store.state.blocktype);
+
     const {
       setSidebarWidth,
       setPrevSidebarWidth,
       sidebarWidth,
     } = useSidebarWidthEffect(220, 420);
-    const {
-      isShow,
-      handleShow,
-      isSidebarCollapse,
-      isSidebarFloating,
-    } = useSidebarStateEffect();
 
+    const { isShow, handleShow } = showEffect();
     const { checkBlockTypeThenAdd } = addBlockEffect();
 
     const transStyleToFAPrefix = (style) => `fa${style.charAt(0)}`;
 
-    const addPage = () => {
-      store.commit('pages/addPage');
-    };
+    const addPage = () => store.commit('pages/addPage');
+
+    onMounted(() => handleShow(false));
 
     return {
       rootPages,
