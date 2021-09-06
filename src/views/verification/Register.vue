@@ -30,11 +30,11 @@
         <div class="brand me-2" type="button" @click="socialLogin('google')">
           <font-awesome-icon :icon="['fab', 'google-plus-square']" size="2x"/>
         </div>
-        <div class="brand me-2" type="button" @click="socialLogin('facebook')">
+        <div class="brand me-2" type="button">
           <font-awesome-icon :icon="['fab', 'facebook-square']"
                 size="2x"/>
         </div>
-        <div class="brand me-2" type="button" @click="socialLogin('twitter')">
+        <div class="brand me-2" type="button">
           <font-awesome-icon :icon="['fab', 'twitter-square']"
                 size="2x"/>
         </div>

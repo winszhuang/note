@@ -16,7 +16,8 @@ const userVerifyEffect = () => {
 
   const socialLogin = async (social) => {
     try {
-      await loginBySocialThen(social);
+      const result = await loginBySocialThen(social);
+      console.log(result);
     } catch (error) {
       console.log(error);
       if (error.code === 'auth/operation-not-allowed') {
