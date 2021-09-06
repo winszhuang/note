@@ -1,6 +1,7 @@
-import { computed } from 'vue';
+import { computed, nextTick } from 'vue';
 import { useStore } from 'vuex';
 import commonBlockEffect from '../components/commonBlockEffect';
+import { stringMixer, generateRandomString } from '../components/commonEffect';
 
 const commonUpdateEffect = () => {
   const store = useStore();
@@ -12,11 +13,14 @@ const commonUpdateEffect = () => {
   const selectedBlocks = computed(() => store.getters['blocks/selectedBlocks']);
   const selectedBlocksIds = computed(() => store.state.blocks.selectedBlocksIds);
   const clipboardBlocks = computed(() => store.state.blocks.clipboardBlocks);
-  // const clipboardBlocksIds = computed(() => store.getters['blocks/getClipboardBlocksIds']);
-  const { Block, getCopyBlockWithNewId, getCopyBlocksWithNewId } = commonBlockEffect();
+  const {
+    BlockFactory,
+    getCopyBlockWithNewId,
+    getCopyBlocksWithNewId,
+    getTypeByHotKey,
+  } = commonBlockEffect();
 
   const editPageData = (key, value) => {
-    // console.log(value);
     store.commit('pages/editPageData', {
       key,
       value,
@@ -118,32 +122,26 @@ const commonUpdateEffect = () => {
       });
     };
 
-    const addBlockFlow = (block) => {
-      store.dispatch('blocks/addBlockAndSetFocusBlockId', { block, index: focusBlockIndex.value + 1 });
-    };
-
-    const addBlockByType = (type) => {
-      const block = new Block(type).addContent({ text: '', html: '' });
-      addBlockFlow(block);
-      return block;
-    };
-
     const enterActions = {
-      h1: () => addBlockByType('p'),
-      h2: () => addBlockByType('p'),
-      h3: () => addBlockByType('p'),
-      p: () => addBlockByType('p'),
-      quote: () => addBlockByType('p'),
+      h1: () => new BlockFactory('p'),
+      h2: () => new BlockFactory('p'),
+      h3: () => new BlockFactory('p'),
+      p: () => new BlockFactory('p'),
+      quote: () => new BlockFactory('p'),
 
-      numberItem: () => addBlockByType('numberItem'),
-      bulletItem: () => addBlockByType('bulletItem'),
+      numberItem: () => new BlockFactory('numberItem'),
+      bulletItem: () => new BlockFactory('bulletItem'),
 
-      todoItem: () => addBlockByType('todoItem'),
+      todoItem: () => new BlockFactory('todoItem'),
 
-      toggleList: () => addBlockByType('toggleList'),
+      // toggleList: () => addBlockByType('toggleList'),
     };
 
     const newBlock = enterActions[currentBlock.type]();
+    store.dispatch('blocks/addBlockAndSetFocusBlockId', {
+      block: newBlock,
+      index: focusBlockIndex.value + 1,
+    });
 
     hasParentIdAction(newBlock);
   };
@@ -161,6 +159,79 @@ const commonUpdateEffect = () => {
     store.commit('blocks/setFocusBlockById', '');
   };
 
+  const duplicatePage = (copyPage, randomStr, level = 0) => {
+    const addCopyPage = () => {
+      const newPage = JSON.parse(JSON.stringify(copyPage));
+
+      newPage.id = randomStr(newPage.id);
+      newPage.createdTime = new Date().getTime().toString();
+      newPage.editTime = new Date().getTime().toString();
+      newPage.blocks = newPage.blocks.map((blockId) => randomStr(blockId));
+      newPage.parentId = level === 0 ? newPage.parentId : randomStr(newPage.parentId);
+
+      store.commit('pages/addPage', newPage);
+    };
+
+    addCopyPage();
+
+    copyPage.blocks.forEach((blockId) => {
+      const oldBlock = computed(() => store.getters['blocks/chooseBlock'](blockId)).value;
+      const newBlock = JSON.parse(JSON.stringify(oldBlock));
+      newBlock.id = randomStr(newBlock.id);
+
+      if (oldBlock.type === 'page') {
+        newBlock.content = randomStr(newBlock.content);
+
+        const innerPageId = oldBlock.content;
+        const innerPage = computed(() => store.getters['pages/choosePage'](innerPageId));
+        duplicatePage(innerPage.value, randomStr, level + 1);
+      }
+
+      store.commit('blocks/addBlock', newBlock);
+    });
+  };
+
+  const replaceBlock = (block, type) => {
+    const newBlock = new BlockFactory(type);
+    console.log(newBlock);
+
+    if (type === 'page') {
+      const innerPageId = generateRandomString();
+
+      store.commit('pages/addPage', {
+        id: innerPageId,
+        name: 'untitle',
+        blocks: [],
+        parentId: currentPage.value.id,
+        createdTime: new Date().getTime().toString(),
+        editTime: new Date().getTime().toString(),
+        tags: [],
+        cover: '',
+      });
+
+      newBlock.content = innerPageId;
+    }
+
+    store.commit('blocks/addBlock', newBlock);
+
+    const blockIdsOfPage = [...currentPage.value.blocks];
+    const index = blockIdsOfPage.indexOf(block.id);
+    blockIdsOfPage[index] = newBlock.id;
+    store.commit('pages/editPageData', {
+      key: 'blocks',
+      value: blockIdsOfPage,
+    });
+
+    store.commit('blocks/deleteBlock', block);
+
+    nextTick(() => {
+      const el = document.querySelector(`[data-block-id="${newBlock.id}"]`);
+      if (el && el.querySelector('[contenteditable]')) {
+        el.querySelector('[contenteditable]').focus();
+      }
+    });
+  };
+
   const checkKeydownInBlockContent = (block, e) => {
     if (currentFocusBlockId.value !== block.id) return;
 
@@ -171,6 +242,13 @@ const commonUpdateEffect = () => {
 
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
+
+      const type = getTypeByHotKey((key) => key === e.target.innerText.slice(1));
+      if (type) {
+        replaceBlock(block, type);
+        return;
+      }
+
       checkBlockThenAddByPressEnter(block);
     }
 
@@ -210,6 +288,20 @@ const commonUpdateEffect = () => {
     setNewBlocksIdsInPage(newBlocksIds);
   };
 
+  const genratePageAndInnerByCopyingBlock = (block) => {
+    const pageId = block.content;
+    const page = computed(() => store.getters['pages/choosePage'](pageId));
+
+    const randomStr = stringMixer();
+    store.commit('blocks/editBlockData', {
+      id: block.id,
+      value: `${randomStr(page.value.id)}`,
+      key: 'content',
+    });
+
+    duplicatePage(page.value, randomStr);
+  };
+
   const duplicateBlocksFromSelectedBlocks = () => {
     const newBlocks = getCopyBlocksWithNewId(selectedBlocks.value);
     addMultiBlock(newBlocks,
@@ -221,6 +313,14 @@ const commonUpdateEffect = () => {
 
     const newBlocksIds = newBlocks.map((block) => block.id);
     store.commit('blocks/setSelectedBlocksIds', newBlocksIds);
+
+    // 處理block類型是page的情況
+    const pageTypeBlocks = newBlocks.filter((block) => block.type === 'page');
+    if (pageTypeBlocks.length) {
+      pageTypeBlocks.forEach((block) => {
+        genratePageAndInnerByCopyingBlock(block);
+      });
+    }
   };
 
   const pasteBlocksAction = async (e) => {
@@ -243,6 +343,7 @@ const commonUpdateEffect = () => {
     e.preventDefault();
 
     const newBlocks = getCopyBlocksWithNewId(clipboardBlocks.value);
+
     if (currentFocusBlock.value) {
       addMultiBlock(newBlocks,
         (addedBlocksIds) => [focusBlockIndex.value + 1, 0, ...addedBlocksIds]);
@@ -262,7 +363,13 @@ const commonUpdateEffect = () => {
     const newBlocksIds = newBlocks.map((block) => block.id);
     store.commit('blocks/setSelectedBlocksIds', newBlocksIds);
 
-    // document.activeElement.blur();
+    // 處理block類型是page的情況
+    const pageTypeBlocks = newBlocks.filter((block) => block.type === 'page');
+    if (pageTypeBlocks.length) {
+      pageTypeBlocks.forEach((block) => {
+        genratePageAndInnerByCopyingBlock(block);
+      });
+    }
   };
 
   const deleteSelectedBlocks = () => {

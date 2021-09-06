@@ -5,14 +5,6 @@
       @paste.stop="paste"
       @keydown.stop="(e) => deleteInput(e, block)"
       @focus="() => setFocusBlock(block.id)"/>
-  <!-- <div type="text"
-        placeholder="ctrl + v 貼上複製的圖片"
-        contenteditable="plaintext-only"
-        class="media-input"
-        v-show="!isShow"
-        @paste.stop="paste($event, block.id)"
-        @keydown.stop="deleteInput($event, block)"
-        @focus="setFocusBlock(block.id)"></div> -->
   <ScaleController v-if="block.content.url"
       :id="block.id + 'scale'"
       :key="block.id + 'scale'"
@@ -27,11 +19,11 @@
 
 <script>
 import { onMounted } from 'vue';
-import ScaleController from '../ScaleController.vue';
-import ContentEditable from '../input/ContentEditable.vue';
-import { showEffect } from '../commonEffect';
-import commonDomEffect from '../commonDomEffect';
-import commonUpdateEffect from '../../views/commonUpdataEffect';
+import ScaleController from '../../ScaleController.vue';
+import ContentEditable from '../../input/ContentEditable.vue';
+import { showEffect } from '../../commonEffect';
+import commonDomEffect from '../../commonDomEffect';
+import commonUpdateEffect from '../../../views/commonUpdataEffect';
 
 const imgurClientId = '794a032c7e8e6f4';
 
@@ -121,7 +113,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../../style/component/_input.scss';
+@import '../../../style/component/_input.scss';
 img{
   width: 100%;
 }

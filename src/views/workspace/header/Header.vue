@@ -60,7 +60,7 @@ export default {
   margin-bottom: 5rem;
   z-index: 7;
   // box-shadow: 0 0 1.5px 0 #707070;
-  background-color: rgb(250, 248, 247);
+  background-color: rgb(253, 252, 251);
 }
 
 .update{

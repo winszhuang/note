@@ -7,18 +7,15 @@
       <Header :currentPage="currentPage"/>
       <div class="content">
         <AreaSelect :work-area="'.content'"/>
-        <!-- <StyleTool/> -->
         <div class="title">
           <PageEditable
               :page="currentPage"
               :key="currentPage.id"
               :placeholder="'請輸入標題'"
               :className="'title-input'"/>
-          <!-- <div class="prefix-line"></div> -->
         </div>
-        <PageInfo :page="currentPage"/>
+        <PageInfo :page="currentPage" :key="currentPage.id + 'info'"/>
         <div class="blockcontent" v-if="currentBlocks">
-          <!-- <div class="fixblock" id="fixblock"></div> -->
           <template v-for="(block) in currentBlocks" :key="block.id">
             <Block :block="block" :is-selected="isBlockSelected(block.id)"
                   :is-under-mouse-on-drag="currentIdUnderTheMouse === block.id
@@ -29,18 +26,18 @@
                   @dragenter="cancelDefault"
                   @dragover="handleBeforeDrop"/>
           </template>
-          <!-- {{ dragStartIds }} -->
         </div>
-
-        <!--測試用-->
         <!-- <hr>
-        <div v-if="hiddenBlocksIds">
-          <div>hiddenBlocksIds:
-            {{ hiddenBlocksIds }}
-          </div>
-        </div>
-        <hr>
         <div v-if="currentPage">
+          <div>currentPage: </div>
+          <ul>
+            <li style="width: 400px; overflow: hidden; text-overflow: ellipsis;">
+              name ------ {{ currentPage.name }}</li>
+            <li>id ------ {{ currentPage.id }}</li>
+            <li>parentId ------ {{ currentPage.parentId }}</li>
+            <li>blocks ------ {{ currentPage.blocks }}</li>
+            <hr>
+          </ul>
           <hr>
           <div>currentFocusBlockId: {{ currentFocusBlockId }}</div>
           <hr>
@@ -80,8 +77,6 @@
             </ul>
           </div>
         </div> -->
-        <!--測試用-->
-
       </div>
     </div>
     <FrontPage v-else/>
@@ -95,12 +90,10 @@ import {
 import { useStore } from 'vuex';
 import commonUpdateEffect from '../commonUpdataEffect';
 import commonDomEffect from '../../components/commonDomEffect';
-// import commonBlockEffect from '../../components/commonBlockEffect';
 import Header from './header/Header.vue';
 import Block from '../../components/Block.vue';
 import AreaSelect from '../../components/AreaSelect.vue';
 import PageEditable from '../../components/input/PageEditable.vue';
-// import StyleTool from '../../components/StyleTool.vue';
 import PageInfo from './PageInfo.vue';
 import BlockStyleEditor from '../../components/BlockStyleEditor.vue';
 import FrontPage from './FrontPage.vue';
@@ -135,11 +128,10 @@ const useKeyDownEffectWithBlocks = () => {
         setClipboardText('');
         e.preventDefault();
         setSelectedBlocksInClipboardBlocks();
-        console.log('8888888888888');
+        document.activeElement.blur();
       } else {
         setClipboardBlocks([]);
       }
-      document.activeElement.blur();
     }
 
     if (hasSelectedBlocks() && (e.key === 'Backspace' || e.key === 'Delete')) {
@@ -153,6 +145,13 @@ const useKeyDownEffectWithBlocks = () => {
       duplicateBlocksFromSelectedBlocks();
       document.activeElement.blur();
     }
+
+    // 目前此功能在處理page類型的block上有問題，待需處理
+    // if (hasSelectedBlocks() && e.ctrlKey && e.key === 'x') {
+    //   e.preventDefault();
+    //   setSelectedBlocksInClipboardBlocks();
+    //   deleteSelectedBlocks(e);
+    // }
   };
 
   const executeKeydownListeningWithBlocks = () => {
@@ -259,7 +258,6 @@ const useBlockStyleEditorEffect = () => {
 
   const clickBlockStyleEditorIconAction = (block) => {
     isShowBlockStyleEditor.value = true;
-    // console.log(selectedBlocksIds.value);
     if (selectedBlocksIds.value.length === 0) {
       store.commit('blocks/addIdToSelectedBlocksIds', block.id);
       return;
@@ -400,76 +398,6 @@ export default {
       );
     });
 
-    // onMounted(() => {
-    //   let breakpoint = '';
-
-    //   if (window.innerWidth < 992) {
-    //     breakpoint = 'sm';
-    //     store.commit('setSidebarCollapse', true);
-    //     store.commit('setSidebarFloating', true);
-    //   } else {
-    //     breakpoint = 'lg';
-    //     console.log('1');
-    //     store.commit('setSidebarFloating', false);
-    //     store.commit('setSidebarCollapse', true);
-    //   }
-    //   store.commit('setWindowWidth', window.innerWidth);
-
-    //   window.addEventListener('resize', () => {
-    //     store.commit('setWindowWidth', window.innerWidth);
-    //   });
-
-    //   watch(() => windowWidth.value, (curr) => {
-    //     if (curr === '') return;
-    //     if (curr < 992) {
-    //       if (breakpoint.value === 'sm') return;
-    //       breakpoint.value = 'sm';
-    //       // console.log(isSidebarCollapse.value, isSidebarFloating.value);
-    //       store.dispatch('floatSidebar');
-    //     } else {
-    //       console.log('2');
-    //       if (breakpoint.value === 'lg') return;
-    //       breakpoint.value = 'lg';
-    //       // console.log(isSidebarCollapse.value, isSidebarFloating.value);
-    //       store.dispatch('lockSidebar');
-    //     }
-    //   });
-
-    //   watch( // 監聽是否切換到其他元素
-    //     currentFocusBlockId,
-    //     (curr, prev) => {
-    //       nextTick(() => {
-    //         if (!curr) return;
-
-    //         const getContenteditable = (el) => el.querySelector('[contenteditable]');
-
-    //         const getEditableElementById = (id) => {
-    //           const el = document.querySelector(`[data-block-id="${id}"]`);
-    //           if (!el) return null;
-    //           if (getContenteditable(el)) return getContenteditable(el);
-    //           return null;
-    //         };
-
-    //         const setCursorToEnd = (el) => {
-    //           const range = window.getSelection();
-    //           range.selectAllChildren(el);
-    //           range.collapseToEnd();
-    //         };
-
-    //         const currFocusDom = getEditableElementById(curr);
-    //         const prevFocusDom = getEditableElementById(prev);
-
-    //         if (!currFocusDom) return;
-    //         currFocusDom.focus();
-    //         setCursorToEnd(currFocusDom);
-
-    //         if (!prevFocusDom) return;
-    //         prevFocusDom.placeholder = '';
-    //       });
-    //     },
-    //   );
-    // });
-
     return {
       clickActions,
       currentPage,
@@ -503,11 +431,6 @@ export default {
 }
 
 @mixin mainspace {
-  // height: 100%;
-  // background: #fbfbf6;
-  // background: #fffffa;
-  // background: #faf9f2;
-  // background: #f5f5f5;
   position: relative;
   z-index: 1;
   &::-webkit-scrollbar {
@@ -537,8 +460,8 @@ export default {
   z-index: 1;
   height: 100vh;
   overflow-y: auto;
-  // background: #fdfdf8;
-  background: rgb(250, 248, 247);
+  background: rgb(253, 252, 251);
+  // background: rgb(250, 248, 247);
 }
 
 .workspace{

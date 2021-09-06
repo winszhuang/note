@@ -29,11 +29,10 @@ export default {
     } = commonUpdateEffect();
 
     const inputToBlockContent = (e) => {
-      // console.log(e.target.innerText);
-      editBlockData(props.block.id, {
-        text: e.target.innerText,
-        html: e.target.innerHTML,
-      }, 'content');
+      const content = { ...props.block.content };
+      content.text = e.target.innerText;
+      content.html = e.target.innerHTML;
+      editBlockData(props.block.id, content, 'content');
     };
 
     const keydownAction = (e) => {

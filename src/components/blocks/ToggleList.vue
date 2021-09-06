@@ -10,7 +10,7 @@
 <script>
 import { computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
-import P from './P.vue';
+import P from './textType/P.vue';
 import { showEffect } from '../commonEffect';
 
 export default {

@@ -33,10 +33,10 @@
 // import { useStore } from 'vuex';
 import { computed } from 'vue';
 import { useStore } from 'vuex';
-import ScaleController from '../ScaleController.vue';
-import ContentEditable from '../input/ContentEditable.vue';
-import commonUpdateEffect from '../../views/commonUpdataEffect';
-import commonBlockEffect from '../commonBlockEffect';
+import ScaleController from '../../ScaleController.vue';
+import ContentEditable from '../../input/ContentEditable.vue';
+import commonUpdateEffect from '../../../views/commonUpdataEffect';
+import commonBlockEffect from '../../commonBlockEffect';
 
 export default {
   name: 'Video',
@@ -96,7 +96,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../../style/component/_input.scss';
+@import '../../../style/component/_input.scss';
 
 iframe{
   width: 100%;

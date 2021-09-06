@@ -26,7 +26,7 @@
       </div>
 
       <div class="pageinfo-item-content"
-          @keydown="handleKeyDownIntagInput($event)">
+          @keydown.stop="handleKeyDownIntagInput($event)">
         <template v-if="page.tags.length !== 0">
           <div class="tag" type="button"
               :style="{ 'background-color': `${tag.color}` }"
@@ -64,7 +64,7 @@ const usePageTagEffect = () => {
 
   const handleKeyDownIntagInput = (e) => {
     if (e.keyCode === 13) {
-      store.commit('pages/addTag', e.target.value);
+      store.dispatch('pages/addTag', e.target.value);
       e.target.value = '';
     }
     if (e.keyCode === 8 && e.target.value === '') {
@@ -84,7 +84,7 @@ const usePageTagEffect = () => {
   };
 
   const deleteTag = (e, tag) => {
-    store.commit('pages/deleteTag', tag);
+    store.dispatch('pages/deleteTag', tag);
     focusToTagInput();
   };
 

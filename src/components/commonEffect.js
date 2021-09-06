@@ -46,6 +46,18 @@ const commonArrEffect = () => {
   };
 };
 
+const stringMixer = () => {
+  const randomStr = generateRandomString();
+
+  return (value) => {
+    const number = parseInt(value, 36) + parseInt(randomStr, 36);
+    const str = number.toString(36);
+    if (str.length < 15) return `${str}6`;
+    if (str.length > 15) return str.slice(0, 15);
+    return str;
+  };
+};
+
 const insertIds = (oldIds, addIds, spliceFunctionArr) => {
   const ids = [...oldIds];
 
@@ -114,4 +126,5 @@ export {
   generateRandomString,
   getRandomLightColor,
   insertIds,
+  stringMixer,
 };

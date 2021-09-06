@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import P from './P.vue';
+import P from './textType/P.vue';
 import commonUpdateEffect from '../../views/commonUpdataEffect';
 
 export default {

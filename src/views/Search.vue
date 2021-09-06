@@ -40,7 +40,6 @@
                 {{ getPage(block.id).name }}
               </div>
             </div>
-            <!-- {{ getBlockContentWithKeyword(block) }} -->
             <div class="search-content" v-html="getContentWithKeyword(block.content?.text)"></div>
             <!-- {{ block.content }} -->
           </div>
@@ -49,21 +48,13 @@
       <!-- <template v-else>
         <div class="recent">
           <div class="recent-subtitle">最近造訪</div>
-          <div class="recent-page" v-for="(name, index) in getPageNameListInHistory"
+          <div class="recent-page" v-for="(page, index) in recentPages"
               :key="name + index">
             <div class="search-item-page-icon">
               <font-awesome-icon :icon="['far', 'file']" size="1x"/>
             </div>
             <div class="search-item-page" type="button" @click="goPageAndCloseModal(page.id)">
-              {{ name }}
-            </div>
-          </div>
-          <div class="recent-page">
-            <div class="search-item-page-icon">
-              <font-awesome-icon :icon="['far', 'file']" size="1x"/>
-            </div>
-            <div class="search-item-page">
-              javascript筆記
+              {{ page.name }}
             </div>
           </div>
         </div>
@@ -86,7 +77,8 @@ export default {
     const searchInput = ref('');
     const searchBlocks = computed(() => store.getters['blocks/searchBlocks'](searchInput.value));
     const searchPages = computed(() => store.getters['pages/searchPages'](searchInput.value));
-    const getPageNameListInHistory = computed(() => store.getters['pages/getPageNameListInHistory']);
+    const recentPages = computed(() => store.getters['userInfo/getPagesInRecentPageIds']);
+
     const getPage = (blockId) => computed(() => store.getters['pages/getPageByBlockId'](blockId)).value;
 
     const goBlockPosition = (page, block) => {
@@ -125,7 +117,7 @@ export default {
       goPageAndCloseModal,
       goBlockPosition,
       getContentWithKeyword,
-      getPageNameListInHistory,
+      recentPages,
     };
   },
 };
@@ -140,7 +132,7 @@ export default {
 $search-border-bottom: .05rem solid rgb(212, 212, 212);
 .search{
   height: 55vh;
-  width: 35vw;
+  width: 50vw;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
   background: #faf9f2;
   border-radius: .3rem;
@@ -148,6 +140,15 @@ $search-border-bottom: .05rem solid rgb(212, 212, 212);
   padding-bottom: .8rem;
   display: flex;
   flex-direction: column;
+  transition: width .3s ease-in;
+  @media (max-width: 992px) {
+    height: 55vh;
+    width: 60vw;
+  }
+  @media (max-width: 450px) {
+    height: 65vh;
+    width: 80vw;
+  }
   &-input{
     box-sizing: border-box;
     display: flex;

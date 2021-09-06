@@ -1,62 +1,40 @@
 // import { computed } from 'vue';
-// import SecureLS from 'secure-ls';
+import SecureLS from 'secure-ls';
 import { useStore } from 'vuex';
-import { setDataToLS } from './localStorageEffect';
+// import { setDataToLS } from './localStorageEffect';
 
 const watchStoreEffect = () => {
   const store = useStore();
-  // const ls = new SecureLS();
+  const ls = new SecureLS();
 
   const updatePagesToLSByWatching = () => {
     store.watch((state) => state.pages.pages, (curr) => {
-      setDataToLS('pages', curr);
-      // ls.set('blocktest', curr);
+      // setDataToLS('pages', curr);
+      ls.set('pages', curr);
     }, { deep: true });
   };
 
   const updateBlocksToLSByWatching = () => {
     store.watch((state) => state.blocks.blocks, (curr) => {
-      // ls.set('blocktest', curr);
-      setDataToLS('blocks', curr);
+      ls.set('blocks', curr);
+      // setDataToLS('blocks', curr);
     }, { deep: true });
   };
 
   const storeObserver = () => {
-    const updateEditTimeOfPageBySubscribe = (mutation, state) => {
-      // console.log(mutation.type);
+    const updateEditTimeOfPage = (mutation, state) => {
       if (!state.pages.currentPageId) return;
-      if (mutation.type === 'blocks/setFocusBlockById') return;
-      if (mutation.type === 'pages/editPageData' && mutation.payload?.property === 'editTime') return;
 
-      const mutationsThatDidntRequireRecordingtime = [
-        'setStoreData',
-        'pages/resetPages',
-        'pages/deletePage',
-        'pages/setCurrentPageId',
-        'pages/addIdToRecentPageIds',
-        'blocks/deleteBlock',
-        'blocks/resetBlocks',
-        'blocks/setFocusBlockById',
-        'blocks/setSelectedBlocksIds',
-        'blocks/addIdsToHiddenBlocksIds',
-        'blocks/deleteIdToBlocksOfBlock',
-        'blocks/deleteIdToBlocksOfPage',
-        'blocks/deleteIdsToHiddenBlocksIds',
-        'blocks/resetHiddenBlocksIds',
-        'userInfo/resetUserInfo',
-        'userInfo/setUserInfo',
-        'userInfo/deleteIdFromRecentPageIds',
-      ];
+      const hasEditBlock = mutation.type === 'blocks/editBlockData';
+      const hasEditPage = mutation.type === 'pages/editPageData'
+        && mutation.payload?.key !== 'editTime';
 
-      // 不需要紀錄時間
-      for (let i = 0; i < mutationsThatDidntRequireRecordingtime.length; i += 1) {
-        if (mutation.type === mutationsThatDidntRequireRecordingtime[i]) return;
+      if (hasEditBlock || hasEditPage) {
+        store.commit('pages/editPageData', {
+          key: 'editTime',
+          value: new Date().getTime().toString(),
+        });
       }
-
-      store.commit('pages/editPageData', {
-        property: 'editTime',
-        value: new Date().getTime().toString(),
-      });
     };
 
     const collapseSidebarByAddSomething = (mutation, state) => {
@@ -92,7 +70,7 @@ const watchStoreEffect = () => {
     };
 
     store.subscribe((mutation, state) => {
-      updateEditTimeOfPageBySubscribe(mutation, state);
+      updateEditTimeOfPage(mutation, state);
       collapseSidebarByAddSomething(mutation, state);
       checkDataInStoreThen(mutation, () => {
         if (window.innerWidth > 992) {

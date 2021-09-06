@@ -66,21 +66,6 @@ export default {
       page.blocks.splice(index, 1);
     },
 
-    addTag(state, name) {
-      const page = findInStoreById(state.pages, state.currentPageId);
-      const tag = {
-        name,
-        color: getRandomLightColor(),
-      };
-      page.tags.push(tag);
-    },
-
-    deleteTag(state, tag) {
-      const { tags } = findInStoreById(state.pages, state.currentPageId);
-      const index = tags.indexOf(tag);
-      tags.splice(index, 1);
-    },
-
     // 處理currentPageId
     setCurrentPageId(state, id) {
       if (id === state.currentPageId) return;
@@ -164,6 +149,26 @@ export default {
       if (childrenPages && childrenPages.length !== 0) {
         childrenPages.forEach((aPage) => dispatch('deletePage', aPage));
       }
+    },
+
+    addTag({ state, commit }, name) {
+      const page = findInStoreById(state.pages, state.currentPageId);
+      const tag = {
+        name,
+        color: getRandomLightColor(),
+      };
+      commit('editPageData', {
+        key: 'tags',
+        value: [...page.tags, tag],
+      });
+    },
+
+    deleteTag({ state, commit }, tag) {
+      const page = findInStoreById(state.pages, state.currentPageId);
+      commit('editPageData', {
+        key: 'tags',
+        value: page.tags.filter((aTag) => aTag !== tag),
+      });
     },
   },
 };

@@ -127,50 +127,19 @@ const addBlockEffect = () => {
   const store = useStore();
   const { blocktype } = toRefs(store.state);
   const { currentPageId } = toRefs(store.state.pages);
-  const { Block } = commonBlockEffect();
+  const { BlockFactory } = commonBlockEffect();
 
   const addBlockFlow = (block) => {
     const currentFocusBlock = computed(() => store.getters['blocks/currentFocusBlock']);
     if (currentFocusBlock.value) {
       const focusBlockIndex = computed(() => store.getters['blocks/getIndexByBlockId'](currentFocusBlock.value.id));
-      // console.log(focusBlockIndex.value);
       store.dispatch('blocks/addBlockAndSetFocusBlockId', { block, index: focusBlockIndex.value + 1 });
     } else {
       store.dispatch('blocks/addBlockAndSetFocusBlockId', { block, index: undefined });
     }
   };
 
-  const addTextTypeBlockFlow = (type) => {
-    const block = new Block(type).addContent({ text: '', html: '' });
-    addBlockFlow(block);
-  };
-
-  const addLinkTypeBlockFlow = (type) => {
-    const block = new Block(type).addContent({
-      title: '',
-      description: '',
-      image: '',
-      url: '',
-    });
-    addBlockFlow(block);
-  };
-
-  const addMediaTypeBlockFlow = (type) => {
-    const block = new Block(type).addContent({ url: '', compressionWidth: '' });
-    addBlockFlow(block);
-  };
-
-  const addCheckBoxTypeBlockFlow = (type) => {
-    const block = new Block(type).addContent({ text: '', html: '', isChecked: false });
-    addBlockFlow(block);
-  };
-
-  const addToggleTypeBlockFlow = (type) => {
-    const block = new Block(type).addContent({ text: '', html: '', isHidden: false });
-    addBlockFlow(block);
-  };
-
-  const addPageTypeBlockFlow = (type) => {
+  const addPageTypeBlockFlow = () => {
     const innerPageId = generateRandomString();
 
     store.commit('pages/addPage', {
@@ -184,7 +153,7 @@ const addBlockEffect = () => {
       cover: '',
     });
 
-    const block = new Block(type).addContent(innerPageId);
+    const block = new BlockFactory('page').addContent(innerPageId);
     store.dispatch('blocks/addBlock', { block });
   };
 
@@ -199,29 +168,13 @@ const addBlockEffect = () => {
       return;
     }
 
-    const actions = {
-      page: addPageTypeBlockFlow,
-      h1: addTextTypeBlockFlow,
-      h2: addTextTypeBlockFlow,
-      h3: addTextTypeBlockFlow,
-      p: addTextTypeBlockFlow,
-      quote: addTextTypeBlockFlow,
-      numberItem: addTextTypeBlockFlow,
-      bulletItem: addTextTypeBlockFlow,
-      codeEditor: addTextTypeBlockFlow,
-      linkPreview: addLinkTypeBlockFlow,
+    if (type === 'page') {
+      addPageTypeBlockFlow();
+      return;
+    }
 
-      img: addMediaTypeBlockFlow,
-      video: addMediaTypeBlockFlow,
-
-      todoItem: addCheckBoxTypeBlockFlow,
-
-      toggleList: addToggleTypeBlockFlow,
-
-      dividingLine: () => addBlockFlow(new Block(type)),
-    };
-
-    actions[type](type);
+    const newBlock = new BlockFactory(type);
+    addBlockFlow(newBlock);
   };
 
   return {
@@ -292,16 +245,11 @@ export default {
   top: 73px;
   bottom: 35px;
   width: .7rem;
-  // background: rgb(235, 78, 78);
   z-index: 10;
   &:hover{
     cursor: col-resize;
   }
 }
-
-// .caret-right{
-//   margin-right: .3rem;
-// }
 
 .block-name{
   padding-top: .05rem;

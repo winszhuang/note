@@ -3,28 +3,9 @@ import { computed } from 'vue';
 import { useStore } from 'vuex';
 import { generateRandomString } from './commonEffect';
 
-// class BlockList {
-//   constructor() {
-//     this.blocks = [];
-//   }
-
-//   addBlock(block) {
-//     this.blocks.push(block);
-//   }
-// }
-
-// class MediaBlock extends Block {
-//   constructor() {
-//     super('img');
-//     this.content = {
-//       url: '',
-//       compressionWidth: '',
-//     };
-//   }
-// }
-
 const commonBlockEffect = () => {
   const store = useStore();
+  const currentFocusBlock = computed(() => store.getters['blocks/currentFocusBlock']);
 
   // 當前level屬於第幾層
   const getLevelOfBlock = (thisBlock) => {
@@ -41,19 +22,45 @@ const commonBlockEffect = () => {
 
   const getBlockWidthById = (id) => {
     const blockEl = document.querySelector(`[data-block-id="${id}"]`);
-    console.log(blockEl);
     const blockWidth = blockEl.getBoundingClientRect().width;
-    console.log(blockWidth);
     return blockWidth;
   };
 
+  const newTextContent = () => ({ text: '', html: '' });
+
+  const newListContent = (type) => ({
+    text: '',
+    html: '',
+    indent: currentFocusBlock.value.type === type
+      ? currentFocusBlock.value.content.indent
+      : 0,
+  });
+
+  const newMediaContent = () => ({ url: '', compressionWidth: '' });
+
+  const newCheckBoxContent = () => ({ text: '', html: '', isChecked: false });
+
+  const newToggleTypeContent = () => ({ text: '', html: '', isHidden: false });
+
+  const newLinkContent = () => ({
+    title: '',
+    description: '',
+    image: '',
+    url: '',
+  });
+
   class Block {
-    constructor(type) {
+    constructor(type = 'p') {
       this.type = type;
       this.id = generateRandomString();
       this.parentId = '';
       this.content = '';
       this.className = 'style-text-color__default';
+    }
+
+    addType(type) {
+      this.type = type;
+      return this;
     }
 
     addContent(content) {
@@ -75,6 +82,43 @@ const commonBlockEffect = () => {
       this.className = className;
       return this;
     }
+
+    copyBlock(block) {
+      this.type = block.type;
+      this.id = block.id;
+      this.parentId = block.parentId;
+      this.content = { ...block.content };
+      return this;
+    }
+  }
+
+  class BlockFactory {
+    constructor(type) {
+      const actions = {
+        h1: () => new Block(type).addContent(newTextContent()),
+        h2: () => new Block(type).addContent(newTextContent()),
+        h3: () => new Block(type).addContent(newTextContent()),
+        p: () => new Block(type).addContent(newTextContent()),
+        quote: () => new Block(type).addContent(newTextContent()),
+        codeEditor: () => new Block(type).addContent(newTextContent()),
+
+        numberItem: () => new Block(type).addContent(newListContent('numberItem')),
+        bulletItem: () => new Block(type).addContent(newListContent('bulletItem')),
+
+        linkPreview: () => new Block(type).addContent(newLinkContent()),
+
+        img: () => new Block(type).addContent(newMediaContent()),
+        video: () => new Block(type).addContent(newMediaContent()),
+
+        todoItem: () => new Block(type).addContent(newCheckBoxContent()),
+
+        dividingLine: () => new Block(type),
+
+        page: () => new Block(type),
+      };
+
+      return actions[type] ? actions[type]() : null;
+    }
   }
 
   const getCopyBlockWithNewId = (block) => {
@@ -92,12 +136,39 @@ const commonBlockEffect = () => {
     });
   };
 
+  const hasBlockType = (type) => {
+    const blocktypeList = computed(() => store.state.blocktype).value;
+
+    const blockType = blocktypeList.find((block) => block.type === type);
+
+    if (blockType) return true;
+    return false;
+  };
+
+  const getTypeByHotKey = (callback) => {
+    const blocktypeList = computed(() => store.state.blocktype).value;
+
+    const blockType = blocktypeList.find((block) => callback(block.hotKey));
+
+    if (blockType) return blockType.type;
+    return null;
+  };
+
   return {
     Block,
+    BlockFactory,
+    newTextContent,
+    newListContent,
+    newMediaContent,
+    newCheckBoxContent,
+    newToggleTypeContent,
+    newLinkContent,
     getLevelOfBlock,
     getCopyBlockWithNewId,
     getCopyBlocksWithNewId,
     getBlockWidthById,
+    getTypeByHotKey,
+    hasBlockType,
   };
 };
 

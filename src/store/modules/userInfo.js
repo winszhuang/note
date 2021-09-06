@@ -30,7 +30,8 @@ export default {
     getPagesInRecentPageIds(state, getters, rootState, rootGetters) {
       const pageList = [];
       state.userInfo.recentPageIds.forEach((id) => {
-        pageList.push(rootGetters['pages/choosePage'](id));
+        const page = rootGetters['pages/choosePage'](id);
+        if (page) pageList.push(page);
       });
       return pageList;
     },

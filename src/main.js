@@ -46,20 +46,20 @@ import {
 
 import 'bootstrap';
 
-import H1 from './components/blocks/H1.vue';
-import H2 from './components/blocks/H2.vue';
-import H3 from './components/blocks/H3.vue';
-import Img from './components/blocks/Img.vue';
+import H1 from './components/blocks/textType/H1.vue';
+import H2 from './components/blocks/textType/H2.vue';
+import H3 from './components/blocks/textType/H3.vue';
+import Img from './components/blocks/mediaType/Img.vue';
 import Page from './components/blocks/Page.vue';
-import Video from './components/blocks/Video.vue';
-import P from './components/blocks/P.vue';
+import Video from './components/blocks/mediaType/Video.vue';
+import P from './components/blocks/textType/P.vue';
 import TodoItem from './components/blocks/TodoItem.vue';
-import NumberItem from './components/blocks/NumberItem.vue';
-import BulletItem from './components/blocks/BulletItem.vue';
+import NumberItem from './components/blocks/listType/NumberItem.vue';
+import BulletItem from './components/blocks/listType/BulletItem.vue';
 import DividingLine from './components/blocks/DividingLine.vue';
 import ToggleList from './components/blocks/ToggleList.vue';
 import CodeEditor from './components/blocks/CodeEditor.vue';
-import Quote from './components/blocks/Quote.vue';
+import Quote from './components/blocks/textType/Quote.vue';
 import LinkPreview from './components/blocks/LinkPreview.vue';
 import App from './App.vue';
 import router from './router';

@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import BlockEditable from '../input/BlockEditable.vue';
+import BlockEditable from '../../input/BlockEditable.vue';
 
 export default {
   name: 'H1',

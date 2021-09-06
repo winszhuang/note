@@ -44,13 +44,16 @@ export default {
       block.blocks.splice(index, 1);
     },
 
-    // changeGroupIdFromBlockId(state, { blockId, groupId }) {
-    //   findInStoreById(state.blocks, blockId).group = groupId;
-    // },
-
     // 處理currentFocusBlockId
     editBlockData(state, { id = state.currentFocusBlockId, value, key = 'content' }) {
       findInStoreById(state.blocks, id)[key] = value;
+    },
+
+    changeBlock(state, { oldBlock, newBlock }) {
+      const index = state.blocks.indexOf(oldBlock);
+      if (index !== -1) {
+        state.blocks[index] = newBlock;
+      }
     },
 
     setFocusBlockById(state, id) {
@@ -226,80 +229,6 @@ export default {
       commit('blocks/setFocusBlockById', block.id, { root: true });
     },
 
-    // pushBlockAndSetFocusBlockId({ commit, dispatch, rootState }, {
-    //   page = findInStoreById(rootState.pages.pages, rootState.pages.currentPageId),
-    //   block = {
-    //     id: generateRandomString(),
-    //     type: 'p',
-    //     content: '',
-    //     blocks: [],
-    //     group: '',
-    //     parentId: '',
-    //   },
-    // }) {
-    //   dispatch('addBlockAndSetFocusBlockId', { block, page, index:  });
-    // },
-
-    // pushBlock({ commit }, {
-    //   type = 'p',
-    //   id = (new Date().getTime() + 3).toString(),
-    //   value = '',
-    //   blocks = [],
-    //   parentId = '',
-    //   group = '',
-    // }) {
-    //   const newBlock = {
-    //     id,
-    //     type,
-    //     content: value,
-    //     blocks,
-    //     parentId,
-    //     group,
-    //   };
-    //   commit('addBlock', newBlock);
-
-    //   // 此段處理block的id被加入某page中的blocks陣列裡的某位置
-    //   commit('pages/addIdToBlocksOfPage', {
-    //     blockId: id,
-    //   }, { root: true });
-
-    //   commit('setFocusBlockById', id);
-    // },
-
-    // 增加子block
-    // addBlockInside({ commit, dispatch }, block) {
-    //   const parentBlock = block;
-
-    //   const id = new Date().getTime().toString(); // 創一個新的blockId
-
-    //   dispatch('addBlock', {
-    //     type: 'p',
-    //     id,
-    //     parentId: parentBlock.id,
-    //   });
-
-    //   commit('addIdToBlocksOfBlock', {
-    //     block: parentBlock,
-    //     blockId: id,
-    //   });
-    // },
-
-    // addGroupTypeBlock({ commit, dispatch }, { block, group }) {
-    //   const newBlock = { ...block };
-    //   if (newBlock.group !== group.id) {
-    //     newBlock.group = group.id;
-    //   }
-
-    //   dispatch('addBlock', {
-    //     block: newBlock,
-    //   });
-
-    //   commit('groups/addIdToGroup', {
-    //     id: newBlock.id,
-    //     group,
-    //   }, { root: true });
-    // },
-
     addPageTypeBlock({ commit, dispatch, rootState }, {
       block,
       page = rootState.pages.currentPageId,
@@ -356,14 +285,5 @@ export default {
       commit('pages/setCurrentPageId', page.id, { root: true });
       commit('setFocusBlockById', block.id);
     },
-
-    // changeGroupIdFromBlocksIds({ commit }, { blocksIds, groupId }) {
-    //   blocksIds.forEach((blockId) => {
-    //     commit('changeGroupIdFromBlockId', {
-    //       blockId,
-    //       groupId,
-    //     });
-    //   });
-    // },
   },
 };

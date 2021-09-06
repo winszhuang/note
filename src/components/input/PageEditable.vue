@@ -4,8 +4,8 @@
         :className="className"
         :id="noId ? '' : page.id"
         :value="page.name"
-        @input="inputToPageContent"
-        @keydown="keydownAction"
+        @input.stop="inputToPageContent"
+        @keydown.stop="keydownAction"
         @focus="setFocusBlock('')"/>
 </template>
 
