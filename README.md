@@ -8,7 +8,15 @@
 
 
 
-主要功能參考至notion。目前為測試版，有許多小問題... 後續會增加更多實用功能
+主要功能參考至notion。目前為測試版，後續會增加更多實用功能
+
+github : https://github.com/winszhuang/note
+
+note網站 : https://winszhuang.github.io/note/
+> 請先註冊使用，或直接用測試用帳戶 : 
+> 帳號123@gmail.com，密碼123456
+
+
 
 ## 涉及知識點
 + vue 3
@@ -16,15 +24,23 @@
     + 遞迴組件(樹狀結構)
 + vuex 4 
     + 使用modules管理不同的數據
-    + store.watch監聽mutation的更新
-+ vue router
+    + store.watch監聽state變化順便更新到資料庫
+    + store.subscribe監聽mutation的更新
++ vue router 4
     + 路由導航
-+ imgur api
-+ localstorage
-+ firestore
-+ firebase auth
-+ bootstrap 5
-+ scss
++ 套件
+    + secure LS (localstorage加密)
+    + prismjs (程式碼高亮顯示)
+    + bootstrap 5.0
+    + font awesome 5.0
+    + scss
+    + eslint (使用airbnb風格)
+    + firebase
+        + Authentication
+        + firestore
++ 使用到的api
+    + LinkPreview API
+    + imgur api
 
 ## 功能說明
 
@@ -89,7 +105,11 @@
 
 ### 增加順序列表、無序列表
 
-> 當前輸入塊為順序或無序列表時，按下Enter鍵可以新增同樣的block
+> 當前輸入塊為順序或無序列表時，按下Enter鍵可以新增同樣種類的block
+
+> 後續更新 :
+> 按下tab或者shift+tab可以往前或往後縮排(列表開頭第一個不行)
+
 
 ![](https://i.imgur.com/4SJbANS.gif)
 
@@ -102,6 +122,14 @@
 
 ![](https://i.imgur.com/Fv4dJqQ.gif)
 
+### 增加連結預覽
+
+> 貼上連結即可產生網址預覽
+> 點擊預覽框會進入該網站(自動進入tab分頁)
+> 補充 : 可能會有某些網站不支援
+
+![](https://i.imgur.com/AxCd3dd.gif)
+
 ### 增加核取框、分割線、引言
 
 > 當前輸入塊為核取框時，按下Enter鍵可以新增同樣的block
@@ -109,6 +137,30 @@
 > 補充 : 只要是可輸入文字的block，按下shift + Enter都可在同block內換行
 
 ![](https://i.imgur.com/KgBVSWI.gif)
+
+## 新增block的快捷鍵
+
+![](https://i.imgur.com/nmmnoQ3.gif)
+
+當光標在文字類型的block上時，可以輸入以下對應的快捷鍵並按下Enter，轉換成對應類型的block
+
+| 快捷鍵        | 作用   | 
+| --------   | -----:  | 
+| /h1      | 轉換成大標題  | 
+| /h2       | 轉換成中標題  | 
+| /h3        | 轉換成小標題 | 
+| /vid      | 轉換成影片類型  | 
+| /img      | 轉換成圖片類型  | 
+| /p       | 轉換成一般文字片段 | 
+| /pag      | 轉換成內嵌頁面 | 
+| /num       | 轉換成順序列表  | 
+| /bul        | 轉換成無序列表 | 
+| /todo      | 轉換成核取框  | 
+| /div      | 轉換成分割線  | 
+| /code      | 轉換成程式碼區塊 | 
+| /quo     | 轉換成引言 | 
+| /link      | 轉換成連結預覽  | 
+
 
 ## **block操作**
 
@@ -166,3 +218,22 @@
 
 ## **顯示或隱藏左側sidebar**
 ![](https://i.imgur.com/zXQ2Tuu.gif)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
