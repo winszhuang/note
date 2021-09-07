@@ -2,21 +2,30 @@
   <div class="all">
     <Sidebar/>
     <Workspace/>
-    <ResetButton/>
+
+    <!--以下為測試工具-->
+    <!-- <ResetButton/>
+    <PrintPage/> -->
   </div>
 </template>
 
 <script>
-import ResetButton from '../testTool/ResetButton.vue';
 import Sidebar from './sidebar/Sidebar.vue';
 import Workspace from './workspace/Workspace.vue';
+
+// 測試工具
+// import ResetButton from '../testTool/ResetButton.vue';
+// import PrintPage from '../testTool/PrintPage.vue';
 
 export default {
   name: 'Home',
   components: {
     Sidebar,
     Workspace,
-    ResetButton,
+
+    // 測試工具
+    // ResetButton,
+    // PrintPage,
   },
 };
 </script>

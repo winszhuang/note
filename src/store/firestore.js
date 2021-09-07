@@ -22,6 +22,17 @@ export const getUserDataByEmailFromFS = async (email) => new Promise((resolve, r
     });
 });
 
+export const isUserDataInFS = async (user) => {
+  try {
+    const result = await getUserDataByEmailFromFS(user.email);
+    if (result) return true;
+    return false;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 export const queryEmailFromFS = async (email) => new Promise((resolve, reject) => {
   console.log(email);
   db.collection('users')

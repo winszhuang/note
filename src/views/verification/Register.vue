@@ -59,6 +59,7 @@ import { useRouter } from 'vue-router';
 import userVerifyEffect from './userVerifyEffect';
 import { signUp } from '../../store/firebaseAuth';
 import { setUserDataToFS } from '../../store/firestore';
+import firstPageData from '../workspace/firstPageData';
 // import { auth } from '../../store/firebase';
 
 export default {
@@ -95,8 +96,8 @@ export default {
             name: userInput.name,
             recentPageIds: [],
           },
-          pages: [],
-          blocks: [],
+          pages: [firstPageData.page],
+          blocks: firstPageData.blocks,
         });
         console.log(result);
         console.log('註冊成功');

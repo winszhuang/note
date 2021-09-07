@@ -7,7 +7,12 @@ import SecureLS from 'secure-ls';
 import { useRouter, useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import { checkAuthState } from './store/firebaseAuth';
-import { getUserDataByEmailFromFS, updateStoreToFS } from './store/firestore';
+import firstPageData from './views/workspace/firstPageData';
+import {
+  setUserDataToFS,
+  updateStoreToFS,
+  getUserDataByEmailFromFS,
+} from './store/firestore';
 
 export default {
   name: 'App',
@@ -24,6 +29,12 @@ export default {
       }
     };
 
+    const setUserDataToLS = (data) => {
+      Object.keys(data).forEach((key) => {
+        ls.set(key, data[key]);
+      });
+    };
+
     const setUserDataToStore = (data) => {
       Object.keys(data).forEach((key) => {
         const value = data[key] || [];
@@ -31,12 +42,6 @@ export default {
           data: value,
           name: key,
         });
-      });
-    };
-
-    const setUserDataToLS = (data) => {
-      Object.keys(data).forEach((key) => {
-        ls.set(key, data[key]);
       });
     };
 
@@ -58,6 +63,25 @@ export default {
     };
 
     const signinProcedure = async (user) => {
+      const isUserExist = await isUserDataInFS(user);
+      if (!isUserExist) {
+        const initUserData = {
+          userInfo: {
+            email: user.email,
+            headshot: user.photoURL,
+            name: user.displayName,
+            recentPageIds: [],
+          },
+          pages: [firstPageData.page],
+          blocks: firstPageData.blocks,
+        };
+        await setUserDataToFS(initUserData);
+        setUserDataToLS(initUserData);
+        setUserDataToStore(initUserData);
+        routeToFrontPage();
+        return;
+      }
+
       if (isUserDataInLS(user)) {
         setUserDataToStore({
           pages: ls.get('pages'),
@@ -68,16 +92,10 @@ export default {
         return;
       }
 
-      if (isUserDataInFS(user)) {
-        const result = await getUserDataByEmailFromFS(user.email);
-        setUserDataToStore(result);
-        setUserDataToLS(result);
-        routeToFrontPage();
-        return;
-      }
-
-      console.log('資料庫沒有資料，請重新註冊');
-      router.push('/register');
+      const result = await getUserDataByEmailFromFS(user.email);
+      setUserDataToLS(result);
+      setUserDataToStore(result);
+      routeToFrontPage();
     };
 
     const signoutProcedure = async () => {

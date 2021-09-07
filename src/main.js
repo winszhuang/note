@@ -1,7 +1,11 @@
 import { createApp } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faGooglePlusSquare, faFacebookSquare, faTwitterSquare } from '@fortawesome/free-brands-svg-icons';
+import {
+  faGooglePlusSquare,
+  faFacebookSquare,
+  faTwitterSquare,
+} from '@fortawesome/free-brands-svg-icons';
 import {
   faPlusSquare,
   faFile,
