@@ -59,7 +59,6 @@ export default {
   padding: 1.5rem .5rem 1.5rem 2rem;
   margin-bottom: 5rem;
   z-index: 7;
-  // box-shadow: 0 0 1.5px 0 #707070;
   background-color: rgb(253, 252, 251);
 }
 

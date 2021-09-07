@@ -106,7 +106,6 @@ const commonUpdateEffect = () => {
   };
 
   const deleteInput = (e, block) => {
-    // console.log(e);
     if (e.target.innerText === '' && e.keyCode === 8) {
       deleteBlockAndDependByPressBackspace(block);
     }
@@ -193,7 +192,6 @@ const commonUpdateEffect = () => {
 
   const replaceBlock = (block, type) => {
     const newBlock = new BlockFactory(type);
-    console.log(newBlock);
 
     if (type === 'page') {
       const innerPageId = generateRandomString();
@@ -264,7 +262,6 @@ const commonUpdateEffect = () => {
   };
 
   const goCurrentPage = (id) => {
-    // console.log(id);
     store.commit('pages/setCurrentPageId', id);
   };
 

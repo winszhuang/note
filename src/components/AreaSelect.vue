@@ -1,9 +1,4 @@
 <template>
-  <!-- <div class="test">
-    {{ currentSelectedIds }}
-    <br>
-    {{ selectedBlocksIds }}
-  </div> -->
   <div id="area-select"
     :style="{
       left: `${selector.left}px`,
@@ -17,7 +12,6 @@ import { watch, computed } from 'vue';
 import { useStore } from 'vuex';
 import { commonCollisionEffect } from './commonEffect';
 import useAreaSelectEffect from './areaSelectEffect';
-// import commonDomEffect from './commonDomEffect';
 
 export default {
   name: 'AreaSelect',
@@ -42,7 +36,6 @@ export default {
     }, { deep: true });
 
     watch(isAreaSelectActive, (curr) => {
-      // console.log(curr);
       store.commit('setIframeActive', !curr);
     });
 
@@ -71,8 +64,6 @@ export default {
   position: fixed;
   left: 0;
   top: 0;
-  // width: 100%;
-  // height: 100%;
   background: rgb(71, 71, 71);
   z-index: 3;
   opacity: .2;

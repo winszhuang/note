@@ -1,5 +1,4 @@
 import { reactive, ref } from 'vue';
-// import { useStore } from 'vuex';
 
 const useAreaSelectEffect = (AllIds, isBoxACollisionB) => {
   const isAreaSelectActive = ref(false);
@@ -36,8 +35,6 @@ const useAreaSelectEffect = (AllIds, isBoxACollisionB) => {
       return;
     }
 
-    // e.preventDefault();
-
     isAreaSelectActive.value = true;
     position.x1 = e.clientX;
     position.y1 = e.clientY;
@@ -59,8 +56,6 @@ const useAreaSelectEffect = (AllIds, isBoxACollisionB) => {
     const width = Math.abs(position.x2 - position.x1);
     const height = Math.abs(position.y2 - position.y1);
 
-    // console.log(left, top, width, height);
-
     setSelector(left, top, width, height);
 
     const selectorBox = {
@@ -75,7 +70,6 @@ const useAreaSelectEffect = (AllIds, isBoxACollisionB) => {
       const blockEl = document.querySelector(`[data-block-id="${id}"]`);
       const blockBounding = blockEl.getBoundingClientRect();
       if (isBoxACollisionB(selectorBox, blockBounding)) {
-        // console.log(`框到id是${id}了`);
         if (currentSelectedIds.includes(id)) return;
         currentSelectedIds.push(id);
       } else {
@@ -84,11 +78,6 @@ const useAreaSelectEffect = (AllIds, isBoxACollisionB) => {
         currentSelectedIds.splice(index, 1);
       }
     });
-    // console.log(currentSelectedIds);
-
-    // if (box.value.width !== 0 || box.value.height !== 0) {
-    //   e.preventDefault(); // 避免框到有input區域會反藍色
-    // }
   };
 
   const mouseUp = () => {

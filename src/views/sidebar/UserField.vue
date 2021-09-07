@@ -2,7 +2,6 @@
   <div class="topfield">
     <div :class="{ userfield: true, 'p-0': isSidebarCollapse }" type="button"
         @click="linkToUserInfo">
-        <!-- :style="{ padding: isSidebarCollapse ? '0' :  }" -->
       <div class="userfield-icon">
         <div :style="{ 'background-image': `url(${headshotURL});` }">C</div>
       </div>
@@ -30,7 +29,6 @@
       </template>
     </NinjaButton>
   </div>
-  <!-- {{ userInfo }} -->
 </template>
 
 <script>
@@ -57,7 +55,6 @@ export default {
 
     const headshotURL = computed(() => {
       if (userInfo.value.headshot) {
-        console.log(userInfo.value.headshot);
         return `${userInfo.value.headshot}`;
       }
       return 'https://image.flaticon.com/icons/png/512/3135/3135715.png';
@@ -142,8 +139,6 @@ export default {
       transform: scale(.8);
       transform-origin: left;
       color: #8b8b8b;
-      // text-decoration: underline;
-      // text-decoration-color: #b8b8b8;
     }
   }
   &:hover{

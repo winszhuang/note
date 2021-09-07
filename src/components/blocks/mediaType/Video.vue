@@ -4,12 +4,6 @@
       :placeholder="'請貼上影片(youtube)網址'"
       @keydown.stop="(e) => deleteInput(e, block)"
       @input="(e) => checkURL(e, block)"/>
-  <!-- <input type="text"
-        placeholder="請貼上影片(youtube)網址"
-        class="media-input"
-        v-show="block.content.url === ''"
-        @keydown="deleteInput($event, block)"
-        @input="checkURL($event, block)"> -->
   <ScaleController v-if="block.content.url !== ''"
         :id="block.id + 'scale'"
         :min-width="200"
@@ -29,8 +23,6 @@
 </template>
 
 <script>
-// import { ref } from 'vue';
-// import { useStore } from 'vuex';
 import { computed } from 'vue';
 import { useStore } from 'vuex';
 import ScaleController from '../../ScaleController.vue';
@@ -68,12 +60,10 @@ export default {
     ];
 
     const checkURL = (e, block) => {
-      // console.log(e.target.innerText);
       const originalUrl = e.target.innerText;
 
       for (let i = 0; i < includeStrings.length; i += 1) {
         if (originalUrl.includes(includeStrings[i])) {
-          console.log('有包含喔');
           const videoId = originalUrl.split(includeStrings[i])[1].slice(0, 11);
           editBlockData(block.id, {
             url: `https://www.youtube-nocookie.com/embed/${videoId}`,

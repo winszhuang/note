@@ -23,7 +23,6 @@
 import Prism from 'prismjs';
 import '../../style/prism.css';
 import {
-  // computed,
   nextTick,
   onMounted,
   ref,
@@ -113,23 +112,6 @@ export default {
       });
     });
 
-    const languages = [
-      'Javascript',
-      'Css',
-      'Sass',
-      'Scss',
-      'SQL',
-      'C-like',
-      'HTML',
-      'Arduino',
-      'C',
-      'C#',
-      'C++',
-      'Java',
-      'Kotlin',
-      'Python',
-    ];
-
     return {
       placeholderInfo,
       scrollLeft,
@@ -138,11 +120,9 @@ export default {
       tabAction,
       pasteAction,
       handlePaste,
-      languages,
       codeText,
       editCodeText,
       setFocusBlock,
-      // handleCodeEditInKeyDown,
     };
   },
 };
@@ -172,7 +152,6 @@ $code-font: 'Courier New', Courier, monospace;
   caret-color: black;
 
   overflow: auto;
-  // top: 200px !important;
 }
 
 #code-editor {
@@ -191,7 +170,6 @@ $code-font: 'Courier New', Courier, monospace;
 
   font-size: 1rem;
   line-height: 1.5rem;
-  // letter-spacing: .1rem;
 
   position: absolute;
   top: 0;

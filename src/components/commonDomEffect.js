@@ -5,21 +5,17 @@ const commonDomEffect = () => {
     let selectors = '';
     arr.forEach((id, key, array) => {
       selectors += `#${id}${key === array.length - 1 ? '' : ', '}`;
-      console.log(selectors);
     });
-    console.log(selectors);
     return document.querySelectorAll(selectors);
   };
 
   const getElementBySelector = (selector) => {
     let element = '';
     if (selector.charAt(0) === '.') {
-      console.log('是class');
       // eslint-disable-next-line prefer-destructuring
       element = document.getElementsByClassName(selector.slice(1))[0];
     }
     if (selector.charAt(0) === '#') {
-      console.log('是id');
       element = document.getElementById(selector.slice(1));
     }
     return element;
@@ -36,8 +32,6 @@ const commonDomEffect = () => {
     }
 
     if (blob !== null) {
-      console.log(blob);
-      console.log(blob.size);
       const reader = new FileReader();
       reader.onload = (e) => {
         resolve(e.target.result);
@@ -51,7 +45,6 @@ const commonDomEffect = () => {
 
   const getBlobByClipBoardData = async (ev) => new Promise((resolve, reject) => {
     const { items } = ev.clipboardData || ev.originalEvent.clipboardData;
-    console.log(items);
     // find pasted image among pasted items
     let blob = null;
     for (let i = 0; i < items.length; i += 1) {
@@ -61,8 +54,6 @@ const commonDomEffect = () => {
     }
 
     if (blob !== null) {
-      console.log(blob);
-      console.log(blob.size);
       resolve(blob);
     }
     reject();
@@ -111,12 +102,6 @@ const commonDomEffect = () => {
       isTrigger = false;
       callback(mouseOffset);
     };
-
-    // for (let i = 0; i < elements.length; i += 1) {
-    //   elements[i].addEventListener('mousedown', (e) => mouseDown(e, mouseDownThen));
-    // }
-    // document.addEventListener('mousemove', (e) => mouseMove(e, mouseMoveThen));
-    // document.addEventListener('mouseup', (e) => mouseUp(e, mouseUpThen));
 
     return {
       mouseDown,
@@ -172,11 +157,7 @@ const commonDomEffect = () => {
       };
     };
     return { domObject };
-    // const catchObject = domObject();
-    // const targetObjetc = domObject();
   };
-
-  // const
 
   return {
     getElementsByIdsInArr,

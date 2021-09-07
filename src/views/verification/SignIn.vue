@@ -3,7 +3,6 @@
     <form class="text-center">
       <div class="verify-title">登入</div>
       <div class="verify-subtitle">請輸入email以及密碼</div>
-      <!-- {{ isShowError }} -->
       <div :class="{ 'verify-input': true, 'error-border': errorMessage.email !== '' }">
         <input type="text" placeholder="user@gmail.com" autocomplete
             v-model="userInput.email" spellcheck="false">
@@ -51,10 +50,8 @@
 </template>
 
 <script>
-// import { watchEffect } from 'vue';
 import userVerifyEffect from './userVerifyEffect';
 import { signIn } from '../../store/firebaseAuth';
-// import { auth } from '../../store/firebase';
 
 export default {
   name: 'SignIn',
@@ -72,8 +69,7 @@ export default {
 
     const checkAndSignIn = async () => {
       try {
-        const result = await signIn(userInput.email, userInput.password);
-        console.log(result);
+        await signIn(userInput.email, userInput.password);
       } catch (error) {
         if (error.code === 'auth/invalid-email') {
           errorMessage.email = '錯誤的email格式';

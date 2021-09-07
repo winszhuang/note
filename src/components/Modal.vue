@@ -19,9 +19,6 @@
           </slot>
         </div>
       </div>
-      <!-- <div class="modal-wrapper">
-
-      </div> -->
     </div>
 </template>
 
@@ -58,7 +55,6 @@ export default {
 .modal-container {
   margin: 0px auto;
   margin-top: 10rem;
-  // width: 500px;
   transition: all 0.3s ease;
   font-family: Helvetica, Arial, sans-serif;
 }

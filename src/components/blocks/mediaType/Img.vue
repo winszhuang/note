@@ -30,7 +30,7 @@ const imgurClientId = '794a032c7e8e6f4';
 export default {
   name: 'Img',
   props: ['block'],
-  components: { ScaleController, ContentEditable }, // ContentEditable
+  components: { ScaleController, ContentEditable },
   setup(props) {
     const {
       editBlockData,
@@ -65,8 +65,6 @@ export default {
       }).then((data) => data.text())
         .then((result) => {
           const data = JSON.parse(result);
-          console.log(data);
-          console.log(data.data.link);
           resolve(data.data.link);
         })
         .catch((err) => reject(err));
@@ -85,16 +83,13 @@ export default {
 
       try {
         const blob = await getBlobByClipBoardData(e);
-        console.log(blob);
         const url = await uploadImageFileToImgur(blob);
-        console.log(url);
 
         editBlockData(props.block.id, {
           url,
           compressionWidth: 0,
         }, 'content');
         handleShow(true);
-        console.log('finish');
       } catch (error) {
         console.log(error);
       }

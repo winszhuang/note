@@ -42,7 +42,6 @@ export const loginBySocialThen = async (social) => {
   });
 
   const provider = brand()[social]();
-  // console.log(provider);
 
   return new Promise((resolve, reject) => {
     auth.signInWithPopup(provider)

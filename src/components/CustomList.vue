@@ -51,7 +51,7 @@
 
 <script>
 import {
-  toRefs, computed, ref, // onMounted
+  toRefs, computed, ref,
 } from 'vue';
 import { useStore } from 'vuex';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';

@@ -60,7 +60,6 @@ import userVerifyEffect from './userVerifyEffect';
 import { signUp } from '../../store/firebaseAuth';
 import { setUserDataToFS } from '../../store/firestore';
 import firstPageData from '../workspace/firstPageData';
-// import { auth } from '../../store/firebase';
 
 export default {
   name: 'Register',
@@ -88,7 +87,7 @@ export default {
         errorMessage.password = '請輸入密碼';
       }
       try {
-        const result = await signUp(userInput.email, userInput.password);
+        await signUp(userInput.email, userInput.password);
         await setUserDataToFS({
           userInfo: {
             email: userInput.email,
@@ -99,7 +98,6 @@ export default {
           pages: [firstPageData.page],
           blocks: firstPageData.blocks,
         });
-        console.log(result);
         console.log('註冊成功');
         router.push('/signin');
       } catch (error) {

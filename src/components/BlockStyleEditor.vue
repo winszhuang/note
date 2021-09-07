@@ -166,7 +166,6 @@ export default {
       }
 
       selectedBlocks.value.forEach((block) => {
-        // console.log(`${curr.style}__${curr.color}`);
         setClassNameToBlock(block, `${curr.style}__${curr.color}`);
       });
     }, { deep: true });
@@ -216,7 +215,6 @@ export default {
     font-weight: 500;
   }
   &-content {
-    // padding: .5rem 1rem;
     border: .01rem solid #6b6b6b;
     margin-bottom: 2rem;
   }

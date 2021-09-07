@@ -29,13 +29,10 @@
 <script>
 import {
   computed,
-  // nextTick,
   onMounted,
   ref,
 } from 'vue';
 import { showEffect } from './commonEffect';
-// import { useStore } from 'vuex';
-// import commonUpdateEffect from '../views/commonUpdataEffect';
 
 export default {
   name: 'ScaleController',
@@ -48,14 +45,11 @@ export default {
   ],
   emits: ['getCompressionWidth'],
   setup(props, { emit }) {
-    // const store = useStore();
-    // const
     let prevWidth = 0;
     const offsetX = ref('');
     const width = ref(0);
     const isActive = ref('false');
     const { isShow, handleShow } = showEffect();
-    // const scaleobject = ref(null);
 
     const getHeight = computed(() => {
       if (!props.aspectRatio) return 'auto';
@@ -66,19 +60,15 @@ export default {
       const containerBounding = container.getBoundingClientRect();
       const aspectRatio = props.aspectRatio[0] / props.aspectRatio[1];
       const height = `${(containerBounding.width - width.value * 2) / aspectRatio}px`;
-      console.log(height);
       return height;
     });
 
     const emitCompressionWidth = () => {
-      // console.log(width.value);
       emit('getCompressionWidth', width.value);
     };
 
     onMounted(() => {
       const scaleobject = document.getElementById(props.id);
-      // console.log(scaleobject);
-      console.log(props.onceCompressionWidth);
       prevWidth = props.onceCompressionWidth;
       width.value = props.onceCompressionWidth;
       isActive.value = false;
@@ -86,8 +76,6 @@ export default {
       let rightX = 0;
       let leftX = 0;
       let leftOrRightHandle = '';
-
-      // const scaleobject = document.getElementById(props.id);
 
       const mouseMoveLeft = (e) => {
         if (isActive.value === false) return;
@@ -123,7 +111,6 @@ export default {
       };
 
       const mouseDownLeft = (e) => {
-        // e.stopPropagation();
         e.preventDefault();
         isActive.value = true;
         offsetX.value = 0;
@@ -132,7 +119,6 @@ export default {
       };
 
       const mouseDownRight = (e) => {
-        // e.stopPropagation();
         e.preventDefault();
         isActive.value = true;
         offsetX.value = 0;

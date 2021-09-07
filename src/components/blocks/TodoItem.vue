@@ -20,8 +20,6 @@ export default {
     const { editBlockData } = commonUpdateEffect();
 
     const setTodoItemData = (e, block) => {
-      console.log(e);
-      // console.log(e.target.checked);
       editBlockData(block.id, {
         text: block.content.text,
         html: block.content.html,

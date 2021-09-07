@@ -27,56 +27,6 @@
                   @dragover="handleBeforeDrop"/>
           </template>
         </div>
-        <!-- <hr>
-        <div v-if="currentPage">
-          <div>currentPage: </div>
-          <ul>
-            <li style="width: 400px; overflow: hidden; text-overflow: ellipsis;">
-              name ------ {{ currentPage.name }}</li>
-            <li>id ------ {{ currentPage.id }}</li>
-            <li>parentId ------ {{ currentPage.parentId }}</li>
-            <li>blocks ------ {{ currentPage.blocks }}</li>
-            <hr>
-          </ul>
-          <hr>
-          <div>currentFocusBlockId: {{ currentFocusBlockId }}</div>
-          <hr>
-          <div>clipboardBlocksIds: {{ clipboardBlocksIds }}</div>
-          <hr>
-          <div>selectedBlocksIds: {{ selectedBlocksIds }}</div>
-          <hr>
-          <div v-if="currentFocusBlock">
-            <div>currentFocusBlock: </div>
-            <ul>
-              <li style="width: 400px; overflow: hidden; text-overflow: ellipsis;">
-                content ------ {{ currentFocusBlock.content }}</li>
-              <li>type ------ {{ currentFocusBlock.type }}</li>
-              <li>id ------ {{ currentFocusBlock.id }}</li>
-              <li>parentId ------ {{ currentFocusBlock.parentId }}</li>
-              <li>blocks ------ {{ currentFocusBlock.blocks }}</li>
-              <li>check ------ {{ currentFocusBlock.check }}</li>
-              <hr>
-            </ul>
-          </div>
-        </div>
-        <hr>
-        <div>currentBlocks: </div>
-        <div v-if="currentBlocks.length">
-          <div
-            v-for="block in currentBlocks"
-            :key="block.id">
-            <ul>
-              <li style="width: 400px; overflow: hidden; text-overflow: ellipsis;">
-                content ------ {{ block.content }}</li>
-              <li>className ------ {{ block.className }}</li>
-              <li>type ------ {{ block.type }}</li>
-              <li>id ------ {{ block.id }}</li>
-              <li>parentId ------ {{ block.parentId }}</li>
-              <li>blocks ------ {{ block.blocks }}</li>
-              <hr>
-            </ul>
-          </div>
-        </div> -->
       </div>
     </div>
     <FrontPage v-else/>
@@ -123,7 +73,6 @@ const useKeyDownEffectWithBlocks = () => {
     const setClipboardText = (text) => navigator.clipboard.writeText(text);
 
     if (e.ctrlKey && e.key === 'c') {
-      console.log(hasSelectedBlocks());
       if (hasSelectedBlocks()) {
         setClipboardText('');
         e.preventDefault();
@@ -324,7 +273,7 @@ export default {
     const isBlockSelected = (id) => computed(() => store.getters['blocks/isBlockSelected'](id)).value;
 
     const {
-      currentFocusBlockId, hiddenBlocksIds, // pages, blocks,
+      currentFocusBlockId, hiddenBlocksIds,
     } = toRefs(store.state.blocks);
 
     const {
@@ -461,7 +410,6 @@ export default {
   height: 100vh;
   overflow-y: auto;
   background: rgb(253, 252, 251);
-  // background: rgb(250, 248, 247);
 }
 
 .workspace{
@@ -489,9 +437,6 @@ export default {
   }
 
   transition: padding .3s ease-out;
-  // @media (min-width:1200px){
-  //   padding: 0 27%;
-  // }
 }
 .blockcontent{
   box-sizing: border-box;
@@ -521,7 +466,6 @@ export default {
     width: 2rem;
     height: .3rem;
     background: $web-orange;
-    // background: #F3C87A;
   }
 }
 

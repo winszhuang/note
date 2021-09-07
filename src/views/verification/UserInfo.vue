@@ -63,7 +63,6 @@ export default {
   &-content{
     font-size: 2.5rem;
     color: #F1F0EA;
-    // margin-bottom: .4rem;
   }
   &-back{
     color: #b6b6b6;

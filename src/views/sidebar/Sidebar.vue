@@ -30,9 +30,6 @@
         </div>
       </div>
       <div class="scollitem">
-        <!-- <div v-if="currentPage">
-          {{ currentPage.blocks }}
-        </div> -->
         <div class="field-title">頁面 :</div>
         <div class="customlist-group">
           <CustomList
@@ -57,7 +54,6 @@
               <font-awesome-icon
                   :icon="[transStyleToFAPrefix(item.style),
                     item.icon || 'heading']" :size="item.size || 'xs'"/>
-              <!-- {{ item.type }} -->
             </div>
             <div class="customlist-item-6 block-name">{{ item.name }}</div>
           </div>
@@ -74,7 +70,7 @@
 <script>
 import { useStore } from 'vuex';
 import {
-  toRefs, computed, onMounted, watch, ref, // reactive watch
+  toRefs, computed, onMounted, watch, ref,
 } from 'vue';
 import UserField from './UserField.vue';
 import CustomList from '../../components/CustomList.vue';

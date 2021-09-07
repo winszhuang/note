@@ -41,7 +41,6 @@
               </div>
             </div>
             <div class="search-content" v-html="getContentWithKeyword(block.content?.text)"></div>
-            <!-- {{ block.content }} -->
           </div>
         </div>
       </template>
@@ -185,11 +184,7 @@ $search-border-bottom: .05rem solid rgb(212, 212, 212);
     @include icon;
     color: rgb(167, 167, 167);
   }
-  // &-divide{
-  //   height: .05rem;
-  //   width: 100;
-  //   background: rgb(206, 48, 48);
-  // }
+
   &-item{
     margin: 0 -1.5rem 0 -1.5rem;
     padding: .7rem 1.5rem;

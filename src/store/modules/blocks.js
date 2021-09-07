@@ -219,7 +219,6 @@ export default {
           html: '',
         },
         blocks: [],
-        // group: '',
         parentId: '',
         className: 'style-text-color__default',
       },

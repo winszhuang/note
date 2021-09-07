@@ -17,7 +17,6 @@ export const getUserDataByEmailFromFS = async (email) => new Promise((resolve, r
       }
     })
     .catch((err) => {
-      console.log(err);
       reject(err);
     });
 });
@@ -34,7 +33,6 @@ export const isUserDataInFS = async (user) => {
 };
 
 export const queryEmailFromFS = async (email) => new Promise((resolve, reject) => {
-  console.log(email);
   db.collection('users')
     .where('email', '==', email)
     .get()
@@ -43,13 +41,11 @@ export const queryEmailFromFS = async (email) => new Promise((resolve, reject) =
         resolve(null);
       } else {
         querySnapshot.forEach((doc) => {
-          console.log(doc.data());
           resolve(doc.data());
         });
       }
     })
     .catch((err) => {
-      console.log(err);
       reject(err);
     });
 });
@@ -71,8 +67,6 @@ export const updateStoreToFS = async () => {
   const blocks = computed(() => store.state.blocks.blocks);
   const userInfo = computed(() => store.state.userInfo.userInfo);
 
-  console.log(userInfo.value);
-  console.log(pages.value);
   const info = {
     userInfo: userInfo.value,
     pages: pages.value,

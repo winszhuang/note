@@ -11,8 +11,6 @@
 </template>
 
 <script>
-// import { computed } from 'vue';
-// import { useStore } from 'vuex';
 import ContentEditable from './ContentEditable.vue';
 import commonUpdateEffect from '../../views/commonUpdataEffect';
 
@@ -48,7 +46,6 @@ export default {
       keydownAction,
       focusToBlock,
       pasteBlocksAction,
-      // unFocusToBlock,
     };
   },
 };

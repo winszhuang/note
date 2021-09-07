@@ -14,11 +14,9 @@
 </template>
 
 <script>
-// import { onMounted } from 'vue';
 import { computed, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import commonUpdateEffect from '../../views/commonUpdataEffect';
-// import commonUpdateEffect from '../../views/commonUpdataEffect';
 
 export default {
   name: 'P',

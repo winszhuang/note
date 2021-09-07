@@ -1,5 +1,4 @@
 <template>
-  <!-- 123 -->
   <div :class="className"
       type="button"
       @mouseenter="handleShow(true)"

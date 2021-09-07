@@ -1,7 +1,5 @@
-// import { computed } from 'vue';
 import SecureLS from 'secure-ls';
 import { useStore } from 'vuex';
-// import { setDataToLS } from './localStorageEffect';
 
 const watchStoreEffect = () => {
   const store = useStore();
@@ -9,7 +7,6 @@ const watchStoreEffect = () => {
 
   const updatePagesToLSByWatching = () => {
     store.watch((state) => state.pages.pages, (curr) => {
-      // setDataToLS('pages', curr);
       ls.set('pages', curr);
     }, { deep: true });
   };
@@ -17,7 +14,6 @@ const watchStoreEffect = () => {
   const updateBlocksToLSByWatching = () => {
     store.watch((state) => state.blocks.blocks, (curr) => {
       ls.set('blocks', curr);
-      // setDataToLS('blocks', curr);
     }, { deep: true });
   };
 

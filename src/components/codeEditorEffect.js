@@ -28,7 +28,7 @@ const generateTextAndWrapNodes = (text) => {
   } else {
     lineSplits = text.split('\n');
   }
-  // const lineSplits = text.split('\r\n');
+
   const newFragment = document.createDocumentFragment();
 
   const lastIndex = lineSplits.length - 1;
@@ -174,20 +174,16 @@ const codeEditorEffect = () => {
 
   const handlePaste = (e) => {
     addWhitespaceTextNodeIfNoNodes(e.currentTarget);
-    // console.log(e.currentTarget);
-    // console.log(e.currentTarget.childNodes);
 
     const text = e.clipboardData.getData('Text');
     if (!text) return;
     if (isSingleLine(text)) return;
 
     e.preventDefault();
-    // e.stopPropagation();
+
     nextTick(() => {
       const { focusNode } = window.getSelection();
       const newNodes = generateTextAndWrapNodes(text);
-      // console.log(newNodes.childNodes);
-      // console.log(focusNode); // 是這個問題
 
       if (focusNode === e.currentTarget) {
         e.currentTarget.appendChild(newNodes);
@@ -201,9 +197,6 @@ const codeEditorEffect = () => {
         insertAfter(wrapNode, focusNode);
         insertAfter(newNodes, wrapNode);
       }
-
-      console.log(e.currentTarget.childNodes);
-      console.log(e.currentTarget.innerText);
     });
   };
 

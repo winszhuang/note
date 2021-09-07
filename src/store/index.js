@@ -8,7 +8,6 @@ import { waitSecondAndCallBack } from '../components/commonEffect';
 const isWindowWidthLarge = () => window.innerWidth > 992;
 
 export default createStore({
-  // strict: true,
   state: {
     blocktype: [
       {

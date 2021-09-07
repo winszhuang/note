@@ -1,5 +1,4 @@
 <template>
-  <!-- {{ block.content.indent }} -->
   <div class="d-flex" :style="{ 'margin-left': `${block.content.indent*1.5}rem`}">
     <div class="prefix">
       <div class="bullet">⦁</div>

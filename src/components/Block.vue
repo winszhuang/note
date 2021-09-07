@@ -60,10 +60,8 @@ export default {
       isShow,
       handleShow,
       getFirstToUpper,
-      // handleLeave,
       getLevelOfBlock,
       getClassNameOfBlockType,
-      // setBlockBottom,
     };
   },
 };

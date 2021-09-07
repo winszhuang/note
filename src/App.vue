@@ -113,7 +113,6 @@ export default {
 
     checkAuthState((user) => {
       const isSignInOrOut = user ? 'signin' : 'signout';
-      // console.log(user ? '登入狀態喔' : '未登入狀態');
 
       const actions = {
         signin: () => signinProcedure(user),
